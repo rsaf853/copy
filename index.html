@@ -56,6 +56,13 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .grid.ordering .card img{-webkit-user-drag:none;pointer-events:none}
 .grid.ordering .card.drag{opacity:.35}
 .sps .sp.drag{opacity:.35}
+.rg{display:grid;grid-template-columns:repeat(auto-fill,128px);gap:10px}
+.rcard{display:block;border:1px solid var(--line);text-decoration:none;color:inherit;background:var(--bg,#fff)}
+.rcard:hover{border-color:var(--fg)}
+.rcard .ph{aspect-ratio:1/1;font-size:30px}
+.rcard .rm{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:7px 8px}
+.rcard b{font-size:12px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcard .rk{flex:none;max-width:60%;font-size:10px;font-weight:600;border:1px solid var(--line);padding:1px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pe{width:150px;aspect-ratio:3/4;border:1px solid var(--line);overflow:hidden;background:var(--soft);touch-action:none;cursor:grab;margin-top:6px}
 .pe img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
 .pe:active{cursor:grabbing}
@@ -258,7 +265,7 @@ function pageChar(id){
   ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal${admin ? ' adm' : ''}">${c.gallery.map(u => { const gp = okPos((c.gallery_pos || {})[u]); return `<div data-act="zoom" data-src="${esc(u)}" data-gu="${esc(u)}" data-gid="${c.id}">${img(u,'',gp)}</div>`; }).join('')}</div>` : ''}
   ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2>${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}` : ''}
   ${(c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
-  ${rcs ? `<h2>RELATED CHARACTERS · ${relOf(c).filter(o => CH.some(x => x.id===o.id)).length}</h2><div class="grid">${rcs}</div>` : ''}
+  ${rcs ? `<h2>RELATED CHARACTERS · ${relOf(c).filter(o => CH.some(x => x.id===o.id)).length}</h2><div class="rg">${rcs}</div>` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
   const sp = $('#sps');
   if(sp && admin && window.Sortable && (c.subs || []).length > 1) Sortable.create(sp, { animation:150, draggable:'.sp', ghostClass:'drag', delay:200, touchStartThreshold:5, filter:'.btn', preventOnFilter:false,
@@ -411,38 +418,46 @@ const nz = v => String(v || '50% 50%').split(' ').map(x => (parseFloat(x) || 0).
 const relOf = c => [...(c.related || []), ...CH.filter(t => t.id !== c.id && (t.related || []).some(o => o.id === c.id) && !(c.related || []).some(o => o.id === t.id)).map(t => ({ id: t.id }))];
 const relCards = c => relOf(c).map(o => { const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
-  return `<a class="card" href="#/c/${t.id}"><div class="ph">${src ? img(src, t.name, pos) : initial(t.name)}</div><div class="meta"><b>${esc(t.name)}</b></div></a>`; }).join('');
+  return `<a class="rcard" href="#/c/${t.id}"><div class="ph">${src ? img(src, t.name, pos) : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">${esc(o.k)}</span>` : ''}</div></a>`; }).join('');
 const relRow = (o, t) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%';
-  return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"><label style="display:flex;gap:6px;align-items:center;margin:8px 0 0;font-weight:700"><input type="checkbox" class="rc" style="width:auto" ${o ? 'checked' : ''}> ${esc(t.name)}</label>
-  <div class="rb" ${o ? '' : 'hidden'} style="margin:4px 0 0 22px"><div class="pe" style="width:90px">${src ? `<img src="${esc(src)}" alt="" style="object-position:${esc(pos)}">` : ''}</div>
+  return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"><div style="display:flex;align-items:center;gap:6px;border:1px solid var(--line);padding:4px 6px;margin-top:6px"><b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</b><input class="rk" placeholder="관계 (친구…)" value="${esc((o && o.k) || '')}" style="width:96px;flex:none;padding:3px 6px"><button class="btn rt" type="button">썸네일</button><button class="btn rd" type="button">✕</button></div>
+  <div class="rb" hidden style="margin:6px 0 0 4px"><div class="pe" style="width:90px">${src ? `<img src="${esc(src)}" alt="" style="object-position:${esc(pos)}">` : ''}</div>
   <input type="file" class="rf" accept="image/*" style="margin-top:6px"><input type="hidden" class="ri" value="${esc((o && o.img) || '')}"><input type="hidden" class="rp" value="${esc(pos)}">
   ${o && o.img ? '<label style="margin:4px 0 0;font-weight:500"><input type="checkbox" class="rx" style="width:auto"> 올린 썸네일 삭제 (대표 사진으로 되돌리기)</label>' : ''}</div></div>`; };
-function bindRel(){
-  document.querySelectorAll('.rr').forEach(r => {
-    const cb = r.querySelector('.rc'), rb = r.querySelector('.rb'), box = r.querySelector('.pe'), file = r.querySelector('.rf'), hid = r.querySelector('.rp');
-    let im = box.querySelector('img'); if(!im){ im = document.createElement('img'); im.alt = ''; box.appendChild(im); }
-    let pos = String(hid.value).split(' ').map(parseFloat); if(pos.length < 2 || pos.some(isNaN)) pos = [50, 50];
-    const apply = () => { im.style.objectPosition = `${pos[0]}% ${pos[1]}%`; hid.value = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; };
-    cb.onchange = () => { rb.hidden = !cb.checked; };
-    file.addEventListener('change', () => { const f = file.files[0]; if(f){ im.src = URL.createObjectURL(f); pos = [50, 50]; apply(); } });
-    let d = null;
-    box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
-    box.addEventListener('pointermove', e => {
-      if(!d || !im.naturalWidth) return;
-      const b = box.getBoundingClientRect(), sc = Math.max(b.width / im.naturalWidth, b.height / im.naturalHeight);
-      const ox = im.naturalWidth * sc - b.width, oy = im.naturalHeight * sc - b.height, cl = v => Math.max(0, Math.min(100, v));
-      if(ox > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / ox * 100);
-      if(oy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / oy * 100);
-      apply(); dirty = true;
-    });
-    const end = () => { d = null; };
-    box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+function relSel(){
+  const sel = $('#radd'), have = [...document.querySelectorAll('#rels .rr')].map(r => +r.dataset.id), me = +(sel.dataset.me || 0);
+  sel.innerHTML = '<option value="">+ 관련 캐릭터 추가…</option>' + sortCh().filter(t => t.id !== me && !have.includes(t.id)).map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
+}
+function bindRow(r){
+  const rb = r.querySelector('.rb'), box = r.querySelector('.pe'), file = r.querySelector('.rf'), hid = r.querySelector('.rp');
+  let im = box.querySelector('img'); if(!im){ im = document.createElement('img'); im.alt = ''; box.appendChild(im); }
+  let pos = String(hid.value).split(' ').map(parseFloat); if(pos.length < 2 || pos.some(isNaN)) pos = [50, 50];
+  const apply = () => { im.style.objectPosition = `${pos[0]}% ${pos[1]}%`; hid.value = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; };
+  r.querySelector('.rt').onclick = () => { rb.hidden = !rb.hidden; };
+  r.querySelector('.rd').onclick = () => { r.remove(); relSel(); };
+  file.addEventListener('change', () => { const f = file.files[0]; if(f){ im.src = URL.createObjectURL(f); pos = [50, 50]; apply(); } });
+  let d = null;
+  box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
+  box.addEventListener('pointermove', e => {
+    if(!d || !im.naturalWidth) return;
+    const bb = box.getBoundingClientRect(), sc = Math.max(bb.width / im.naturalWidth, bb.height / im.naturalHeight);
+    const ox = im.naturalWidth * sc - bb.width, oy = im.naturalHeight * sc - bb.height, cl = v => Math.max(0, Math.min(100, v));
+    if(ox > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / ox * 100);
+    if(oy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / oy * 100);
+    apply(); dirty = true;
   });
+  const end = () => { d = null; };
+  box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+}
+function bindRel(){
+  document.querySelectorAll('#rels .rr').forEach(bindRow); relSel();
+  $('#radd').onchange = e => { const t = CH.find(x => x.id === +e.target.value); if(!t) return;
+    $('#rels').insertAdjacentHTML('beforeend', relRow(null, t)); bindRow($('#rels').lastElementChild); const rb = $('#rels').lastElementChild.querySelector('.rb'); rb.hidden = true; relSel(); };
 }
 async function readRel(){
-  const rows = [...document.querySelectorAll('.rr')].filter(r => r.querySelector('.rc').checked), out = [];
+  const rows = [...document.querySelectorAll('#rels .rr')], out = [];
   for(let i = 0; i < rows.length; i++){
-    const r = rows[i], o = { id: +r.dataset.id }; let im = r.querySelector('.ri').value;
+    const r = rows[i], o = { id: +r.dataset.id }; let im = r.querySelector('.ri').value; const kw = r.querySelector('.rk').value.trim(); if(kw) o.k = kw;
     const rx = r.querySelector('.rx'); if(rx && rx.checked) im = '';
     const f = r.querySelector('.rf').files[0]; if(f && f.size){ st(`관련 캐릭터 썸네일 업로드 중… ${i+1}/${rows.length}`); im = await upload(f, 'characters'); }
     const pp = r.querySelector('.rp').value;
@@ -483,8 +498,9 @@ function formC(c){
     <label>설명</label><textarea name="descr" rows="4">${esc(c ? c.descr : '')}</textarea>
     <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
     <label>아웃핏 프롬프트 (OUTFIT)</label><textarea class="m" name="outfit" rows="3">${esc(c ? (c.outfit || '') : '')}</textarea>
-    <label>관련 캐릭터 (체크하면 상세 페이지 맨 아래에 카드로 떠요 · 썸네일은 대표 사진이 기본, 새로 올리거나 드래그로 조정 가능)</label>
-    <div id="rels">${sortCh().filter(t => !c || t.id !== c.id).map(t => relRow((c ? relOf(c) : []).find(o => o.id === t.id), t)).join('') || '<p class="hint">다른 캐릭터가 아직 없어요.</p>'}</div>
+    <label>관련 캐릭터 (상세 페이지 맨 아래에 카드로 떠요 · 썸네일 버튼으로 사진 교체/위치 조정)</label>
+    <select id="radd" data-me="${c ? c.id : 0}"></select>
+    <div id="rels">${(c ? relOf(c) : []).map(o => { const t = CH.find(x => x.id === o.id); return t ? relRow(o, t) : ''; }).join('')}</div>
     ${btns('SAVE')}
   </form>`);
   initPos(c && c.img, c && c.img_pos); bindRel();
