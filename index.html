@@ -56,6 +56,10 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .grid.ordering .card img{-webkit-user-drag:none;pointer-events:none}
 .grid.ordering .card.drag{opacity:.35}
 .sps .sp.drag{opacity:.35}
+.bo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.bo.one{grid-template-columns:1fr}
+.bo .pr{margin:0}
+@media(max-width:640px){.bo{grid-template-columns:1fr}}
 .rg{display:grid;grid-template-columns:repeat(auto-fill,210px);gap:12px}
 @media(max-width:640px){.rg{grid-template-columns:repeat(2,1fr);gap:8px}}
 .rcard{position:relative;display:block;border:1px solid var(--line);text-decoration:none;color:inherit;background:var(--bg,#fff)}
@@ -86,7 +90,7 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .sb:first-child{border-top:0}
 .sb .hd{border-bottom:0;padding:5px 10px}
 .sb .tx{max-height:170px;padding-top:2px}
-.sp .tx,.sb .tx{font-size:11px;color:var(--mut)}
+.sp .tx,.sb .tx{font-size:11px}
 .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
 .hd .btn{padding:0 7px;font-size:10.5px}
 .hd div{display:flex;gap:4px}
@@ -114,7 +118,7 @@ td{white-space:pre-wrap;word-break:break-word}
 .sp .bd{min-width:0}
 /* LIST: 왼쪽 썸네일 */
 [data-v=a] .sp{display:flex}
-[data-v=a] .sp .sim:not(.no){display:block;width:150px;min-height:150px;flex:none;border-right:1px solid var(--line)}
+[data-v=a] .sp .sim:not(.no){display:block;width:150px;aspect-ratio:3/4;min-height:0;align-self:flex-start;flex:none;border-right:1px solid var(--line)}
 [data-v=a] .sp .sim img{position:absolute;inset:0}
 [data-v=a] .sp .bd{flex:1}
 /* GRID: 카드 */
@@ -123,8 +127,7 @@ td{white-space:pre-wrap;word-break:break-word}
 [data-v=c] .sp .sim{display:flex;aspect-ratio:4/3;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--mut);border-bottom:2px solid var(--fg)}
 [data-v=c] .sp .sim.no{display:none}
 [data-v=c] .sp .bd{flex:1}
-[data-v=c] .sp .tx{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
-[data-v=c] .sp .tx.open{display:block;overflow-y:auto}
+[data-v=c] .sp .tx{max-height:110px;overflow-y:auto}
 @media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:240px;min-height:0;border-right:0;border-bottom:1px solid var(--line)}}
 h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
 .empty{color:var(--mut);padding:32px 0;text-align:center}
@@ -206,7 +209,7 @@ function subBox(c, x, i, pre='s'){
   const z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
   return `<div class="sp" data-si="${i}"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t,x.pos) : initial(t)}</div>
   <div class="bd"><div class="hd"><span class="tt"><span>${esc(t)}</span></span><div>${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="${i}">EDIT</button>` : ''}<button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div></div>
-  <pre class="tx" data-act="expand">${esc(x.x)}</pre></div></div>`;
+  <pre class="tx">${esc(x.x)}</pre></div></div>`;
 }
 
 /* ---------- data ---------- */
@@ -266,7 +269,7 @@ function pageChar(id){
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
   ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal${admin ? ' adm' : ''}">${c.gallery.map(u => { const gp = okPos((c.gallery_pos || {})[u]); return `<div data-act="zoom" data-src="${esc(u)}" data-gu="${esc(u)}" data-gid="${c.id}">${img(u,'',gp)}</div>`; }).join('')}</div>` : ''}
-  ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2>${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}` : ''}
+  ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : ''}
   ${(c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
   ${rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS · ${relOf(c).filter(o => CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
@@ -361,7 +364,7 @@ function formSub(c, i){
   const row = subRow(x, true).replace('<button class="btn" type="button" data-act="del-sub">REMOVE</button>', '').replace('rows="3"', 'rows="10"');
   openM(`<h3>${isNew ? '서브 프롬프트 추가' : '서브 프롬프트 수정'}${c.name ? ' · ' + esc(c.name) : ''}</h3>
   <form id="f"><div id="subs" data-ph="1">${row}</div>
-  <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞춰요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div></div>
+  <div id="pe-wrap" hidden><label>썸네일 위치 — 어느 쪽이든 드래그하면 LIST와 GRID에 보이는 부분이 같이 바뀌어요</label><div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap"><div><div style="font-size:11px;color:var(--mut)">LIST</div><div class="pe" id="pbox" style="width:120px"><img id="pimg" alt=""></div></div><div><div style="font-size:11px;color:var(--mut)">GRID</div><div class="pe" id="pbox2" style="width:200px;aspect-ratio:4/3"><img id="pimg2" alt=""></div></div></div></div>
   ${isNew ? '' : `<button class="btn" type="button" data-act="del-one-sub" data-id="${c.id}" data-i="${i}" style="margin-top:6px">DELETE THIS SUB</button>`}
   ${btns('SAVE')}</form>`);
   initPos(x.img, x.pos, 'sub_p', 'sub_f');
@@ -550,29 +553,31 @@ function formC(c){
 }
 
 function initPos(src0, pos0, hn = 'img_pos', fn = 'file'){
-  const box = $('#pbox'), im = $('#pimg'), wrap = $('#pe-wrap'), hid = $('#f [name=' + hn + ']'), file = $('#f [name=' + fn + ']');
+  const boxes = [...document.querySelectorAll('#pe-wrap .pe')], ims = boxes.map(b => b.querySelector('img')), wrap = $('#pe-wrap'), hid = $('#f [name=' + hn + ']'), file = $('#f [name=' + fn + ']');
   let pos = String(pos0 || '50% 50%').split(' ').map(parseFloat); if(pos.length < 2 || pos.some(isNaN)) pos = [50, 50];
   let blob = '';
-  const apply = () => { im.style.objectPosition = `${pos[0]}% ${pos[1]}%`; hid.value = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; };
-  const show = src => { if(src){ im.src = src; wrap.hidden = false; } else wrap.hidden = true; };
+  const apply = () => { const o = `${pos[0]}% ${pos[1]}%`; ims.forEach(im => { im.style.objectPosition = o; }); hid.value = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; };
+  const show = src => { if(src){ ims.forEach(im => { im.src = src; }); wrap.hidden = false; } else wrap.hidden = true; };
   show(src0); apply();
   file.addEventListener('change', () => {
     const f = file.files[0];
     if(blob) URL.revokeObjectURL(blob);
     if(f){ blob = URL.createObjectURL(f); pos = [50, 50]; show(blob); apply(); } else { blob = ''; show(src0); }
   });
-  let d = null;
-  box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
-  box.addEventListener('pointermove', e => {
-    if(!d || !im.naturalWidth) return;
-    const r = box.getBoundingClientRect(), sc = Math.max(r.width / im.naturalWidth, r.height / im.naturalHeight);
-    const ox = im.naturalWidth * sc - r.width, oy = im.naturalHeight * sc - r.height, cl = v => Math.max(0, Math.min(100, v));
-    if(ox > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / ox * 100);
-    if(oy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / oy * 100);
-    apply(); dirty = true;
+  boxes.forEach((box, bi) => {
+    const im = ims[bi]; let d = null;
+    box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
+    box.addEventListener('pointermove', e => {
+      if(!d || !im.naturalWidth) return;
+      const r = box.getBoundingClientRect(), sc = Math.max(r.width / im.naturalWidth, r.height / im.naturalHeight);
+      const ox = im.naturalWidth * sc - r.width, oy = im.naturalHeight * sc - r.height, cl = v => Math.max(0, Math.min(100, v));
+      if(ox > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / ox * 100);
+      if(oy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / oy * 100);
+      apply(); dirty = true;
+    });
+    const end = () => { d = null; };
+    box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
   });
-  const end = () => { d = null; };
-  box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
 }
 
 function formLogin(){
