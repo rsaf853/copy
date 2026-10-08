@@ -55,6 +55,7 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .grid.ordering .card{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .grid.ordering .card img{-webkit-user-drag:none;pointer-events:none}
 .grid.ordering .card.drag{opacity:.35}
+.sps .sp.drag{opacity:.35}
 .pe{width:150px;aspect-ratio:3/4;border:1px solid var(--line);overflow:hidden;background:var(--soft);touch-action:none;cursor:grab;margin-top:6px}
 .pe img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
 .pe:active{cursor:grabbing}
@@ -110,6 +111,7 @@ td{white-space:pre-wrap;word-break:break-word}
 [data-v=c]{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 [data-v=c] .sp{margin:0;border-left:1px solid var(--line);display:flex;flex-direction:column}
 [data-v=c] .sp .sim{display:flex;aspect-ratio:4/3;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--mut);border-bottom:2px solid var(--fg)}
+[data-v=c] .sp .sim.no{display:none}
 [data-v=c] .sp .bd{flex:1}
 [data-v=c] .sp .tx{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 [data-v=c] .sp .tx.open{display:block;overflow-y:auto}
@@ -133,9 +135,10 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .cur{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px}
 .cur img{width:40px;height:54px;object-fit:cover;border:1px solid var(--line)}
 .gal{display:flex;flex-wrap:wrap;gap:6px}
-.gal div{height:200px;flex:none;max-width:100%;border:1px solid var(--line);overflow:hidden;cursor:zoom-in;background:var(--soft)}
+.gal div{height:200px;aspect-ratio:3/4;flex:none;max-width:100%;border:1px solid var(--line);overflow:hidden;cursor:zoom-in;background:var(--soft)}
 .gal div:hover{border-color:var(--fg)}
-.gal img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
+.gal img{height:100%;width:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
+.gal.adm div{touch-action:none;cursor:grab}
 .gedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .mb .gi{margin:0;font-weight:500}
 .gi img{width:56px;height:74px;object-fit:cover;border:1px solid var(--line);display:block}
@@ -191,7 +194,7 @@ function subBox(c, x, i, pre='s'){
     return `<div class="sb"><div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div>`;
   }
   const z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
-  return `<div class="sp"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t,x.pos) : initial(t)}</div>
+  return `<div class="sp" data-si="${i}"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t,x.pos) : initial(t)}</div>
   <div class="bd"><div class="hd"><span class="tt"><span>${esc(t)}</span></span><div>${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="${i}">EDIT</button>` : ''}<button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div></div>
   <pre class="tx" data-act="expand">${esc(x.x)}</pre></div></div>`;
 }
@@ -205,6 +208,7 @@ async function load(){
 const textOf = k => {
   if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
   if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
+  if(k[0]==='o') return (CH.find(c => c.id===+k.slice(1))||{}).outfit;
   return k[0]==='p' ? (PR.find(p => p.id===+k.slice(1))||{}).text : (CH.find(c => c.id===+k.slice(1))||{}).prompt;
 };
 const num = p => PR.findIndex(x => x.id===p.id) + 1;
@@ -242,7 +246,7 @@ async function saveOrder(){
 function pageChar(id){
   const c = CH.find(x => x.id===+id);
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
-  const rel = PR.filter(p => p.char_id===c.id).reverse();
+  const rel = PR.filter(p => p.char_id===c.id).reverse(), rcs = relCards(c);
   app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
   <div class="prof">
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
@@ -251,10 +255,20 @@ function pageChar(id){
       <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
-  ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal">${c.gallery.map(u => `<div data-act="zoom" data-src="${esc(u)}">${img(u,'')}</div>`).join('')}</div>` : ''}
-  ${c.prompt ? `<h2>CHARACTER PROMPT</h2><div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}
+  ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal${admin ? ' adm' : ''}">${c.gallery.map(u => { const gp = okPos((c.gallery_pos || {})[u]); return `<div data-act="zoom" data-src="${esc(u)}" data-gu="${esc(u)}" data-gid="${c.id}">${img(u,'',gp)}</div>`; }).join('')}</div>` : ''}
+  ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2>${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}` : ''}
   ${(c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
+  ${rcs ? `<h2>RELATED CHARACTERS · ${relOf(c).filter(o => CH.some(x => x.id===o.id)).length}</h2><div class="grid">${rcs}</div>` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
+  const sp = $('#sps');
+  if(sp && admin && window.Sortable && (c.subs || []).length > 1) Sortable.create(sp, { animation:150, draggable:'.sp', ghostClass:'drag', delay:200, touchStartThreshold:5, filter:'.btn', preventOnFilter:false,
+    onEnd: async () => {
+      const order = [...sp.querySelectorAll('.sp')].map(el => +el.dataset.si), subs = order.map(i => c.subs[i]);
+      if(order.every((v, k) => v === k)) return;
+      const r = await sb.from('characters').update({ subs }).eq('id', c.id);
+      if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.subs = subs;
+      pageChar(c.id);
+    } });
 }
 
 let cat = 'all', q = '', shown = 20;
@@ -392,6 +406,52 @@ const subRow = (x={}, ph=false) => `<div class="sr"><input name="sub_t" placehol
   ${x.img ? `<div class="cur">${img(x.img,'')}<label style="margin:0"><input type="checkbox" name="sub_rm" style="width:auto"> 사진 삭제</label></div>` : ''}` : ''}
   <button class="btn" type="button" data-act="del-sub">REMOVE</button></div>`;
 
+/* ---------- related characters ---------- */
+const nz = v => String(v || '50% 50%').split(' ').map(x => (parseFloat(x) || 0).toFixed(1)).join(' ');
+const relOf = c => [...(c.related || []), ...CH.filter(t => t.id !== c.id && (t.related || []).some(o => o.id === c.id) && !(c.related || []).some(o => o.id === t.id)).map(t => ({ id: t.id }))];
+const relCards = c => relOf(c).map(o => { const t = CH.find(x => x.id===o.id); if(!t) return '';
+  const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
+  return `<a class="card" href="#/c/${t.id}"><div class="ph">${src ? img(src, t.name, pos) : initial(t.name)}</div><div class="meta"><b>${esc(t.name)}</b></div></a>`; }).join('');
+const relRow = (o, t) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%';
+  return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"><label style="display:flex;gap:6px;align-items:center;margin:8px 0 0;font-weight:700"><input type="checkbox" class="rc" style="width:auto" ${o ? 'checked' : ''}> ${esc(t.name)}</label>
+  <div class="rb" ${o ? '' : 'hidden'} style="margin:4px 0 0 22px"><div class="pe" style="width:90px">${src ? `<img src="${esc(src)}" alt="" style="object-position:${esc(pos)}">` : ''}</div>
+  <input type="file" class="rf" accept="image/*" style="margin-top:6px"><input type="hidden" class="ri" value="${esc((o && o.img) || '')}"><input type="hidden" class="rp" value="${esc(pos)}">
+  ${o && o.img ? '<label style="margin:4px 0 0;font-weight:500"><input type="checkbox" class="rx" style="width:auto"> 올린 썸네일 삭제 (대표 사진으로 되돌리기)</label>' : ''}</div></div>`; };
+function bindRel(){
+  document.querySelectorAll('.rr').forEach(r => {
+    const cb = r.querySelector('.rc'), rb = r.querySelector('.rb'), box = r.querySelector('.pe'), file = r.querySelector('.rf'), hid = r.querySelector('.rp');
+    let im = box.querySelector('img'); if(!im){ im = document.createElement('img'); im.alt = ''; box.appendChild(im); }
+    let pos = String(hid.value).split(' ').map(parseFloat); if(pos.length < 2 || pos.some(isNaN)) pos = [50, 50];
+    const apply = () => { im.style.objectPosition = `${pos[0]}% ${pos[1]}%`; hid.value = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; };
+    cb.onchange = () => { rb.hidden = !cb.checked; };
+    file.addEventListener('change', () => { const f = file.files[0]; if(f){ im.src = URL.createObjectURL(f); pos = [50, 50]; apply(); } });
+    let d = null;
+    box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
+    box.addEventListener('pointermove', e => {
+      if(!d || !im.naturalWidth) return;
+      const b = box.getBoundingClientRect(), sc = Math.max(b.width / im.naturalWidth, b.height / im.naturalHeight);
+      const ox = im.naturalWidth * sc - b.width, oy = im.naturalHeight * sc - b.height, cl = v => Math.max(0, Math.min(100, v));
+      if(ox > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / ox * 100);
+      if(oy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / oy * 100);
+      apply(); dirty = true;
+    });
+    const end = () => { d = null; };
+    box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+  });
+}
+async function readRel(){
+  const rows = [...document.querySelectorAll('.rr')].filter(r => r.querySelector('.rc').checked), out = [];
+  for(let i = 0; i < rows.length; i++){
+    const r = rows[i], o = { id: +r.dataset.id }; let im = r.querySelector('.ri').value;
+    const rx = r.querySelector('.rx'); if(rx && rx.checked) im = '';
+    const f = r.querySelector('.rf').files[0]; if(f && f.size){ st(`관련 캐릭터 썸네일 업로드 중… ${i+1}/${rows.length}`); im = await upload(f, 'characters'); }
+    const pp = r.querySelector('.rp').value;
+    if(im){ o.img = im; if(okPos(pp)) o.pos = pp; } else if(okPos(pp) && nz(pp) !== nz(r.dataset.dp)) o.pos = pp;
+    out.push(o);
+  }
+  return out;
+}
+
 function formC(c){
   const inf = c ? (c.info||[]) : [];
   const get = ks => (inf.find(([k]) => ks.includes(k))||[])[1] || '';
@@ -422,11 +482,12 @@ function formC(c){
     <label>추가 프로필 정보 — 한 줄에 "항목: 값" (콜론 없는 줄은 윗 항목 값에 줄바꿈으로 이어져요)</label><textarea name="info" rows="4">${esc(extra)}</textarea>
     <label>설명</label><textarea name="descr" rows="4">${esc(c ? c.descr : '')}</textarea>
     <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
-    <label>서브 프롬프트 (사진 선택 가능)</label><div id="subs" data-ph="1">${((c && c.subs) || []).map(x => subRow(x, true)).join('')}</div>
-    <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
+    <label>아웃핏 프롬프트 (OUTFIT)</label><textarea class="m" name="outfit" rows="3">${esc(c ? (c.outfit || '') : '')}</textarea>
+    <label>관련 캐릭터 (체크하면 상세 페이지 맨 아래에 카드로 떠요 · 썸네일은 대표 사진이 기본, 새로 올리거나 드래그로 조정 가능)</label>
+    <div id="rels">${sortCh().filter(t => !c || t.id !== c.id).map(t => relRow((c ? relOf(c) : []).find(o => o.id === t.id), t)).join('') || '<p class="hint">다른 캐릭터가 아직 없어요.</p>'}</div>
     ${btns('SAVE')}
   </form>`);
-  initPos(c && c.img, c && c.img_pos);
+  initPos(c && c.img, c && c.img_pos); bindRel();
   $('#gsel').onchange = e => { const t = $('#gtxt'); t.hidden = e.target.value !== '__o'; if(!t.hidden) t.focus(); };
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
@@ -442,10 +503,18 @@ function formC(c){
       const rm = fd.getAll('grm'), gallery = ((c && c.gallery) || []).filter((_,i) => !rm.includes(String(i)));
       const gf = fd.getAll('gfiles').filter(x => x && x.size);
       for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
-      const subs = await readSubs(fd);
-      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), subs, gallery, img_pos: fd.get('img_pos') || '50% 50%' };
-      const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
+      const related = await readRel();
+      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), outfit: fd.get('outfit').trim(), related, gallery, img_pos: fd.get('img_pos') || '50% 50%' };
+      const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row).select('id').single();
       if(r.error) throw r.error;
+      /* 양방향: 상대 캐릭터의 관련 목록도 같이 맞춰요 */
+      const cid = c ? c.id : r.data.id, nowIds = related.map(o => o.id);
+      const before = c ? relOf(c).map(o => o.id) : [];
+      const ops = [];
+      CH.forEach(t => { if(t.id === cid) return; const has = (t.related || []).some(o => o.id === cid);
+        if(nowIds.includes(t.id) && !has) ops.push(sb.from('characters').update({ related: [...(t.related || []), { id: cid }] }).eq('id', t.id));
+        else if(!nowIds.includes(t.id) && before.includes(t.id) && has) ops.push(sb.from('characters').update({ related: (t.related || []).filter(o => o.id !== cid) }).eq('id', t.id)); });
+      const er = (await Promise.all(ops)).find(x => x.error); if(er) throw er.error;
     }); };
 }
 
@@ -501,6 +570,38 @@ function copy(b){
     document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(_){} a.remove(); done(); };
   (navigator.clipboard && window.isSecureContext) ? navigator.clipboard.writeText(t).then(done, fb) : fb();
 }
+/* gallery: 관리자는 사진을 드래그해서 위치 조정 (놓으면 자동 저장) */
+let gd = null, gmoved = false;
+document.addEventListener('click', e => { if(gmoved){ e.stopPropagation(); e.preventDefault(); gmoved = false; } }, true);
+document.addEventListener('pointerdown', e => {
+  const t = admin && e.target.closest('.gal.adm div[data-gu]'); if(!t) return;
+  const im = t.querySelector('img'); if(!im) return;
+  let p = String(im.style.objectPosition || '50% 50%').split(' ').map(parseFloat); if(p.length < 2 || p.some(isNaN)) p = [50, 50];
+  gd = { t, im, x:e.clientX, y:e.clientY, p, pos:[...p], moved:false }; gmoved = false;
+});
+document.addEventListener('pointermove', e => {
+  if(!gd || !gd.im.naturalWidth) return;
+  const dx = e.clientX - gd.x, dy = e.clientY - gd.y;
+  if(!gd.moved && Math.hypot(dx, dy) < 4) return;
+  gd.moved = true;
+  const r = gd.t.getBoundingClientRect(), sc = Math.max(r.width / gd.im.naturalWidth, r.height / gd.im.naturalHeight);
+  const ox = gd.im.naturalWidth * sc - r.width, oy = gd.im.naturalHeight * sc - r.height, cl = v => Math.max(0, Math.min(100, v));
+  if(ox > 1) gd.pos[0] = cl(gd.p[0] - dx / ox * 100);
+  if(oy > 1) gd.pos[1] = cl(gd.p[1] - dy / oy * 100);
+  gd.im.style.objectPosition = `${gd.pos[0].toFixed(1)}% ${gd.pos[1].toFixed(1)}%`;
+});
+const gend = async () => {
+  if(!gd) return; const g = gd; gd = null;
+  if(!g.moved) return;
+  gmoved = true; setTimeout(() => { gmoved = false; }, 100);
+  const c = CH.find(x => x.id === +g.t.dataset.gid); if(!c) return;
+  const map = { ...(c.gallery_pos || {}), [g.t.dataset.gu]: g.im.style.objectPosition };
+  const r = await sb.from('characters').update({ gallery_pos: map }).eq('id', c.id);
+  if(r.error) return alert('위치 저장 실패: ' + r.error.message);
+  c.gallery_pos = map;
+};
+document.addEventListener('pointerup', gend); document.addEventListener('pointercancel', gend);
+
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if(!b) return;
   const a = b.dataset.act, id = +b.dataset.id || null;
