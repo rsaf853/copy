@@ -98,11 +98,36 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 #lb[hidden]{display:none}
 #lb img{max-width:100%;max-height:100%;object-fit:contain}
 @media(max-width:640px){.prof{grid-template-columns:1fr}.prof .ph{max-width:300px}.pr{flex-direction:column}.pr .im{width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
+.h2s{display:flex;justify-content:space-between;align-items:center}
+.vs{display:flex;gap:3px}.vs .chip{padding:0 8px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
+.tg{font:600 11px/1.5 var(--sans);border:1px solid var(--fg);padding:0 8px}
+.sp{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px}
+.sp .tt{display:flex;align-items:center;gap:7px;min-width:0}
+.sp .th{display:none}
+.sp .sim{display:none;background:var(--soft);overflow:hidden;cursor:zoom-in}
+.sp .sim img,.sp .th img{width:100%;height:100%;object-fit:cover;display:block}
+.sp .bd{min-width:0}
+/* A: 왼쪽 썸네일 */
+[data-v=a] .sp{display:flex}
+[data-v=a] .sp .sim:not(.no){display:block;width:96px;min-height:96px;flex:none;border-right:1px solid var(--line)}
+[data-v=a] .sp .bd{flex:1}
+/* B: 제목 옆 미니 썸네일 */
+[data-v=b] .sp .th{display:block;width:28px;height:38px;flex:none;border:1px solid var(--line);overflow:hidden;cursor:zoom-in}
+[data-v=b] .sp .hd{padding:6px 10px}
+/* C: 카드 그리드 */
+[data-v=c]{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+[data-v=c] .sp{margin:0;border-left:1px solid var(--line);display:flex;flex-direction:column}
+[data-v=c] .sp .sim{display:flex;aspect-ratio:4/3;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--mut);border-bottom:2px solid var(--fg)}
+[data-v=c] .sp .bd{flex:1}
+[data-v=c] .sp .tx{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+[data-v=c] .sp .tx.open{display:block}
+@media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <a class="logo" href="#/characters">r<svg class="hrt" viewBox="0 0 24 24" aria-label="o"><path d="M12 21s-7-4.6-9.5-9C.8 8.8 2.6 5 6.2 5c2.2 0 3.8 1.3 5.8 3.4C14 6.3 15.6 5 17.8 5c3.6 0 5.4 3.8 3.7 7-2.5 4.4-9.5 9-9.5 9z"/></svg>sie <span class="lg2">prompt</span></a>
+  <a class="logo" href="#/characters">r♡sie <span class="lg2">prompt</span></a>
   <nav>
     <a href="#/characters" id="n1">persona</a>
     <a href="#/prompts" id="n2">prompt</a>
@@ -126,7 +151,15 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const pad = n => String(n).padStart(3, '0');
 const img = (src, alt) => src ? `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : '';
 const initial = n => esc([...n][0] || '?');
-let CH = [], PR = [], admin = false;
+let CH = [], PR = [], admin = false, dirty = false;
+let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!'abc'.includes(SV)) SV = 'a';
+const tagsOf = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
+function subBox(c, x, i){
+  const t = x.t || 'SUB ' + (i+1), z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
+  return `<div class="sp"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t) : initial(t)}</div>
+  <div class="bd"><div class="hd"><span class="tt">${x.img ? `<span class="th"${z}>${img(x.img,t)}</span>` : ''}<span>${esc(t)}</span></span><button class="btn" data-act="copy" data-k="s${c.id}-${i}">COPY</button></div>
+  <pre class="tx" data-act="expand">${esc(x.x)}</pre></div></div>`;
+}
 
 /* ---------- data ---------- */
 async function load(){
@@ -155,7 +188,7 @@ function pageChars(){
   ${admin ? '<button class="btn" data-act="new-c">+ NEW</button>' : ''}</div>
   ${CH.length ? `<div class="grid">${CH.map(c => `<a class="card" href="#/c/${c.id}">
     <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
-    <div class="meta"><b>${esc(c.name)}</b><span>${esc(c.tag||'')}</span></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
+    <div class="meta"><b>${esc(c.name)}</b><span>${esc(tagsOf(c.tag).join(' · '))}</span></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
 }
 
 function pageChar(id){
@@ -165,14 +198,14 @@ function pageChar(id){
   app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
   <div class="prof">
     <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
-    <div><h1>${esc(c.name)}</h1><p class="sub" style="margin:0">${esc(c.tag||'')}</p>
+    <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
       <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>
       <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
   ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal">${c.gallery.map(u => `<div data-act="zoom" data-src="${esc(u)}">${img(u,'')}</div>`).join('')}</div>` : ''}
   ${c.prompt ? `<h2>CHARACTER PROMPT</h2><div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}
-  ${(c.subs||[]).length ? `<h2>SUB PROMPTS</h2>${c.subs.map((x,i) => `<div class="pr"><div class="bd"><div class="hd"><span>${esc(x.t || 'SUB ' + (i+1))}</span><button class="btn" data-act="copy" data-k="s${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div></div>`).join('')}` : ''}
+  ${(c.subs||[]).length ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${['a','b','c'].map(v => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${v.toUpperCase()}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${c.subs.map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2>${rel.map(promptBox).join('')}` : ''}`;
 }
 
@@ -208,9 +241,9 @@ function route(){
 }
 
 /* ---------- modal & forms ---------- */
-const openM = h => { $('#mb').innerHTML = h; $('#md').hidden = false; };
+const openM = h => { $('#mb').innerHTML = h; dirty = false; $('#md').hidden = false; };
 const closeM = () => { $('#md').hidden = true; $('#mb').innerHTML = ''; };
-$('#md').onclick = e => { if(e.target.id==='md') closeM(); };
+$('#mb').addEventListener('input', () => { dirty = true; });
 const st = t => { const s = $('#st'); if(s) s.textContent = t; };
 const btns = label => `<div class="st" id="st"></div><div class="row"><button class="btn pri" type="submit" id="sv">${label}</button><button class="btn" type="button" data-act="close">CANCEL</button></div>`;
 
@@ -260,8 +293,12 @@ const parseInfo = t => t.split('\n').map(l => l.trim()).filter(Boolean).map(l =>
   const m = l.match(/^([^:：]+)[:：]\s*(.*)$/); return m ? [m[1].trim(), m[2].trim()] : [l, ''];
 }).filter(([k,v]) => k && v);
 
-const FIX = [['성별',['성별']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
-const subRow = (x={}) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea><button class="btn" type="button" data-act="del-sub">REMOVE</button></div>`;
+const FIX = [['성별',['성별']], ['나이',['나이','Age','age','AGE']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
+const subRow = (x={}) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
+  <input type="hidden" name="sub_img" value="${esc(x.img)}">
+  <label style="margin:2px 0 0">이미지 ${x.img ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="sub_file" accept="image/*">
+  ${x.img ? `<div class="cur">${img(x.img,'')}<button class="btn" type="button" data-act="rm-sub-img">이미지 삭제</button></div>` : ''}
+  <button class="btn" type="button" data-act="del-sub">REMOVE</button></div>`;
 
 function formC(c){
   const inf = c ? (c.info||[]) : [];
@@ -272,7 +309,7 @@ function formC(c){
   <form id="f">
     <div class="g2">
       <div><label>이름</label><input name="name" required value="${esc(c ? c.name : '')}"></div>
-      <div><label>태그 (주인공, 조연 등)</label><input name="tag" value="${esc(c ? c.tag : '')}"></div>
+      <div><label>태그 (쉼표로 구분: 주인공, 조연 …)</label><input name="tag" value="${esc(c ? c.tag : '')}"></div>
       ${FIX.map(([k,ks],i) => `<div><label>${k}</label><input name="fx${i}" value="${esc(get(ks))}" ${k==='DOB' ? 'placeholder="YYYY-MM-DD"' : ''}></div>`).join('')}
     </div>
     ${imgField(c && c.img)}
@@ -294,8 +331,13 @@ function formC(c){
       const rm = fd.getAll('grm'), gallery = ((c && c.gallery) || []).filter((_,i) => !rm.includes(String(i)));
       const gf = fd.getAll('gfiles').filter(x => x && x.size);
       for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
-      const t = fd.getAll('sub_t'), x = fd.getAll('sub_x');
-      const subs = x.map((v,i) => ({ t: (t[i]||'').trim(), x: v.trim() })).filter(o => o.x);
+      const t = fd.getAll('sub_t'), x = fd.getAll('sub_x'), si = fd.getAll('sub_img'), sf = fd.getAll('sub_file'), subs = [];
+      for(let i = 0; i < x.length; i++){
+        const tx = (x[i]||'').trim(); if(!tx) continue;
+        let sim = si[i] || '', file = sf[i];
+        if(file && file.size){ st(`서브 이미지 업로드 중… ${i+1}/${x.length}`); sim = await upload(file, 'characters'); }
+        subs.push({ t: (t[i]||'').trim(), x: tx, img: sim });
+      }
       const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), subs, gallery };
       const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
       if(r.error) throw r.error;
@@ -336,6 +378,9 @@ document.addEventListener('click', async e => {
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
   if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow());
   if(a==='del-sub') return b.closest('.sr').remove();
+  if(a==='rm-sub-img'){ const r = b.closest('.sr'); r.querySelector('[name=sub_img]').value = ''; const cu = r.querySelector('.cur'); if(cu) cu.remove(); return; }
+  if(a==='subv'){ SV = b.dataset.sv; try{ localStorage.setItem('sv', SV); }catch(_){} const sp = $('#sps'); if(sp) sp.dataset.v = SV; document.querySelectorAll('[data-act=subv]').forEach(x => x.classList.toggle('on', x===b)); return; }
+  if(a==='expand'){ b.classList.toggle('open'); return; }
   if(a==='new-p') return formP();
   if(a==='edit-p') return formP(PR.find(p => p.id===id));
   if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
@@ -344,14 +389,14 @@ document.addEventListener('click', async e => {
   if(a==='del-c') { if(await del('characters', id, '캐릭터')) location.hash==='#/characters' ? route() : location.hash = '#/characters'; }
 });
 $('#lb').onclick = () => { $('#lb').hidden = true; };
-addEventListener('keydown', e => { if(e.key==='Escape'){ $('#lb').hidden = true; closeM(); } });
+addEventListener('keydown', e => { if(e.key==='Escape'){ if(!$('#lb').hidden){ $('#lb').hidden = true; return; } if(!$('#md').hidden && (!dirty || confirm('입력한 내용이 사라져요. 닫을까요?'))) closeM(); } });
 $('#theme').onclick = () => {
   const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
   r.dataset.theme = dark ? 'light' : 'dark';
 };
 const syncAdm = () => $('#adm').textContent = admin ? '✧' : '✦';
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
-sb.auth.onAuthStateChange((_ev, s) => { admin = !!s; syncAdm(); if(CH.length || PR.length) route(); });
+sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)) route(); });
 addEventListener('hashchange', route);
 
 (async () => {
