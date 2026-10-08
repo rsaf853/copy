@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>r♡sieprompt</title>
+<script>try{var t=localStorage.getItem('rosie-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="icon" type="image/png" href="images/moai.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -19,12 +20,15 @@ a{color:inherit}
 .wrap{max-width:1014px;margin:0 auto;padding:0 16px}
 header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:2px solid var(--fg);z-index:5}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:44px}
-.logo{font-family:Pretendard,"Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;font-weight:600;font-size:16px;letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;white-space:pre}
+.logo{font-family:Pretendard,"Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;font-weight:800;font-size:16px;letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;white-space:pre}
 .hrt{width:.95em;height:.95em;margin:0 .02em;fill:none;stroke:var(--fg);stroke-width:3.2;stroke-linejoin:round;transform:translateY(1px)}
-.lg2{font-size:11px;font-weight:500;color:var(--mut)}
+.lg2{font-size:14px;font-weight:500;color:var(--fg)}
 nav{display:flex;gap:2px;align-items:center}
 nav a,.btn{font:600 11px/1.5 var(--sans);text-decoration:none;border:1px solid transparent;padding:3px 8px;background:none;color:var(--fg);cursor:pointer}
-nav a{color:var(--mut)}
+nav a{color:var(--mut);font-size:14px;padding:3px 6px}
+nav a.on{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+.tg2{margin-left:8px;width:30px;height:30px;padding:0;border:1px solid var(--line);background:none;color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.tg2:hover{border-color:var(--fg)}
 nav a.on,nav a:hover{color:var(--fg)}
 nav .btn{color:var(--mut);border:0}
 nav .btn:hover{background:none;color:var(--mut);border:0}
@@ -43,9 +47,9 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .ph{aspect-ratio:3/4;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:var(--mut);overflow:hidden}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .card .meta{padding:8px 10px;border-top:2px solid var(--fg)}
-.card b{display:block;font-size:13px;font-weight:800}
+.card b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card span{color:var(--mut);font-size:11px;font-weight:500}
-.card .meta .fn{display:block;min-height:1.5em;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .meta .al{display:inline;margin-left:6px;font-size:10.5px;font-weight:500;color:var(--mut);opacity:.85}
 .btn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .hint{color:var(--mut);font:500 11px/1.5 var(--sans);margin:-8px 0 12px}
 .grid.ordering .card{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -85,6 +89,16 @@ textarea.m{font-family:var(--mono);font-size:12px}
 table{width:100%;border-collapse:collapse;margin:10px 0 14px;border-top:2px solid var(--fg)}
 th,td{text-align:left;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:700;vertical-align:top}
 th{width:72px;color:var(--mut);font:500 11px/1.5 var(--sans);padding-top:6px}
+td{white-space:pre-wrap;word-break:break-word}
+.fxa{field-sizing:content;resize:none;overflow:hidden}
+.cmw{position:relative}
+.cmw input{padding-right:30px}
+.cmw span{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;pointer-events:none}
+.sb.ph{display:flex}
+.sim{position:relative;width:120px;min-height:160px;flex:none;border-right:1px solid var(--line);background:var(--soft);cursor:zoom-in;overflow:hidden}
+.sim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.sbd{flex:1;min-width:0}
+@media(max-width:640px){.sim{width:96px;min-height:128px}}
 h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
 .empty{color:var(--mut);padding:32px 0;text-align:center}
 .acts{display:flex;gap:5px;margin-top:12px}
@@ -128,7 +142,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
   <nav>
     <a href="#/characters" id="n1">persona</a>
     <a href="#/prompts" id="n2">prompt</a>
-    <button class="btn" id="theme" title="테마">◐</button>
+    <button class="tg2" id="theme" type="button" aria-label="테마 전환"></button>
   </nav>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
@@ -157,7 +171,9 @@ let CH = [], PR = [], admin = false, dirty = false;
 const tagsOf = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
 function subBox(c, x, i, pre='s'){
   const t = x.t || 'SUB ' + (i+1);
-  return `<div class="sb"><div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div>`;
+  const hd = `<div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre>`;
+  if(pre==='s' && x.img) return `<div class="sb ph"><div class="sim" data-act="zoom" data-src="${esc(x.img)}">${img(x.img,'')}</div><div class="sbd">${hd}</div></div>`;
+  return `<div class="sb">${hd}</div>`;
 }
 
 /* ---------- data ---------- */
@@ -189,7 +205,7 @@ function pageChars(){
   ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
   ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${sortCh().map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
-    <div class="meta"><b>${esc(c.name)}</b><span class="fn">${esc(fullOf(c))}</span></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
+    <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
   const g = $('#cg');
   if(g && admin && ORD){
     g.addEventListener('click', e => { if(!e.target.closest('[data-act]')) e.preventDefault(); });
@@ -211,7 +227,7 @@ function pageChar(id){
   <div class="prof">
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
-      <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>
+      <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(lab(k))}</th><td>${esc(lab(k)==='Height' && /^\d+(\.\d+)?$/.test(String(v).trim()) ? String(v).trim() + 'cm' : v)}</td></tr>`).join('')}</table>
       <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
@@ -280,13 +296,21 @@ async function finish(fn){
   catch(err){ st('오류: ' + (err.message || err)); b.disabled = false; }
 }
 
-async function readSubs(fd){
-  const t = fd.getAll('sub_t'), x = fd.getAll('sub_x'), subs = [];
-  for(let i = 0; i < x.length; i++){
-    const tx = (x[i]||'').trim(); if(!tx) continue;
-    subs.push({ t: (t[i]||'').trim(), x: tx });
+async function readSubs(){
+  const rows = [...document.querySelectorAll('#subs .sr')], out = [];
+  for(let i = 0; i < rows.length; i++){
+    const r = rows[i], x = r.querySelector('[name=sub_x]').value.trim(); if(!x) continue;
+    const o = { t: r.querySelector('[name=sub_t]').value.trim(), x };
+    const fi = r.querySelector('[name=sub_f]');
+    if(fi){
+      let im = (r.querySelector('[name=sub_i]') || {}).value || '';
+      const rm = r.querySelector('[name=sub_rm]'); if(rm && rm.checked) im = '';
+      const f = fi.files[0]; if(f && f.size){ st(`서브 사진 업로드 중… ${i+1}/${rows.length}`); im = await upload(f, 'subs'); }
+      if(im) o.img = im;
+    }
+    out.push(o);
   }
-  return subs;
+  return out;
 }
 function formP(p){
   const cats = [...new Set(PR.map(x => x.cat))];
@@ -297,7 +321,7 @@ function formP(p){
     <label>연결할 캐릭터 (선택)</label><select name="char_id"><option value="">없음</option>${CH.map(c => `<option value="${c.id}" ${p && p.char_id===c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
     <label>프롬프트</label><textarea class="m" name="text" rows="9" required>${esc(p ? p.text : '')}</textarea>
     ${imgField(p && p.img)}
-    <label>서브 프롬프트</label><div id="subs">${((p && p.subs) || []).map(subRow).join('')}</div>
+    <label>서브 프롬프트</label><div id="subs">${((p && p.subs) || []).map(x => subRow(x)).join('')}</div>
     <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
     ${btns('SAVE')}
   </form>`);
@@ -312,19 +336,38 @@ function formP(p){
     }); };
 }
 
-const parseInfo = t => t.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
-  const m = l.match(/^([^:：]+)[:：]\s*(.*)$/); return m ? [m[1].trim(), m[2].trim()] : [l, ''];
-}).filter(([k,v]) => k && v);
+const parseInfo = t => {
+  const out = [];
+  t.split('\n').forEach(raw => {
+    const l = raw.trim(); if(!l) return;
+    const m = l.match(/^([^:：]+)[:：]\s*(.*)$/);
+    if(m) out.push([m[1].trim(), m[2].trim()]);
+    else if(out.length) out[out.length-1][1] += '\n' + l;
+  });
+  return out.filter(([k,v]) => k && v);
+};
 
-const FIX = [['본명',['본명','풀네임','Full name','full name']], ['Alias',['Alias','alias','ALIAS','별칭']], ['성별',['성별']], ['나이',['나이','Age','age','AGE']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
-const subRow = (x={}) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
+const FIX = [['Full Name',['Full Name','본명','풀네임','Full name','full name']], ['Alias',['Alias','alias','ALIAS','별칭']], ['Gender',['Gender','성별']], ['Age',['Age','나이','age','AGE']], ['Height',['Height','키']], ['DOB',['DOB','생일']], ['Nationality',['Nationality','국적']]];
+const lab = k => (FIX.find(([,ks]) => ks.includes(k)) || [k])[0];
+const subRow = (x={}, ph=false) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
+  ${ph ? `<input type="hidden" name="sub_i" value="${esc(x.img)}"><label style="margin:4px 0 0">사진 ${x.img ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="sub_f" accept="image/*">
+  ${x.img ? `<div class="cur">${img(x.img,'')}<label style="margin:0"><input type="checkbox" name="sub_rm" style="width:auto"> 사진 삭제</label></div>` : ''}` : ''}
   <button class="btn" type="button" data-act="del-sub">REMOVE</button></div>`;
 
 function formC(c){
   const inf = c ? (c.info||[]) : [];
   const get = ks => (inf.find(([k]) => ks.includes(k))||[])[1] || '';
   const used = FIX.flatMap(([,ks]) => ks);
-  const fx = i => `<div><label>${FIX[i][0]}</label><input name="fx${i}" value="${esc(get(FIX[i][1]))}" ${FIX[i][0]==='DOB' ? 'placeholder="YYYY-MM-DD"' : ''}></div>`;
+  const fx = i => {
+    const lb = FIX[i][0], v = get(FIX[i][1]);
+    if(lb==='Gender'){
+      const other = v && !['남성','여성'].includes(v);
+      return `<div><label>Gender</label><select name="gsel" id="gsel"><option value="">선택 안 함</option><option value="남성" ${v==='남성' ? 'selected' : ''}>남성</option><option value="여성" ${v==='여성' ? 'selected' : ''}>여성</option><option value="__o" ${other ? 'selected' : ''}>직접 입력</option></select>
+      <input name="fx${i}" id="gtxt" placeholder="직접 입력" value="${other ? esc(v) : ''}" style="margin-top:5px" ${other ? '' : 'hidden'}></div>`;
+    }
+    if(lb==='Height') return `<div><label>Height</label><div class="cmw"><input name="fx${i}" inputmode="decimal" placeholder="175" value="${esc(v.replace(/\s*cm$/i,''))}"><span>cm</span></div></div>`;
+    return `<div><label>${lb}</label><textarea class="fxa" name="fx${i}" rows="1" ${lb==='DOB' ? 'placeholder="YYYY-MM-DD"' : ''}>${esc(v)}</textarea></div>`;
+  };
   const extra = c ? inf.filter(([k]) => !used.includes(k)).map(([k,v]) => `${k}: ${v}`).join('\n') : '';
   openM(`<h3>${c ? '캐릭터 수정' : '캐릭터 추가'}</h3>
   <form id="f">
@@ -338,20 +381,26 @@ function formC(c){
     <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞춰요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((c && c.img_pos) || '50% 50%')}"></div>
     <label>갤러리 (여러 장 선택 가능)</label><input type="file" name="gfiles" accept="image/*" multiple>
     ${((c && c.gallery) || []).length ? `<div class="gedit">${c.gallery.map((u,i) => `<label class="gi">${img(u,'')}<input type="checkbox" name="grm" value="${i}" style="width:auto"> 삭제</label>`).join('')}</div>` : ''}
-    <label>추가 프로필 정보 — 한 줄에 "항목: 값" (값이 비면 표시 안 됨)</label><textarea name="info" rows="4">${esc(extra)}</textarea>
+    <label>추가 프로필 정보 — 한 줄에 "항목: 값" (콜론 없는 줄은 윗 항목 값에 줄바꿈으로 이어져요)</label><textarea name="info" rows="4">${esc(extra)}</textarea>
     <label>설명</label><textarea name="descr" rows="4">${esc(c ? c.descr : '')}</textarea>
     <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
-    <label>서브 프롬프트</label><div id="subs">${((c && c.subs) || []).map(subRow).join('')}</div>
+    <label>서브 프롬프트 (사진 선택 가능)</label><div id="subs" data-ph="1">${((c && c.subs) || []).map(x => subRow(x, true)).join('')}</div>
     <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
     ${btns('SAVE')}
   </form>`);
   initPos(c && c.img, c && c.img_pos);
+  $('#gsel').onchange = e => { const t = $('#gtxt'); t.hidden = e.target.value !== '__o'; if(!t.hidden) t.focus(); };
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
       let im = c ? c.img : '';
       if(fd.get('rmimg')) im = '';
       const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'characters'); }
-      const fixed = FIX.map(([k],i) => [k, (fd.get('fx'+i)||'').trim()]).filter(([,v]) => v);
+      const fixed = FIX.map(([k],i) => {
+        let v = (fd.get('fx'+i)||'').trim();
+        if(k==='Gender'){ const g = fd.get('gsel'); v = g==='__o' ? v : (g || ''); }
+        if(k==='Height' && /^\d+(\.\d+)?$/.test(v)) v += 'cm';
+        return [k, v];
+      }).filter(([,v]) => v);
       const rm = fd.getAll('grm'), gallery = ((c && c.gallery) || []).filter((_,i) => !rm.includes(String(i)));
       const gf = fd.getAll('gfiles').filter(x => x && x.size);
       for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
@@ -422,7 +471,7 @@ document.addEventListener('click', async e => {
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
-  if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow());
+  if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow({}, !!$('#subs').dataset.ph));
   if(a==='del-sub') return b.closest('.sr').remove();
   if(a==='new-p') return formP();
   if(a==='edit-p') return formP(PR.find(p => p.id===id));
@@ -433,10 +482,18 @@ document.addEventListener('click', async e => {
 });
 $('#lb').onclick = () => { $('#lb').hidden = true; };
 addEventListener('keydown', e => { if(e.key==='Escape'){ if(!$('#lb').hidden){ $('#lb').hidden = true; return; } if(!$('#md').hidden && (!dirty || confirm('입력한 내용이 사라져요. 닫을까요?'))) closeM(); } });
+const SUN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>';
+const MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme:dark)').matches; };
+const paintTheme = () => { const d = isDark(), b = $('#theme'); b.innerHTML = d ? MOON : SUN; const t = d ? '라이트 모드로 전환' : '다크 모드로 전환'; b.setAttribute('aria-label', t); b.title = t; };
 $('#theme').onclick = () => {
-  const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
-  r.dataset.theme = dark ? 'light' : 'dark';
+  const r = document.documentElement;
+  r.dataset.theme = isDark() ? 'light' : 'dark';
+  try{ localStorage.setItem('rosie-theme', r.dataset.theme); }catch(_){}
+  paintTheme();
 };
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
+paintTheme();
 const syncAdm = () => $('#adm').textContent = admin ? '✧' : '✦';
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)) route(); });
