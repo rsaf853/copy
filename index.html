@@ -94,11 +94,30 @@ td{white-space:pre-wrap;word-break:break-word}
 .cmw{position:relative}
 .cmw input{padding-right:30px}
 .cmw span{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;pointer-events:none}
-.sb.ph{display:flex}
-.sim{position:relative;width:120px;min-height:160px;flex:none;border-right:1px solid var(--line);background:var(--soft);cursor:zoom-in;overflow:hidden}
-.sim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.sbd{flex:1;min-width:0}
-@media(max-width:640px){.sim{width:96px;min-height:128px}}
+.h2s{display:flex;justify-content:space-between;align-items:center}
+.vs{display:flex;gap:3px}.vs .chip{padding:0 8px}
+.sp{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px;min-width:0}
+.sp .tt{display:flex;align-items:center;gap:7px;min-width:0}
+.sp .th{display:none}
+.sp .sim{display:none;position:relative;background:var(--soft);overflow:hidden;cursor:zoom-in}
+.sp .sim img,.sp .th img{width:100%;height:100%;object-fit:cover;display:block}
+.sp .bd{min-width:0}
+/* A: 왼쪽 썸네일 */
+[data-v=a] .sp{display:flex}
+[data-v=a] .sp .sim:not(.no){display:block;width:96px;min-height:96px;flex:none;border-right:1px solid var(--line)}
+[data-v=a] .sp .sim img{position:absolute;inset:0}
+[data-v=a] .sp .bd{flex:1}
+/* B: 제목 옆 미니 썸네일 */
+[data-v=b] .sp .th{display:block;width:28px;height:38px;flex:none;border:1px solid var(--line);overflow:hidden;cursor:zoom-in}
+[data-v=b] .sp .hd{padding:6px 10px}
+/* C: 카드 그리드 */
+[data-v=c]{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+[data-v=c] .sp{margin:0;border-left:1px solid var(--line);display:flex;flex-direction:column}
+[data-v=c] .sp .sim{display:flex;aspect-ratio:4/3;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--mut);border-bottom:2px solid var(--fg)}
+[data-v=c] .sp .bd{flex:1}
+[data-v=c] .sp .tx{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+[data-v=c] .sp .tx.open{display:block;overflow-y:auto}
+@media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:160px;min-height:0;border-right:0;border-bottom:1px solid var(--line)}}
 h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
 .empty{color:var(--mut);padding:32px 0;text-align:center}
 .acts{display:flex;gap:5px;margin-top:12px}
@@ -169,11 +188,16 @@ let ORD = false;
 const initial = n => esc([...n][0] || '?');
 let CH = [], PR = [], admin = false, dirty = false;
 const tagsOf = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
+let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!'abc'.includes(SV)) SV = 'a';
 function subBox(c, x, i, pre='s'){
   const t = x.t || 'SUB ' + (i+1);
-  const hd = `<div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre>`;
-  if(pre==='s' && x.img) return `<div class="sb ph"><div class="sim" data-act="zoom" data-src="${esc(x.img)}">${img(x.img,'')}</div><div class="sbd">${hd}</div></div>`;
-  return `<div class="sb">${hd}</div>`;
+  if(pre!=='s'){
+    return `<div class="sb"><div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div>`;
+  }
+  const z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
+  return `<div class="sp"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t) : initial(t)}</div>
+  <div class="bd"><div class="hd"><span class="tt">${x.img ? `<span class="th"${z}>${img(x.img,t)}</span>` : ''}<span>${esc(t)}</span></span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div>
+  <pre class="tx" data-act="expand">${esc(x.x)}</pre></div></div>`;
 }
 
 /* ---------- data ---------- */
@@ -233,7 +257,7 @@ function pageChar(id){
   </div>
   ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal">${c.gallery.map(u => `<div data-act="zoom" data-src="${esc(u)}">${img(u,'')}</div>`).join('')}</div>` : ''}
   ${c.prompt ? `<h2>CHARACTER PROMPT</h2><div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}
-  ${(c.subs||[]).length ? `<h2>SUB PROMPTS</h2><div class="pr"><div class="bd">${c.subs.map((x,i) => subBox(c,x,i)).join('')}</div></div>` : ''}
+  ${(c.subs||[]).length ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${['a','b','c'].map(v => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${v.toUpperCase()}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${c.subs.map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
 }
 
@@ -470,6 +494,8 @@ document.addEventListener('click', async e => {
   if(a==='order'){ ORD = !ORD; return pageChars(); }
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
+  if(a==='expand'){ b.classList.toggle('open'); return; }
+  if(a==='subv'){ SV = b.dataset.sv; try{ localStorage.setItem('sv', SV); }catch(_){} const sp = $('#sps'); if(sp) sp.dataset.v = SV; document.querySelectorAll('[data-act=subv]').forEach(x => x.classList.toggle('on', x===b)); return; }
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
   if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow({}, !!$('#subs').dataset.ph));
   if(a==='del-sub') return b.closest('.sr').remove();
