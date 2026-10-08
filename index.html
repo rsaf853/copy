@@ -40,8 +40,10 @@ nav a.on{text-decoration:underline;text-decoration-thickness:1.5px;text-underlin
 nav a.on,nav a:hover{color:var(--fg)}
 nav .btn{color:var(--mut);border:0}
 nav .btn:hover{background:none;color:var(--mut);border:0}
-footer .wrap{display:flex;align-items:baseline;gap:8px}
-#adm{border:0;background:none;color:inherit;padding:0;margin:0;font:inherit;letter-spacing:inherit;line-height:inherit;-webkit-appearance:none;appearance:none;cursor:default}
+footer .wrap{display:flex;align-items:center;gap:8px}
+#adm{border:0;background:none;color:inherit;padding:4px;margin:-4px;display:inline-flex;align-items:center;cursor:default;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;outline:0}
+#adm svg{width:11px;height:11px;display:block}
+#adm.on path{fill:currentColor}
 .btn{border-color:var(--line)}
 .btn:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .btn:disabled{opacity:.4;pointer-events:none}
@@ -191,7 +193,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
   </nav>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap"><button id="adm" aria-label="관리자">♡︎</button>PERSONAL ARCHIVE · NO REDISTRIBUTION<button id="set" hidden>SETTINGS</button></div></footer>
+<footer><div class="wrap"><button id="adm" aria-label="관리자"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5C5 15.5 2.5 12 2.5 8.6 2.5 6 4.5 4 7 4c1.9 0 3.7 1 5 2.8C13.3 5 15.1 4 17 4c2.5 0 4.5 2 4.5 4.6 0 3.4-2.5 6.9-9.5 11.9z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg></button>PERSONAL ARCHIVE · NO REDISTRIBUTION<button id="set" hidden>SETTINGS</button></div></footer>
 <div id="lb" hidden></div>
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
@@ -736,7 +738,7 @@ $('#theme').onclick = () => {
 };
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
 paintTheme();
-const syncAdm = () => { $('#adm').textContent = admin ? '♥\uFE0E' : '♡\uFE0E'; $('#set').hidden = !admin; };
+const syncAdm = () => { $('#adm').classList.toggle('on', admin); $('#set').hidden = !admin; };
 const FEATS = [['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그']];
 function formSettings(){
   openM(`<h3>SETTINGS</h3><form id="f">${FEATS.map(([k,l]) => `<label>${l}</label><select name="${k}">${[['on','공개'],['admin','나만 보기'],['off','끔']].map(([v,t]) => `<option value="${v}"${(SET[k]||'on')===v ? ' selected' : ''}>${t}</option>`).join('')}</select>`).join('')}${btns('SAVE')}</form>`);
