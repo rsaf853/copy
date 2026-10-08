@@ -188,7 +188,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
   </nav>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap"><button id="adm">✦</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
+<footer><div class="wrap"><button id="adm" aria-label="관리자">♡︎</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
 <div id="lb" hidden></div>
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
@@ -278,7 +278,7 @@ function pageChar(id){
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
       <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(lab(k))}</th><td>${esc(lab(k)==='Height' && /^\d+(\.\d+)?$/.test(String(v).trim()) ? String(v).trim() + 'cm' : v)}</td></tr>`).join('')}</table>
-      <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
+      <div style="white-space:pre-wrap;font-size:12.5px">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
   ${(c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : ''}
@@ -314,7 +314,7 @@ function pagePrompts(){
   const cnt = k => k==='all' ? PR.length : PR.filter(p => p.cat===k).length;
   app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">ARCHIVE · ${PR.length} SAVED</p></div>
   ${admin ? '<button class="btn" data-act="new-p">+ NEW</button>' : ''}</div>
-  <input type="search" id="q" placeholder="search" value="${esc(q)}">
+  <input type="search" id="q" placeholder="검색" value="${esc(q)}">
   <div class="bar" id="chips">${['all',...cats].map(k => `<button class="chip ${k===cat?'on':''}" data-c="${esc(k)}">${esc(k)} ${cnt(k)}</button>`).join('')}</div>
   <div id="list"></div>`;
   $('#q').oninput = e => { q = e.target.value; shown = 20; list(); };
@@ -327,7 +327,7 @@ function list(){
   const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || p.text.toLowerCase().includes(s))).reverse();
   $('#list').innerHTML = rows.length
     ? `<div class="pgrid">${rows.slice(0,shown).map(promptBox).join('')}</div>` + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
-    : '<p class="empty">i'm feeling lucky!</p>';
+    : '<p class="empty">결과가 없어요.</p>';
   const m = $('#more'); if(m) m.onclick = () => { shown += 20; list(); };
 }
 
@@ -722,7 +722,7 @@ $('#theme').onclick = () => {
 };
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
 paintTheme();
-const syncAdm = () => $('#adm').textContent = admin ? '✧' : '✦';
+const syncAdm = () => $('#adm').textContent = admin ? '♥\uFE0E' : '♡\uFE0E';
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)) route(); });
 addEventListener('hashchange', route);
