@@ -68,7 +68,7 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .rcard .rce{position:absolute;top:6px;right:6px;z-index:2;background:var(--bg);border:1px solid var(--fg);font:700 10px/1 var(--sans);padding:4px 7px;cursor:pointer}
 .rcard .rm{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 10px}
 .rcard b{font-size:13px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rcard .rk{flex:none;max-width:60%;font-size:10px;font-weight:600;border:1px solid var(--line);padding:1px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcard .rk{flex:none;max-width:60%;font-size:11px;font-weight:600;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pe{width:150px;aspect-ratio:3/4;border:1px solid var(--line);overflow:hidden;background:var(--soft);touch-action:none;cursor:grab;margin-top:6px}
 .pe img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
 .pe:active{cursor:grabbing}
@@ -89,8 +89,6 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .sb{border-top:1px solid var(--line)}
 .sb:first-child{border-top:0}
 .sb .hd{border-bottom:0;padding:5px 10px}
-.sb .tx{max-height:170px;padding-top:2px}
-.sp .tx,.sb .tx{font-size:11px}
 .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
 .hd .btn{padding:0 7px;font-size:10.5px}
 .hd div{display:flex;gap:4px}
@@ -428,7 +426,7 @@ const relOf = c => [...(c.related || []), ...CH.filter(t => t.id !== c.id && (t.
 const relCards = c => relOf(c).map(o => { const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
   const pz = okPos(pos) || '50% 50%', thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
-  return `<a class="rcard" href="#/c/${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">${esc(o.k)}</span>` : ''}</div></a>`; }).join('');
+  return `<a class="rcard" href="#/c/${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
 const rrHtml = (o, t) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || 1;
   return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
   <div class="pe" style="width:240px;aspect-ratio:4/3">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
