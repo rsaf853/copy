@@ -158,10 +158,10 @@ const initial = n => esc([...n][0] || '?');
 let CH = [], PR = [], admin = false, dirty = false;
 let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!'abc'.includes(SV)) SV = 'a';
 const tagsOf = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
-function subBox(c, x, i){
+function subBox(c, x, i, pre='s'){
   const t = x.t || 'SUB ' + (i+1), z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
   return `<div class="sp"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t) : initial(t)}</div>
-  <div class="bd"><div class="hd"><span class="tt">${x.img ? `<span class="th"${z}>${img(x.img,t)}</span>` : ''}<span>${esc(t)}</span></span><button class="btn" data-act="copy" data-k="s${c.id}-${i}">COPY</button></div>
+  <div class="bd"><div class="hd"><span class="tt">${x.img ? `<span class="th"${z}>${img(x.img,t)}</span>` : ''}<span>${esc(t)}</span></span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div>
   <pre class="tx" data-act="expand">${esc(x.x)}</pre></div></div>`;
 }
 
@@ -172,6 +172,7 @@ async function load(){
   CH = c.data; PR = p.data; return true;
 }
 const textOf = k => {
+  if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
   if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
   return k[0]==='p' ? (PR.find(p => p.id===+k.slice(1))||{}).text : (CH.find(c => c.id===+k.slice(1))||{}).prompt;
 };
@@ -184,7 +185,7 @@ function promptBox(p){
   return `<div class="pr">${p.img ? `<div class="im">${img(p.img,'')}</div>` : ''}
   <div class="bd"><div class="hd"><span>#${pad(num(p))} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
-  <pre class="tx">${esc(p.text)}</pre></div></div>`;
+  <pre class="tx">${esc(p.text)}</pre>${(p.subs||[]).length ? `<div class="sps" data-v="${SV}" style="padding:4px 10px 0">${p.subs.map((x,i) => subBox(p,x,i,'q')).join('')}</div>` : ''}</div></div>`;
 }
 
 function pageChars(){
@@ -271,6 +272,16 @@ async function finish(fn){
   catch(err){ st('오류: ' + (err.message || err)); b.disabled = false; }
 }
 
+async function readSubs(fd){
+  const t = fd.getAll('sub_t'), x = fd.getAll('sub_x'), si = fd.getAll('sub_img'), sf = fd.getAll('sub_file'), subs = [];
+  for(let i = 0; i < x.length; i++){
+    const tx = (x[i]||'').trim(); if(!tx) continue;
+    let sim = si[i] || '', file = sf[i];
+    if(file && file.size){ st(`서브 이미지 업로드 중… ${i+1}/${x.length}`); sim = await upload(file, 'prompts'); }
+    subs.push({ t: (t[i]||'').trim(), x: tx, img: sim });
+  }
+  return subs;
+}
 function formP(p){
   const cats = [...new Set(PR.map(x => x.cat))];
   openM(`<h3>${p ? '프롬프트 수정' : '프롬프트 추가'}</h3>
@@ -280,6 +291,8 @@ function formP(p){
     <label>연결할 캐릭터 (선택)</label><select name="char_id"><option value="">없음</option>${CH.map(c => `<option value="${c.id}" ${p && p.char_id===c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
     <label>프롬프트</label><textarea class="m" name="text" rows="9" required>${esc(p ? p.text : '')}</textarea>
     ${imgField(p && p.img)}
+    <label>서브 프롬프트</label><div id="subs">${((p && p.subs) || []).map(subRow).join('')}</div>
+    <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
     ${btns('SAVE')}
   </form>`);
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
@@ -287,7 +300,7 @@ function formP(p){
       let im = p ? p.img : '';
       if(fd.get('rmimg')) im = '';
       const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'prompts'); }
-      const row = { cat: fd.get('cat').trim(), text: fd.get('text').trim(), img: im, char_id: fd.get('char_id') ? +fd.get('char_id') : null };
+      const row = { cat: fd.get('cat').trim(), text: fd.get('text').trim(), img: im, char_id: fd.get('char_id') ? +fd.get('char_id') : null, subs: await readSubs(fd) };
       const r = p ? await sb.from('prompts').update(row).eq('id', p.id) : await sb.from('prompts').insert(row);
       if(r.error) throw r.error;
     }); };
@@ -335,13 +348,7 @@ function formC(c){
       const rm = fd.getAll('grm'), gallery = ((c && c.gallery) || []).filter((_,i) => !rm.includes(String(i)));
       const gf = fd.getAll('gfiles').filter(x => x && x.size);
       for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
-      const t = fd.getAll('sub_t'), x = fd.getAll('sub_x'), si = fd.getAll('sub_img'), sf = fd.getAll('sub_file'), subs = [];
-      for(let i = 0; i < x.length; i++){
-        const tx = (x[i]||'').trim(); if(!tx) continue;
-        let sim = si[i] || '', file = sf[i];
-        if(file && file.size){ st(`서브 이미지 업로드 중… ${i+1}/${x.length}`); sim = await upload(file, 'characters'); }
-        subs.push({ t: (t[i]||'').trim(), x: tx, img: sim });
-      }
+      const subs = await readSubs(fd);
       const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), subs, gallery };
       const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
       if(r.error) throw r.error;
