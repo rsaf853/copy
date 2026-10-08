@@ -314,7 +314,7 @@ function pagePrompts(){
   const cnt = k => k==='all' ? PR.length : PR.filter(p => p.cat===k).length;
   app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">ARCHIVE · ${PR.length} SAVED</p></div>
   ${admin ? '<button class="btn" data-act="new-p">+ NEW</button>' : ''}</div>
-  <input type="search" id="q" placeholder="검색" value="${esc(q)}">
+  <input type="search" id="q" placeholder="search" value="${esc(q)}">
   <div class="bar" id="chips">${['all',...cats].map(k => `<button class="chip ${k===cat?'on':''}" data-c="${esc(k)}">${esc(k)} ${cnt(k)}</button>`).join('')}</div>
   <div id="list"></div>`;
   $('#q').oninput = e => { q = e.target.value; shown = 20; list(); };
@@ -327,7 +327,7 @@ function list(){
   const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || p.text.toLowerCase().includes(s))).reverse();
   $('#list').innerHTML = rows.length
     ? `<div class="pgrid">${rows.slice(0,shown).map(promptBox).join('')}</div>` + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
-    : '<p class="empty">결과가 없어요.</p>';
+    : '<p class="empty">I'm feeling lucky!</p>';
   const m = $('#more'); if(m) m.onclick = () => { shown += 20; list(); };
 }
 
