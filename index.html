@@ -40,8 +40,8 @@ nav a.on{text-decoration:underline;text-decoration-thickness:1.5px;text-underlin
 nav a.on,nav a:hover{color:var(--fg)}
 nav .btn{color:var(--mut);border:0}
 nav .btn:hover{background:none;color:var(--mut);border:0}
-footer .wrap{display:flex;align-items:center;gap:8px}
-#adm{border:0;background:none;color:var(--mut);padding:0;font:inherit;font-family:Pretendard,"Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;cursor:default}
+footer .wrap{display:flex;align-items:baseline;gap:8px}
+#adm{border:0;background:none;color:inherit;padding:0;margin:0;font:inherit;letter-spacing:inherit;line-height:inherit;-webkit-appearance:none;appearance:none;cursor:default}
 .btn{border-color:var(--line)}
 .btn:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .btn:disabled{opacity:.4;pointer-events:none}
@@ -178,6 +178,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .pin{position:absolute;top:6px;right:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--bg);color:var(--mut);border:1px solid var(--line);cursor:pointer}
 .pin:hover{color:var(--fg);border-color:var(--fg)}
 .pin.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+#set{border:0;background:none;color:inherit;padding:0;margin:0 0 0 auto;font:inherit;letter-spacing:inherit;line-height:inherit;cursor:pointer}
 </style>
 </head>
 <body>
@@ -190,7 +191,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
   </nav>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap"><button id="adm" aria-label="관리자">♡︎</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
+<footer><div class="wrap"><button id="adm" aria-label="관리자">♡︎</button>PERSONAL ARCHIVE · NO REDISTRIBUTION<button id="set" hidden>SETTINGS</button></div></footer>
 <div id="lb" hidden></div>
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
@@ -214,7 +215,10 @@ const sortCh = () => [...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0) || (a
 let ORD = false;
 const initial = n => esc([...n][0] || '?');
 let CH = [], PR = [], admin = false, dirty = false;
-const tagsOf = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
+let SET = {};
+const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin); };
+const pv = k => SET[k]==='admin' ? ' · PRIVATE' : '';
+const tagsOf = s => !show('tags') ? [] : String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
 let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!['a','c'].includes(SV)) SV = 'a';
 function subBox(c, x, i, pre='s'){
   const t = x.t || 'SUB ' + (i+1);
@@ -231,7 +235,9 @@ function subBox(c, x, i, pre='s'){
 async function load(){
   const [c, p] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id')]);
   if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
-  CH = c.data; PR = p.data; return true;
+  CH = c.data; PR = p.data;
+  const st2 = await sb.from('site_settings').select('*'); if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
+  return true;
 }
 const textOf = k => {
   if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
@@ -248,7 +254,7 @@ function promptBox(p){
   return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
   <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
-  <pre class="tx">${esc(p.text)}</pre>${(p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('')}</div></div>`;
+  <pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
 }
 
 function pageChars(){
@@ -283,11 +289,11 @@ function pageChar(id){
       <div style="white-space:pre-wrap;font-size:12.5px">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
-  ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : ''}
-  ${(c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
-  ${(c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : ''}
-  ${rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : ''}
-  ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
+  ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
+  ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
+  ${!show('gal') ? '' : ((c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY${pv('gal')} · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : '')}
+  ${!show('rel') ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : '')}
+  ${!show('relp') ? '' : (rel.length ? `<h2>RELATED PROMPTS${pv('relp')}</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : '')}`;
   document.querySelectorAll('.gal div[data-gi] img').forEach(im => {
     const f = () => { if(im.naturalWidth) im.parentElement.style.setProperty('--r', (im.naturalWidth / im.naturalHeight).toFixed(3)); };
     im.loading = 'eager'; im.complete ? f() : im.addEventListener('load', f);
@@ -339,6 +345,8 @@ function list(){
 
 function route(){
   const [a,b] = (location.hash.slice(2) || 'characters').split('/');
+  $('#n2').style.display = show('pp') ? '' : 'none';
+  if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
   if(a==='prompts' || a==='c') ORD = false;
   $('#n1').classList.toggle('on', a!=='prompts'); $('#n2').classList.toggle('on', a==='prompts');
   a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
@@ -728,7 +736,17 @@ $('#theme').onclick = () => {
 };
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
 paintTheme();
-const syncAdm = () => $('#adm').textContent = admin ? '♥\uFE0E' : '♡\uFE0E';
+const syncAdm = () => { $('#adm').textContent = admin ? '♥\uFE0E' : '♡\uFE0E'; $('#set').hidden = !admin; };
+const FEATS = [['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그']];
+function formSettings(){
+  openM(`<h3>SETTINGS</h3><form id="f">${FEATS.map(([k,l]) => `<label>${l}</label><select name="${k}">${[['on','공개'],['admin','나만 보기'],['off','끔']].map(([v,t]) => `<option value="${v}"${(SET[k]||'on')===v ? ' selected' : ''}>${t}</option>`).join('')}</select>`).join('')}${btns('SAVE')}</form>`);
+  $('#f').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e.target); st('저장 중…');
+    const rows = FEATS.map(([k]) => ({ key: k, value: fd.get(k) }));
+    const r = await sb.from('site_settings').upsert(rows);
+    if(r.error) return st('저장 실패: ' + r.error.message);
+    rows.forEach(o => { SET[o.key] = o.value; }); closeM(); route(); };
+}
+$('#set').onclick = formSettings;
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)) route(); });
 addEventListener('hashchange', route);
