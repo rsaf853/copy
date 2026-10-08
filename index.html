@@ -37,7 +37,7 @@ main{padding:24px 0 56px;min-height:70vh}
 h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .sub{color:var(--mut);font:500 11px/1.5 var(--sans);margin:0 0 18px}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
 .card{display:block;border:1px solid var(--line);text-decoration:none}
 .card:hover{border-color:var(--fg)}
 .ph{aspect-ratio:3/4;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:var(--mut);overflow:hidden}
@@ -104,7 +104,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 <header><div class="wrap">
   <a class="logo" href="#/characters">r<svg class="hrt" viewBox="0 0 24 24" aria-label="o"><path d="M12 21s-7-4.6-9.5-9C.8 8.8 2.6 5 6.2 5c2.2 0 3.8 1.3 5.8 3.4C14 6.3 15.6 5 17.8 5c3.6 0 5.4 3.8 3.7 7-2.5 4.4-9.5 9-9.5 9z"/></svg>sie <span class="lg2">prompt</span></a>
   <nav>
-    <a href="#/characters" id="n1">profile</a>
+    <a href="#/characters" id="n1">persona</a>
     <a href="#/prompts" id="n2">prompt</a>
     <button class="btn" id="theme" title="테마">◐</button>
   </nav>
@@ -151,7 +151,7 @@ function promptBox(p){
 }
 
 function pageChars(){
-  app.innerHTML = `<div class="top"><div><h1>PROFILE</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
+  app.innerHTML = `<div class="top"><div><h1>PERSONA</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
   ${admin ? '<button class="btn" data-act="new-c">+ NEW</button>' : ''}</div>
   ${CH.length ? `<div class="grid">${CH.map(c => `<a class="card" href="#/c/${c.id}">
     <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
@@ -267,7 +267,7 @@ function formC(c){
   const inf = c ? (c.info||[]) : [];
   const get = ks => (inf.find(([k]) => ks.includes(k))||[])[1] || '';
   const used = FIX.flatMap(([,ks]) => ks);
-  const extra = c ? inf.filter(([k]) => !used.includes(k)).map(([k,v]) => `${k}: ${v}`).join('\n') : '나이: \n성격: \n특징: ';
+  const extra = c ? inf.filter(([k]) => !used.includes(k)).map(([k,v]) => `${k}: ${v}`).join('\n') : '';
   openM(`<h3>${c ? '캐릭터 수정' : '캐릭터 추가'}</h3>
   <form id="f">
     <div class="g2">
