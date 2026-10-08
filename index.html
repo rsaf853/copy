@@ -371,7 +371,7 @@ const parseInfo = t => {
   return out.filter(([k,v]) => k && v);
 };
 
-const FIX = [['Full Name',['Full Name','본명','풀네임','Full name','full name']], ['Alias',['Alias','alias','ALIAS','별칭']], ['Gender',['Gender','성별']], ['Age',['Age','나이','age','AGE']], ['Height',['Height','키']], ['DOB',['DOB','생일']], ['Nationality',['Nationality','국적']]];
+const FIX = [['Name',['Name','Full Name','본명','풀네임','Full name','full name']], ['Alias',['Alias','alias','ALIAS','별칭']], ['Gender',['Gender','성별']], ['Age',['Age','나이','age','AGE']], ['Height',['Height','키']], ['DOB',['DOB','생일']], ['Nationality',['Nationality','국적']]];
 const lab = k => (FIX.find(([,ks]) => ks.includes(k)) || [k])[0];
 const subRow = (x={}, ph=false) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
   ${ph ? `<input type="hidden" name="sub_i" value="${esc(x.img)}"><label style="margin:4px 0 0">사진 ${x.img ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="sub_f" accept="image/*">
