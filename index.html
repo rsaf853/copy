@@ -184,7 +184,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
   </nav>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap"><button id="adm">✦</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
+<footer><div class="wrap"><button id="adm">♥︎</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
 <div id="lb" hidden></div>
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
@@ -718,7 +718,7 @@ $('#theme').onclick = () => {
 };
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
 paintTheme();
-const syncAdm = () => $('#adm').textContent = admin ? '✧' : '✦';
+const syncAdm = () => $('#adm').textContent = admin ? '♡' : '♥︎';
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)) route(); });
 addEventListener('hashchange', route);
