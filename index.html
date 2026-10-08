@@ -123,6 +123,10 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 [data-v=c] .sp .tx{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 [data-v=c] .sp .tx.open{display:block}
 @media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
+.card{position:relative}
+.pin{position:absolute;top:6px;right:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--bg);color:var(--mut);border:1px solid var(--line);cursor:pointer}
+.pin:hover{color:var(--fg);border-color:var(--fg)}
+.pin.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 </style>
 </head>
 <body>
@@ -186,7 +190,7 @@ function promptBox(p){
 function pageChars(){
   app.innerHTML = `<div class="top"><div><h1>PERSONA</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
   ${admin ? '<button class="btn" data-act="new-c">+ NEW</button>' : ''}</div>
-  ${CH.length ? `<div class="grid">${CH.map(c => `<a class="card" href="#/c/${c.id}">
+  ${CH.length ? `<div class="grid">${[...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0)).map(c => `<a class="card" href="#/c/${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
     <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}</b><span>${esc(tagsOf(c.tag).join(' · '))}</span></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
 }
@@ -373,6 +377,7 @@ function copy(b){
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if(!b) return;
   const a = b.dataset.act, id = +b.dataset.id || null;
+  if(a==='pin'){ e.preventDefault(); const c = CH.find(x => x.id===id); const r = await sb.from('characters').update({ pinned: !c.pinned }).eq('id', id); if(r.error) return alert('핀 실패: ' + r.error.message); await load(); return pageChars(); }
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
