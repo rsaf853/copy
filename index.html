@@ -62,14 +62,21 @@ input,select,textarea{width:100%;border:1px solid var(--line);background:var(--b
 input:focus,select:focus,textarea:focus{border-color:var(--fg)}
 #q{margin-bottom:10px}
 textarea.m{font-family:var(--mono);font-size:12px}
-.pr{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px;display:flex}
-.pr .im{width:96px;flex:none;border-right:1px solid var(--line);background:var(--soft)}
-.pr .im img{width:100%;height:100%;object-fit:cover;display:block}
-.pr .bd{flex:1;min-width:0}
+.pr{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px;display:flex;min-width:0}
+.pr .im{position:relative;width:36%;min-width:120px;max-width:170px;min-height:230px;flex:none;border-right:1px solid var(--line);background:var(--soft);cursor:zoom-in;overflow:hidden}
+.pr .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pr .bd{flex:1;min-width:0;display:flex;flex-direction:column}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pgrid .pr{margin:0}
+.sb{border-top:1px solid var(--line)}
+.sb:first-child{border-top:0}
+.sb .hd{border-bottom:0;padding:5px 10px}
+.sb .tx{max-height:170px;padding-top:2px}
 .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
 .hd .btn{padding:0 7px;font-size:10.5px}
 .hd div{display:flex;gap:4px}
-.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--fg) transparent}
+.tx::-webkit-scrollbar{width:4px}.tx::-webkit-scrollbar-thumb{background:var(--fg)}
 .more{display:block;margin:16px auto 0}
 .back{display:inline-block;margin-bottom:14px;font:600 11px/1.5 var(--sans);color:var(--mut);text-decoration:none}
 .back:hover{color:var(--fg)}
@@ -105,33 +112,10 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .gi img{width:56px;height:74px;object-fit:cover;border:1px solid var(--line);display:block}
 #lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:30;cursor:zoom-out;padding:16px}
 #lb[hidden]{display:none}
-#lb img{max-width:100%;max-height:100%;object-fit:contain}
-@media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}.card .meta{padding:7px 8px}.gal div{height:150px}.prof{grid-template-columns:1fr}.prof .ph{max-width:300px}.pr{flex-direction:column}.pr .im{width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
-.h2s{display:flex;justify-content:space-between;align-items:center}
-.vs{display:flex;gap:3px}.vs .chip{padding:0 8px}
+#lb img{max-width:min(100%,560px);max-height:min(100%,78vh);object-fit:contain}
+@media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}.card .meta{padding:7px 8px}.gal div{height:150px}.prof{grid-template-columns:1fr}.prof .ph{max-width:300px}.pgrid{grid-template-columns:1fr}.pr{flex-direction:column}.pr .im{width:100%;max-width:none;min-width:0;min-height:0;height:240px;border-right:0;border-bottom:1px solid var(--line)}}
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
 .tg{font:600 11px/1.5 var(--sans);border:1px solid var(--fg);padding:0 8px}
-.sp{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px}
-.sp .tt{display:flex;align-items:center;gap:7px;min-width:0}
-.sp .th{display:none}
-.sp .sim{display:none;background:var(--soft);overflow:hidden;cursor:zoom-in}
-.sp .sim img,.sp .th img{width:100%;height:100%;object-fit:cover;display:block}
-.sp .bd{min-width:0}
-/* A: 왼쪽 썸네일 */
-[data-v=a] .sp{display:flex}
-[data-v=a] .sp .sim:not(.no){display:block;width:96px;min-height:96px;flex:none;border-right:1px solid var(--line)}
-[data-v=a] .sp .bd{flex:1}
-/* B: 제목 옆 미니 썸네일 */
-[data-v=b] .sp .th{display:block;width:28px;height:38px;flex:none;border:1px solid var(--line);overflow:hidden;cursor:zoom-in}
-[data-v=b] .sp .hd{padding:6px 10px}
-/* C: 카드 그리드 */
-[data-v=c]{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-[data-v=c] .sp{margin:0;border-left:1px solid var(--line);display:flex;flex-direction:column}
-[data-v=c] .sp .sim{display:flex;aspect-ratio:4/3;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--mut);border-bottom:2px solid var(--fg)}
-[data-v=c] .sp .bd{flex:1}
-[data-v=c] .sp .tx{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
-[data-v=c] .sp .tx.open{display:block}
-@media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
 .card{position:relative}
 .pin{position:absolute;top:6px;right:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--bg);color:var(--mut);border:1px solid var(--line);cursor:pointer}
 .pin:hover{color:var(--fg);border-color:var(--fg)}
@@ -170,13 +154,10 @@ const sortCh = () => [...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0) || (a
 let ORD = false;
 const initial = n => esc([...n][0] || '?');
 let CH = [], PR = [], admin = false, dirty = false;
-let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!'abc'.includes(SV)) SV = 'a';
 const tagsOf = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
 function subBox(c, x, i, pre='s'){
-  const t = x.t || 'SUB ' + (i+1), z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
-  return `<div class="sp"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t) : initial(t)}</div>
-  <div class="bd"><div class="hd"><span class="tt">${x.img ? `<span class="th"${z}>${img(x.img,t)}</span>` : ''}<span>${esc(t)}</span></span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div>
-  <pre class="tx" data-act="expand">${esc(x.x)}</pre></div></div>`;
+  const t = x.t || 'SUB ' + (i+1);
+  return `<div class="sb"><div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div>`;
 }
 
 /* ---------- data ---------- */
@@ -196,10 +177,10 @@ const chName = id => (CH.find(c => c.id===id)||{}).name;
 /* ---------- views ---------- */
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
-  return `<div class="pr">${p.img ? `<div class="im">${img(p.img,'')}</div>` : ''}
+  return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'')}</div>` : ''}
   <div class="bd"><div class="hd"><span>#${pad(num(p))} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
-  <pre class="tx">${esc(p.text)}</pre>${(p.subs||[]).length ? `<div class="sps" data-v="${SV}" style="padding:4px 10px 0">${p.subs.map((x,i) => subBox(p,x,i,'q')).join('')}</div>` : ''}</div></div>`;
+  <pre class="tx">${esc(p.text)}</pre>${(p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('')}</div></div>`;
 }
 
 function pageChars(){
@@ -236,8 +217,8 @@ function pageChar(id){
   </div>
   ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal">${c.gallery.map(u => `<div data-act="zoom" data-src="${esc(u)}">${img(u,'')}</div>`).join('')}</div>` : ''}
   ${c.prompt ? `<h2>CHARACTER PROMPT</h2><div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}
-  ${(c.subs||[]).length ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${['a','b','c'].map(v => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${v.toUpperCase()}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${c.subs.map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
-  ${rel.length ? `<h2>RELATED PROMPTS</h2>${rel.map(promptBox).join('')}` : ''}`;
+  ${(c.subs||[]).length ? `<h2>SUB PROMPTS</h2><div class="pr"><div class="bd">${c.subs.map((x,i) => subBox(c,x,i)).join('')}</div></div>` : ''}
+  ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
 }
 
 let cat = 'all', q = '', shown = 20;
@@ -259,7 +240,7 @@ function list(){
   const s = q.trim().toLowerCase();
   const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || p.text.toLowerCase().includes(s))).reverse();
   $('#list').innerHTML = rows.length
-    ? rows.slice(0,shown).map(promptBox).join('') + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
+    ? `<div class="pgrid">${rows.slice(0,shown).map(promptBox).join('')}</div>` + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
     : '<p class="empty">결과가 없어요.</p>';
   const m = $('#more'); if(m) m.onclick = () => { shown += 20; list(); };
 }
@@ -300,12 +281,10 @@ async function finish(fn){
 }
 
 async function readSubs(fd){
-  const t = fd.getAll('sub_t'), x = fd.getAll('sub_x'), si = fd.getAll('sub_img'), sf = fd.getAll('sub_file'), subs = [];
+  const t = fd.getAll('sub_t'), x = fd.getAll('sub_x'), subs = [];
   for(let i = 0; i < x.length; i++){
     const tx = (x[i]||'').trim(); if(!tx) continue;
-    let sim = si[i] || '', file = sf[i];
-    if(file && file.size){ st(`서브 이미지 업로드 중… ${i+1}/${x.length}`); sim = await upload(file, 'prompts'); }
-    subs.push({ t: (t[i]||'').trim(), x: tx, img: sim });
+    subs.push({ t: (t[i]||'').trim(), x: tx });
   }
   return subs;
 }
@@ -339,9 +318,6 @@ const parseInfo = t => t.split('\n').map(l => l.trim()).filter(Boolean).map(l =>
 
 const FIX = [['본명',['본명','풀네임','Full name','full name']], ['Alias',['Alias','alias','ALIAS','별칭']], ['성별',['성별']], ['나이',['나이','Age','age','AGE']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
 const subRow = (x={}) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
-  <input type="hidden" name="sub_img" value="${esc(x.img)}">
-  <label style="margin:2px 0 0">이미지 ${x.img ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="sub_file" accept="image/*">
-  ${x.img ? `<div class="cur">${img(x.img,'')}<button class="btn" type="button" data-act="rm-sub-img">이미지 삭제</button></div>` : ''}
   <button class="btn" type="button" data-act="del-sub">REMOVE</button></div>`;
 
 function formC(c){
@@ -448,9 +424,6 @@ document.addEventListener('click', async e => {
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
   if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow());
   if(a==='del-sub') return b.closest('.sr').remove();
-  if(a==='rm-sub-img'){ const r = b.closest('.sr'); r.querySelector('[name=sub_img]').value = ''; const cu = r.querySelector('.cur'); if(cu) cu.remove(); return; }
-  if(a==='subv'){ SV = b.dataset.sv; try{ localStorage.setItem('sv', SV); }catch(_){} const sp = $('#sps'); if(sp) sp.dataset.v = SV; document.querySelectorAll('[data-act=subv]').forEach(x => x.classList.toggle('on', x===b)); return; }
-  if(a==='expand'){ b.classList.toggle('open'); return; }
   if(a==='new-p') return formP();
   if(a==='edit-p') return formP(PR.find(p => p.id===id));
   if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
