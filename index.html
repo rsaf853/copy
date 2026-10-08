@@ -84,10 +84,11 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .sb:first-child{border-top:0}
 .sb .hd{border-bottom:0;padding:5px 10px}
 .sb .tx{max-height:170px;padding-top:2px}
+.sp .tx,.sb .tx{font-size:11px;color:var(--mut)}
 .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
 .hd .btn{padding:0 7px;font-size:10.5px}
 .hd div{display:flex;gap:4px}
-.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--fg) transparent}
+.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--fg) transparent}
 .tx::-webkit-scrollbar{width:4px}.tx::-webkit-scrollbar-thumb{background:var(--fg)}
 .more{display:block;margin:16px auto 0}
 .back{display:inline-block;margin-bottom:14px;font:600 11px/1.5 var(--sans);color:var(--mut);text-decoration:none}
@@ -111,7 +112,7 @@ td{white-space:pre-wrap;word-break:break-word}
 .sp .bd{min-width:0}
 /* LIST: 왼쪽 썸네일 */
 [data-v=a] .sp{display:flex}
-[data-v=a] .sp .sim:not(.no){display:block;width:96px;min-height:96px;flex:none;border-right:1px solid var(--line)}
+[data-v=a] .sp .sim:not(.no){display:block;width:150px;min-height:150px;flex:none;border-right:1px solid var(--line)}
 [data-v=a] .sp .sim img{position:absolute;inset:0}
 [data-v=a] .sp .bd{flex:1}
 /* GRID: 카드 */
@@ -122,7 +123,7 @@ td{white-space:pre-wrap;word-break:break-word}
 [data-v=c] .sp .bd{flex:1}
 [data-v=c] .sp .tx{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 [data-v=c] .sp .tx.open{display:block;overflow-y:auto}
-@media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:160px;min-height:0;border-right:0;border-bottom:1px solid var(--line)}}
+@media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:240px;min-height:0;border-right:0;border-bottom:1px solid var(--line)}}
 h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
 .empty{color:var(--mut);padding:32px 0;text-align:center}
 .acts{display:flex;gap:5px;margin-top:12px}
@@ -224,7 +225,7 @@ const chName = id => (CH.find(c => c.id===id)||{}).name;
 /* ---------- views ---------- */
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
-  return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'')}</div>` : ''}
+  return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
   <div class="bd"><div class="hd"><span>#${pad(num(p))} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
   <pre class="tx">${esc(p.text)}</pre>${(p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('')}</div></div>`;
@@ -380,16 +381,18 @@ function formP(p){
     <label>연결할 캐릭터 (선택)</label><select name="char_id"><option value="">없음</option>${CH.map(c => `<option value="${c.id}" ${p && p.char_id===c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
     <label>프롬프트</label><textarea class="m" name="text" rows="9" required>${esc(p ? p.text : '')}</textarea>
     ${imgField(p && p.img)}
+    <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞춰요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((p && p.img_pos) || '50% 50%')}"></div>
     <label>서브 프롬프트</label><div id="subs">${((p && p.subs) || []).map(x => subRow(x)).join('')}</div>
     <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
     ${btns('SAVE')}
   </form>`);
+  initPos(p && p.img, p && p.img_pos);
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
       let im = p ? p.img : '';
       if(fd.get('rmimg')) im = '';
       const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'prompts'); }
-      const row = { cat: fd.get('cat').trim(), text: fd.get('text').trim(), img: im, char_id: fd.get('char_id') ? +fd.get('char_id') : null, subs: await readSubs(fd) };
+      const row = { cat: fd.get('cat').trim(), text: fd.get('text').trim(), img: im, img_pos: fd.get('img_pos') || '50% 50%', char_id: fd.get('char_id') ? +fd.get('char_id') : null, subs: await readSubs(fd) };
       const r = p ? await sb.from('prompts').update(row).eq('id', p.id) : await sb.from('prompts').insert(row);
       if(r.error) throw r.error;
     }); };
@@ -418,10 +421,12 @@ const nz = v => String(v || '50% 50%').split(' ').map(x => (parseFloat(x) || 0).
 const relOf = c => [...(c.related || []), ...CH.filter(t => t.id !== c.id && (t.related || []).some(o => o.id === c.id) && !(c.related || []).some(o => o.id === t.id)).map(t => ({ id: t.id }))];
 const relCards = c => relOf(c).map(o => { const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
-  return `<a class="rcard" href="#/c/${t.id}"><div class="ph">${src ? img(src, t.name, pos) : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">${esc(o.k)}</span>` : ''}</div></a>`; }).join('');
-const relRow = (o, t) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%';
+  const pz = okPos(pos) || '50% 50%', thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
+  return `<a class="rcard" href="#/c/${t.id}"><div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">${esc(o.k)}</span>` : ''}</div></a>`; }).join('');
+const relRow = (o, t) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || 1;
   return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"><div style="display:flex;align-items:center;gap:6px;border:1px solid var(--line);padding:4px 6px;margin-top:6px"><b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</b><input class="rk" placeholder="관계 (친구…)" value="${esc((o && o.k) || '')}" style="width:96px;flex:none;padding:3px 6px"><button class="btn rt" type="button">썸네일</button><button class="btn rd" type="button">✕</button></div>
-  <div class="rb" hidden style="margin:6px 0 0 4px"><div class="pe" style="width:90px">${src ? `<img src="${esc(src)}" alt="" style="object-position:${esc(pos)}">` : ''}</div>
+  <div class="rb" hidden style="margin:6px 0 0 4px"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div><div class="pe" style="width:140px;aspect-ratio:1/1">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
+  <input type="range" class="rz" min="1" max="3" step="0.05" value="${z}" style="width:140px;padding:0;margin-top:6px">
   <input type="file" class="rf" accept="image/*" style="margin-top:6px"><input type="hidden" class="ri" value="${esc((o && o.img) || '')}"><input type="hidden" class="rp" value="${esc(pos)}">
   ${o && o.img ? '<label style="margin:4px 0 0;font-weight:500"><input type="checkbox" class="rx" style="width:auto"> 올린 썸네일 삭제 (대표 사진으로 되돌리기)</label>' : ''}</div></div>`; };
 function relSel(){
@@ -429,21 +434,25 @@ function relSel(){
   sel.innerHTML = '<option value="">+ 관련 캐릭터 추가…</option>' + sortCh().filter(t => t.id !== me && !have.includes(t.id)).map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
 }
 function bindRow(r){
-  const rb = r.querySelector('.rb'), box = r.querySelector('.pe'), file = r.querySelector('.rf'), hid = r.querySelector('.rp');
+  const rb = r.querySelector('.rb'), box = r.querySelector('.pe'), file = r.querySelector('.rf'), hid = r.querySelector('.rp'), rz = r.querySelector('.rz');
   let im = box.querySelector('img'); if(!im){ im = document.createElement('img'); im.alt = ''; box.appendChild(im); }
   let pos = String(hid.value).split(' ').map(parseFloat); if(pos.length < 2 || pos.some(isNaN)) pos = [50, 50];
-  const apply = () => { im.style.objectPosition = `${pos[0]}% ${pos[1]}%`; hid.value = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; };
+  let z = parseFloat(rz.value) || 1;
+  const apply = () => { const o = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; im.style.objectPosition = o; im.style.transformOrigin = o; im.style.transform = `scale(${z})`; hid.value = o; };
+  apply();
   r.querySelector('.rt').onclick = () => { rb.hidden = !rb.hidden; };
   r.querySelector('.rd').onclick = () => { r.remove(); relSel(); };
-  file.addEventListener('change', () => { const f = file.files[0]; if(f){ im.src = URL.createObjectURL(f); pos = [50, 50]; apply(); } });
+  file.addEventListener('change', () => { const f = file.files[0]; if(f){ im.src = URL.createObjectURL(f); pos = [50, 50]; z = 1; rz.value = 1; apply(); } });
+  rz.oninput = () => { z = parseFloat(rz.value) || 1; apply(); dirty = true; };
+  box.addEventListener('wheel', e => { e.preventDefault(); z = Math.max(1, Math.min(3, z - e.deltaY * 0.002)); rz.value = z; apply(); dirty = true; }, { passive:false });
   let d = null;
   box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
   box.addEventListener('pointermove', e => {
     if(!d || !im.naturalWidth) return;
     const bb = box.getBoundingClientRect(), sc = Math.max(bb.width / im.naturalWidth, bb.height / im.naturalHeight);
-    const ox = im.naturalWidth * sc - bb.width, oy = im.naturalHeight * sc - bb.height, cl = v => Math.max(0, Math.min(100, v));
-    if(ox > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / ox * 100);
-    if(oy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / oy * 100);
+    const gx = z * (im.naturalWidth * sc - bb.width) + (z - 1) * bb.width, gy = z * (im.naturalHeight * sc - bb.height) + (z - 1) * bb.height, cl = v => Math.max(0, Math.min(100, v));
+    if(gx > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / gx * 100);
+    if(gy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / gy * 100);
     apply(); dirty = true;
   });
   const end = () => { d = null; };
@@ -460,7 +469,7 @@ async function readRel(){
     const r = rows[i], o = { id: +r.dataset.id }; let im = r.querySelector('.ri').value; const kw = r.querySelector('.rk').value.trim(); if(kw) o.k = kw;
     const rx = r.querySelector('.rx'); if(rx && rx.checked) im = '';
     const f = r.querySelector('.rf').files[0]; if(f && f.size){ st(`관련 캐릭터 썸네일 업로드 중… ${i+1}/${rows.length}`); im = await upload(f, 'characters'); }
-    const pp = r.querySelector('.rp').value;
+    const pp = r.querySelector('.rp').value, zz = parseFloat(r.querySelector('.rz').value) || 1; if(zz > 1.001) o.z = +zz.toFixed(2);
     if(im){ o.img = im; if(okPos(pp)) o.pos = pp; } else if(okPos(pp) && nz(pp) !== nz(r.dataset.dp)) o.pos = pp;
     out.push(o);
   }
