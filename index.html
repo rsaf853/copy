@@ -1,1 +1,312 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PROMPT NOTE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#000;--mut:#666;--soft:#f2f2f2;--sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#999;--soft:#161616}}
+:root[data-theme="dark"]{--bg:#000;--fg:#fff;--mut:#999;--soft:#161616}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;border-radius:0}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.55;letter-spacing:-0.025em;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{letter-spacing:inherit;line-height:inherit}
+a{color:inherit}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:1px solid var(--fg);z-index:5}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-weight:700;letter-spacing:.12em;font-size:14px;text-decoration:none}
+nav{display:flex;gap:4px;align-items:center}
+nav a,.btn{font:500 12px/1.55 var(--sans);letter-spacing:.06em;text-decoration:none;border:1px solid transparent;padding:6px 12px;background:none;color:var(--fg);cursor:pointer}
+nav a.on{border-color:var(--fg)}
+nav a:hover,.btn:hover{background:var(--fg);color:var(--bg)}
+.btn{border-color:var(--fg)}
+.btn:disabled{opacity:.4;pointer-events:none}
+main{padding:40px 0 80px;min-height:70vh}
+h1{font-size:28px;margin:0 0 6px}
+.sub{color:var(--mut);font:12px/1.55 var(--sans);letter-spacing:.08em;margin:0 0 28px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.card{display:block;border:1px solid var(--fg);text-decoration:none}
+.card:hover{background:var(--soft)}
+.ph{aspect-ratio:3/4;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;border-bottom:1px solid var(--fg);overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card .meta{padding:12px 14px}
+.card b{display:block;font-size:16px}
+.card span{color:var(--mut);font-size:13px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;align-items:center}
+.chip{font:500 12px/1.55 var(--sans);border:1px solid var(--fg);background:none;color:var(--fg);padding:5px 12px;cursor:pointer}
+.chip.on,.chip:hover{background:var(--fg);color:var(--bg)}
+input,select,textarea{width:100%;border:1px solid var(--fg);background:var(--bg);color:var(--fg);padding:10px 12px;font:14px/1.55 var(--sans);outline:none}
+input:focus,select:focus,textarea:focus{box-shadow:inset 0 0 0 1px var(--fg)}
+#q{margin-bottom:14px}
+textarea.m{font-family:var(--mono);font-size:13px}
+.pr{border:1px solid var(--fg);margin-bottom:14px;display:flex}
+.pr .im{width:120px;flex:none;border-right:1px solid var(--fg);background:var(--soft)}
+.pr .im img{width:100%;height:100%;object-fit:cover;display:block}
+.pr .bd{flex:1;min-width:0}
+.hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--fg);font:12px/1.55 var(--sans);letter-spacing:.06em;gap:10px}
+.hd .btn{padding:2px 10px}
+.hd div{display:flex;gap:6px}
+.tx{padding:14px;margin:0;font-family:var(--mono);font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.more{display:block;margin:24px auto 0}
+.back{display:inline-block;margin-bottom:24px;font:12px/1.55 var(--sans);letter-spacing:.06em}
+.prof{display:grid;grid-template-columns:260px 1fr;gap:32px;margin-bottom:36px}
+.prof .ph{border:1px solid var(--fg)}
+table{width:100%;border-collapse:collapse;margin:16px 0 22px}
+th,td{text-align:left;padding:9px 0;border-bottom:1px solid var(--fg);font-size:14px;vertical-align:top}
+th{width:96px;color:var(--mut);font:500 12px/1.55 var(--sans);letter-spacing:.06em;padding-top:11px}
+h2{font:700 13px/1.55 var(--sans);letter-spacing:.1em;margin:36px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--fg)}
+.empty{color:var(--mut);padding:40px 0;text-align:center}
+.acts{display:flex;gap:8px;margin-top:16px}
+footer{border-top:1px solid var(--fg);padding:20px 0;color:var(--mut);font:12px/1.55 var(--sans)}
+#md{position:fixed;inset:0;background:rgba(0,0,0,.6);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 14px 24px;z-index:20}
+#md[hidden]{display:none}
+.mb{background:var(--bg);border:1px solid var(--fg);max-width:560px;margin:0 auto;padding:22px}
+.mb h3{margin:0 0 6px;font-size:18px}
+.mb label{display:block;font-size:12px;color:var(--mut);margin:16px 0 6px}
+.mb .row{display:flex;gap:8px;margin-top:22px}
+.mb .row .btn{padding:9px 18px}
+.mb .row .btn.pri{background:var(--fg);color:var(--bg)}
+.st{color:var(--mut);font-size:13px;margin-top:12px;min-height:20px;white-space:pre-wrap}
+.cur{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:13px}
+.cur img{width:48px;height:64px;object-fit:cover;border:1px solid var(--fg)}
+@media(max-width:640px){.prof{grid-template-columns:1fr}.prof .ph{max-width:260px}.pr{flex-direction:column}.pr .im{width:100%;height:200px;border-right:0;border-bottom:1px solid var(--fg)}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="#/characters">PROMPT NOTE</a>
+  <nav>
+    <a href="#/characters" id="n1">PROFILE</a>
+    <a href="#/prompts" id="n2">PROMPT</a>
+    <button class="btn" id="adm">ADMIN</button>
+    <button class="btn" id="theme" title="테마">◐</button>
+  </nav>
+</div></header>
+<main><div class="wrap" id="app"></div></main>
+<footer><div class="wrap">PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
+<div id="md" hidden><div class="mb" id="mb"></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://sxnijnngeatcscwyxhep.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4bmlqbm5nZWF0Y3Njd3l4aGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjE0MjIsImV4cCI6MjEwNzAzNzQyMn0.zT-jmsg7M14H7BFnqWFSclc6wnANJNDnHiVuCY9SoI8";
+const BUCKET = "images";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = s => document.querySelector(s), app = $('#app');
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad = n => String(n).padStart(3, '0');
+const img = (src, alt) => src ? `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : '';
+const initial = n => esc([...n][0] || '?');
+let CH = [], PR = [], admin = false;
+
+/* ---------- data ---------- */
+async function load(){
+  const [c, p] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id')]);
+  if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
+  CH = c.data; PR = p.data; return true;
+}
+const textOf = k => k[0]==='p' ? (PR.find(p => p.id===+k.slice(1))||{}).text : (CH.find(c => c.id===+k.slice(1))||{}).prompt;
+const num = p => PR.findIndex(x => x.id===p.id) + 1;
+const chName = id => (CH.find(c => c.id===id)||{}).name;
+
+/* ---------- views ---------- */
+function promptBox(p){
+  const cn = p.char_id ? chName(p.char_id) : '';
+  return `<div class="pr">${p.img ? `<div class="im">${img(p.img,'')}</div>` : ''}
+  <div class="bd"><div class="hd"><span>#${pad(num(p))} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}</span>
+  <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
+  <pre class="tx">${esc(p.text)}</pre></div></div>`;
+}
+
+function pageChars(){
+  app.innerHTML = `<div class="top"><div><h1>PROFILE</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
+  ${admin ? '<button class="btn" data-act="new-c">+ NEW</button>' : ''}</div>
+  ${CH.length ? `<div class="grid">${CH.map(c => `<a class="card" href="#/c/${c.id}">
+    <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
+    <div class="meta"><b>${esc(c.name)}</b><span>${esc(c.tag||'')}</span></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
+}
+
+function pageChar(id){
+  const c = CH.find(x => x.id===+id);
+  if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
+  const rel = PR.filter(p => p.char_id===c.id).reverse();
+  app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
+  <div class="prof">
+    <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
+    <div><h1>${esc(c.name)}</h1><p class="sub" style="margin:0">${esc(c.tag||'')}</p>
+      <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>
+      <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
+      ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
+  </div>
+  ${c.prompt ? `<h2>CHARACTER PROMPT</h2><div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}
+  ${rel.length ? `<h2>RELATED PROMPTS</h2>${rel.map(promptBox).join('')}` : ''}`;
+}
+
+let cat = 'all', q = '', shown = 20;
+function pagePrompts(){
+  const cats = [...new Set(PR.map(p => p.cat))];
+  if(cat!=='all' && !cats.includes(cat)) cat = 'all';
+  const cnt = k => k==='all' ? PR.length : PR.filter(p => p.cat===k).length;
+  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">ARCHIVE · ${PR.length} SAVED</p></div>
+  ${admin ? '<button class="btn" data-act="new-p">+ NEW</button>' : ''}</div>
+  <input type="search" id="q" placeholder="검색" value="${esc(q)}">
+  <div class="bar" id="chips">${['all',...cats].map(k => `<button class="chip ${k===cat?'on':''}" data-c="${esc(k)}">${esc(k)} ${cnt(k)}</button>`).join('')}</div>
+  <div id="list"></div>`;
+  $('#q').oninput = e => { q = e.target.value; shown = 20; list(); };
+  $('#chips').onclick = e => { const b = e.target.closest('[data-c]'); if(!b) return; cat = b.dataset.c; shown = 20;
+    document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x===b)); list(); };
+  list();
+}
+function list(){
+  const s = q.trim().toLowerCase();
+  const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || p.text.toLowerCase().includes(s))).reverse();
+  $('#list').innerHTML = rows.length
+    ? rows.slice(0,shown).map(promptBox).join('') + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
+    : '<p class="empty">결과가 없어요.</p>';
+  const m = $('#more'); if(m) m.onclick = () => { shown += 20; list(); };
+}
+
+function route(){
+  const [a,b] = (location.hash.slice(2) || 'characters').split('/');
+  $('#n1').classList.toggle('on', a!=='prompts'); $('#n2').classList.toggle('on', a==='prompts');
+  a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
+  window.scrollTo(0,0);
+}
+
+/* ---------- modal & forms ---------- */
+const openM = h => { $('#mb').innerHTML = h; $('#md').hidden = false; };
+const closeM = () => { $('#md').hidden = true; $('#mb').innerHTML = ''; };
+$('#md').onclick = e => { if(e.target.id==='md') closeM(); };
+const st = t => { const s = $('#st'); if(s) s.textContent = t; };
+const btns = label => `<div class="st" id="st"></div><div class="row"><button class="btn pri" type="submit" id="sv">${label}</button><button class="btn" type="button" data-act="close">CANCEL</button></div>`;
+
+async function upload(file, dir){
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+  const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width*s); cv.height = Math.round(bmp.height*s);
+  cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+  const blob = await new Promise(r => cv.toBlob(r, 'image/webp', .88));
+  const path = `${dir}/${crypto.randomUUID()}.webp`;
+  const { error } = await sb.storage.from(BUCKET).upload(path, blob, { contentType:'image/webp', cacheControl:'31536000' });
+  if(error) throw error;
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+const imgField = cur => `<label>이미지 ${cur ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="file" accept="image/*">
+  ${cur ? `<div class="cur">${img(cur,'')}<label style="margin:0"><input type="checkbox" name="rmimg" style="width:auto"> 이미지 삭제</label></div>` : ''}`;
+
+async function finish(fn){
+  const b = $('#sv'); b.disabled = true; st('저장 중…');
+  try{ await fn(); closeM(); await load(); route(); }
+  catch(err){ st('오류: ' + (err.message || err)); b.disabled = false; }
+}
+
+function formP(p){
+  const cats = [...new Set(PR.map(x => x.cat))];
+  openM(`<h3>${p ? '프롬프트 수정' : '프롬프트 추가'}</h3>
+  <form id="f">
+    <label>카테고리</label><input name="cat" list="cl" required value="${esc(p ? p.cat : (cat!=='all' ? cat : ''))}" placeholder="solo, duo, outfit …" autocomplete="off">
+    <datalist id="cl">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist>
+    <label>연결할 캐릭터 (선택)</label><select name="char_id"><option value="">없음</option>${CH.map(c => `<option value="${c.id}" ${p && p.char_id===c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+    <label>프롬프트</label><textarea class="m" name="text" rows="9" required>${esc(p ? p.text : '')}</textarea>
+    ${imgField(p && p.img)}
+    ${btns('SAVE')}
+  </form>`);
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      let im = p ? p.img : '';
+      if(fd.get('rmimg')) im = '';
+      const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'prompts'); }
+      const row = { cat: fd.get('cat').trim(), text: fd.get('text').trim(), img: im, char_id: fd.get('char_id') ? +fd.get('char_id') : null };
+      const r = p ? await sb.from('prompts').update(row).eq('id', p.id) : await sb.from('prompts').insert(row);
+      if(r.error) throw r.error;
+    }); };
+}
+
+const parseInfo = t => t.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+  const m = l.match(/^([^:：]+)[:：]\s*(.*)$/); return m ? [m[1].trim(), m[2].trim()] : [l, ''];
+}).filter(([k,v]) => k && v);
+
+function formC(c){
+  const info = c ? (c.info||[]).map(([k,v]) => `${k}: ${v}`).join('\n') : '이름: \n나이: \n키: \n생일: \n성격: \n특징: ';
+  openM(`<h3>${c ? '캐릭터 수정' : '캐릭터 추가'}</h3>
+  <form id="f">
+    <label>이름</label><input name="name" required value="${esc(c ? c.name : '')}">
+    <label>태그 (주인공, 조연 등)</label><input name="tag" value="${esc(c ? c.tag : '')}">
+    ${imgField(c && c.img)}
+    <label>프로필 정보 — 한 줄에 "항목: 값" (값이 비면 표시 안 됨)</label><textarea name="info" rows="8">${esc(info)}</textarea>
+    <label>설명</label><textarea name="descr" rows="5">${esc(c ? c.descr : '')}</textarea>
+    <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
+    ${btns('SAVE')}
+  </form>`);
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      let im = c ? c.img : '';
+      if(fd.get('rmimg')) im = '';
+      const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'characters'); }
+      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: parseInfo(fd.get('info')), descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim() };
+      const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
+      if(r.error) throw r.error;
+    }); };
+}
+
+function formLogin(){
+  openM(`<h3>ADMIN LOGIN</h3><form id="f">
+    <label>이메일</label><input type="email" name="email" required autocomplete="username">
+    <label>비밀번호</label><input type="password" name="pw" required autocomplete="current-password">
+    ${btns('LOGIN')}</form>`);
+  $('#f').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e.target); st('로그인 중…');
+    const { error } = await sb.auth.signInWithPassword({ email: fd.get('email'), password: fd.get('pw') });
+    if(error) return st('로그인 실패: ' + error.message);
+    closeM(); route(); };
+}
+
+async function del(table, id, label){
+  if(!confirm(`이 ${label}를 삭제할까요?`)) return false;
+  const { error } = await sb.from(table).delete().eq('id', id);
+  if(error){ alert('삭제 실패: ' + error.message); return false; }
+  await load(); return true;
+}
+
+/* ---------- events ---------- */
+function copy(b){
+  const t = textOf(b.dataset.k) || '', o = b.textContent;
+  const done = () => { b.textContent = 'COPIED'; setTimeout(() => b.textContent = o, 1200); };
+  const fb = () => { const a = document.createElement('textarea'); a.value = t; a.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(_){} a.remove(); done(); };
+  (navigator.clipboard && window.isSecureContext) ? navigator.clipboard.writeText(t).then(done, fb) : fb();
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const a = b.dataset.act, id = +b.dataset.id || null;
+  if(a==='copy') return copy(b);
+  if(a==='close') return closeM();
+  if(a==='new-p') return formP();
+  if(a==='edit-p') return formP(PR.find(p => p.id===id));
+  if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
+  if(a==='new-c') return formC();
+  if(a==='edit-c') return formC(CH.find(c => c.id===id));
+  if(a==='del-c') { if(await del('characters', id, '캐릭터')) location.hash==='#/characters' ? route() : location.hash = '#/characters'; }
+});
+$('#theme').onclick = () => {
+  const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+  r.dataset.theme = dark ? 'light' : 'dark';
+};
+const syncAdm = () => $('#adm').textContent = admin ? 'LOGOUT' : 'ADMIN';
+$('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
+sb.auth.onAuthStateChange((_ev, s) => { admin = !!s; syncAdm(); if(CH.length || PR.length) route(); });
+addEventListener('hashchange', route);
+
+(async () => {
+  app.innerHTML = '<p class="empty">LOADING…</p>';
+  const { data } = await sb.auth.getSession(); admin = !!data.session; syncAdm();
+  if(await load()) route();
+})();
+</script>
+</body>
+</html>
