@@ -274,7 +274,7 @@ function pageChar(id){
       <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
-  ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}
+  ${(c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : ''}
   ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : ''}
   ${(c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
   ${rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : ''}
@@ -552,8 +552,6 @@ function formC(c){
     </div>
     ${imgField(c && c.img)}
     <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞추고, 확대도 할 수 있어요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((c && c.img_pos) || '50% 50%')}"></div>
-    <label>갤러리 (여러 장 선택 가능)</label><input type="file" name="gfiles" accept="image/*" multiple>
-    ${((c && c.gallery) || []).length ? `<div class="gedit">${c.gallery.map((u,i) => `<label class="gi">${img(u,'')}<input type="checkbox" name="grm" value="${i}" style="width:auto"> 삭제</label>`).join('')}</div>` : ''}
     <label>추가 프로필 정보 — 한 줄에 "항목: 값" (콜론 없는 줄은 윗 항목 값에 줄바꿈으로 이어져요)</label><textarea name="info" rows="4">${esc(extra)}</textarea>
     <label>설명</label><textarea name="descr" rows="4">${esc(c ? c.descr : '')}</textarea>
     <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
@@ -573,11 +571,28 @@ function formC(c){
         if(k==='Height' && /^\d+(\.\d+)?$/.test(v)) v += 'cm';
         return [k, v];
       }).filter(([,v]) => v);
-      const rm = fd.getAll('grm'), gallery = ((c && c.gallery) || []).filter((_,i) => !rm.includes(String(i)));
-      const gf = fd.getAll('gfiles').filter(x => x && x.size);
-      for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
+      const gallery = (c && c.gallery) || [];
       const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), outfit: fd.get('outfit').trim(), gallery, img_pos: fd.get('img_pos') || '50% 50%' };
       const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
+      if(r.error) throw r.error;
+    }); };
+}
+
+function formGal(c){
+  const g = c.gallery || [];
+  openM(`<h3>갤러리 · ${esc(c.name)}</h3>
+  <form id="f">
+    <label>사진 추가 (여러 장 선택 가능)</label><input type="file" name="gfiles" accept="image/*" multiple>
+    ${g.length ? `<label>기존 사진 — 체크하면 삭제돼요 (순서는 상세 페이지에서 드래그)</label><div class="gedit">${g.map((u,i) => `<label class="gi">${img(u,'')}<input type="checkbox" name="grm" value="${i}" style="width:auto"> 삭제</label>`).join('')}</div>` : ''}
+    ${btns('SAVE')}
+  </form>`);
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      const rm = fd.getAll('grm'), gallery = g.filter((_,i) => !rm.includes(String(i)));
+      const gf = fd.getAll('gfiles').filter(x => x && x.size);
+      if(!gf.length && !rm.length) throw new Error('추가하거나 삭제할 사진을 선택해주세요');
+      for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
+      const r = await sb.from('characters').update({ gallery }).eq('id', c.id);
       if(r.error) throw r.error;
     }); };
 }
@@ -665,6 +680,7 @@ document.addEventListener('click', async e => {
     if(t) ops.push(sb.from('characters').update({ related: (t.related || []).filter(x => x.id !== c.id) }).eq('id', t.id));
     const er = (await Promise.all(ops)).find(x => x.error); if(er) return alert('삭제 실패: ' + er.error.message);
     closeM(); await load(); route(); return; }
+  if(a==='edit-gal'){ const c = CH.find(x => x.id===id); if(c) formGal(c); return; }
   if(a==='edit-sub'){ const c = CH.find(x => x.id===id); if(c) formSub(c, +b.dataset.i); return; }
   if(a==='del-one-sub'){ const c = CH.find(x => x.id===id); if(!c || !confirm('이 서브 프롬프트를 삭제할까요?')) return;
     const subs = (c.subs || []).filter((_, k) => k !== +b.dataset.i);
