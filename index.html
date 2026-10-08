@@ -17,6 +17,8 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5;letter-spacing:-0.03em;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{letter-spacing:inherit;line-height:inherit}
 a{color:inherit}
+img{pointer-events:none;-webkit-user-drag:none;user-drag:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+body{-webkit-touch-callout:none}
 .wrap{max-width:1014px;margin:0 auto;padding:0 16px}
 header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:2px solid var(--fg);z-index:5}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:44px}
@@ -698,6 +700,9 @@ document.addEventListener('click', async e => {
   if(a==='edit-c') return formC(CH.find(c => c.id===id));
   if(a==='del-c') { if(await del('characters', id, '캐릭터')) location.hash==='#/characters' ? route() : location.hash = '#/characters'; }
 });
+/* 이미지 저장 방지: 우클릭·꾹 누르기 메뉴·드래그 차단 (입력창/프롬프트 글자 영역은 복사·붙여넣기 메뉴 유지) */
+document.addEventListener('contextmenu', e => { if(!e.target.closest('input,textarea,select,pre,.tx,[contenteditable]')) e.preventDefault(); });
+document.addEventListener('dragstart', e => { if(e.target.tagName==='IMG' || e.target.closest('img')) e.preventDefault(); });
 $('#lb').onclick = () => { $('#lb').hidden = true; };
 addEventListener('keydown', e => { if(e.key==='Escape'){ if(!$('#lb').hidden){ $('#lb').hidden = true; return; } if(!$('#md').hidden && (!dirty || confirm('입력한 내용이 사라져요. 닫을까요?'))) closeM(); } });
 const SUN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>';
