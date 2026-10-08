@@ -3,92 +3,114 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PROMPT NOTE</title>
+<title>r♡sieprompt</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fff;--fg:#000;--mut:#666;--soft:#f2f2f2;--sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#999;--soft:#161616}}
-:root[data-theme="dark"]{--bg:#000;--fg:#fff;--mut:#999;--soft:#161616}
+:root{--bg:#fff;--fg:#000;--mut:#9a9a9a;--line:#e4e4e4;--soft:#f6f6f6;--sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}}
+:root[data-theme="dark"]{--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;border-radius:0}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.55;letter-spacing:-0.025em;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5;letter-spacing:-0.03em;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{letter-spacing:inherit;line-height:inherit}
 a{color:inherit}
-.wrap{max-width:900px;margin:0 auto;padding:0 20px}
-header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:1px solid var(--fg);z-index:5}
-header .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
-.logo{font-weight:700;letter-spacing:.12em;font-size:14px;text-decoration:none}
-nav{display:flex;gap:4px;align-items:center}
-nav a,.btn{font:500 12px/1.55 var(--sans);letter-spacing:.06em;text-decoration:none;border:1px solid transparent;padding:6px 12px;background:none;color:var(--fg);cursor:pointer}
-nav a.on{border-color:var(--fg)}
-nav a:hover,.btn:hover{background:var(--fg);color:var(--bg)}
-.btn{border-color:var(--fg)}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:2px solid var(--fg);z-index:5}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:44px}
+.logo{font-weight:600;font-size:16px;letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;white-space:pre}
+.hrt{width:.95em;height:.95em;margin:0 .02em;fill:none;stroke:var(--fg);stroke-width:3.2;stroke-linejoin:round;transform:translateY(1px)}
+.lg2{font-size:11px;font-weight:500;color:var(--mut)}
+nav{display:flex;gap:2px;align-items:center}
+nav a,.btn{font:600 11px/1.5 var(--sans);text-decoration:none;border:1px solid transparent;padding:3px 8px;background:none;color:var(--fg);cursor:pointer}
+nav a{color:var(--mut)}
+nav a.on,nav a:hover{color:var(--fg)}
+nav .btn{color:var(--mut);border:0}
+nav .btn:hover{background:none;color:var(--mut);border:0}
+footer .wrap{display:flex;align-items:center;gap:8px}
+#adm{border:0;background:none;color:var(--mut);padding:0;font:inherit;cursor:default}
+.btn{border-color:var(--line)}
+.btn:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .btn:disabled{opacity:.4;pointer-events:none}
-main{padding:40px 0 80px;min-height:70vh}
-h1{font-size:28px;margin:0 0 6px}
-.sub{color:var(--mut);font:12px/1.55 var(--sans);letter-spacing:.08em;margin:0 0 28px}
+main{padding:24px 0 56px;min-height:70vh}
+h1{font-size:22px;font-weight:800;margin:0 0 2px}
+.sub{color:var(--mut);font:500 11px/1.5 var(--sans);margin:0 0 18px}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
-.card{display:block;border:1px solid var(--fg);text-decoration:none}
-.card:hover{background:var(--soft)}
-.ph{aspect-ratio:3/4;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;border-bottom:1px solid var(--fg);overflow:hidden}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{display:block;border:1px solid var(--line);text-decoration:none}
+.card:hover{border-color:var(--fg)}
+.ph{aspect-ratio:3/4;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:800;color:var(--mut);overflow:hidden}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
-.card .meta{padding:12px 14px}
-.card b{display:block;font-size:16px}
-.card span{color:var(--mut);font-size:13px}
-.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;align-items:center}
-.chip{font:500 12px/1.55 var(--sans);border:1px solid var(--fg);background:none;color:var(--fg);padding:5px 12px;cursor:pointer}
-.chip.on,.chip:hover{background:var(--fg);color:var(--bg)}
-input,select,textarea{width:100%;border:1px solid var(--fg);background:var(--bg);color:var(--fg);padding:10px 12px;font:14px/1.55 var(--sans);outline:none}
-input:focus,select:focus,textarea:focus{box-shadow:inset 0 0 0 1px var(--fg)}
-#q{margin-bottom:14px}
-textarea.m{font-family:var(--mono);font-size:13px}
-.pr{border:1px solid var(--fg);margin-bottom:14px;display:flex}
-.pr .im{width:120px;flex:none;border-right:1px solid var(--fg);background:var(--soft)}
+.card .meta{padding:10px 12px;border-top:2px solid var(--fg)}
+.card b{display:block;font-size:15px;font-weight:800}
+.card span{color:var(--mut);font-size:12px;font-weight:500}
+.bar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;align-items:center}
+.chip{font:600 11px/1.5 var(--sans);border:1px solid var(--line);background:none;color:var(--mut);padding:2px 9px;cursor:pointer}
+.chip:hover{color:var(--fg);border-color:var(--fg)}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+input,select,textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:7px 10px;font:13px/1.5 var(--sans);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--fg)}
+#q{margin-bottom:10px}
+textarea.m{font-family:var(--mono);font-size:12px}
+.pr{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px;display:flex}
+.pr .im{width:96px;flex:none;border-right:1px solid var(--line);background:var(--soft)}
 .pr .im img{width:100%;height:100%;object-fit:cover;display:block}
 .pr .bd{flex:1;min-width:0}
-.hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--fg);font:12px/1.55 var(--sans);letter-spacing:.06em;gap:10px}
-.hd .btn{padding:2px 10px}
-.hd div{display:flex;gap:6px}
-.tx{padding:14px;margin:0;font-family:var(--mono);font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
-.more{display:block;margin:24px auto 0}
-.back{display:inline-block;margin-bottom:24px;font:12px/1.55 var(--sans);letter-spacing:.06em}
-.prof{display:grid;grid-template-columns:260px 1fr;gap:32px;margin-bottom:36px}
-.prof .ph{border:1px solid var(--fg)}
-table{width:100%;border-collapse:collapse;margin:16px 0 22px}
-th,td{text-align:left;padding:9px 0;border-bottom:1px solid var(--fg);font-size:14px;vertical-align:top}
-th{width:96px;color:var(--mut);font:500 12px/1.55 var(--sans);letter-spacing:.06em;padding-top:11px}
-h2{font:700 13px/1.55 var(--sans);letter-spacing:.1em;margin:36px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--fg)}
-.empty{color:var(--mut);padding:40px 0;text-align:center}
-.acts{display:flex;gap:8px;margin-top:16px}
-footer{border-top:1px solid var(--fg);padding:20px 0;color:var(--mut);font:12px/1.55 var(--sans)}
-#md{position:fixed;inset:0;background:rgba(0,0,0,.6);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 14px 24px;z-index:20}
+.hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
+.hd .btn{padding:0 7px;font-size:10.5px}
+.hd div{display:flex;gap:4px}
+.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.more{display:block;margin:16px auto 0}
+.back{display:inline-block;margin-bottom:14px;font:600 11px/1.5 var(--sans);color:var(--mut);text-decoration:none}
+.back:hover{color:var(--fg)}
+.prof{display:grid;grid-template-columns:300px 1fr;gap:24px;margin-bottom:24px}
+.prof .ph{border:1px solid var(--line);border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;margin:10px 0 14px;border-top:2px solid var(--fg)}
+th,td{text-align:left;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:700;vertical-align:top}
+th{width:72px;color:var(--mut);font:500 11px/1.5 var(--sans);padding-top:6px}
+h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
+.empty{color:var(--mut);padding:32px 0;text-align:center}
+.acts{display:flex;gap:5px;margin-top:12px}
+footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500 11px/1.5 var(--sans)}
+#md{position:fixed;inset:0;background:rgba(0,0,0,.55);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 12px 20px;z-index:20}
 #md[hidden]{display:none}
-.mb{background:var(--bg);border:1px solid var(--fg);max-width:560px;margin:0 auto;padding:22px}
-.mb h3{margin:0 0 6px;font-size:18px}
-.mb label{display:block;font-size:12px;color:var(--mut);margin:16px 0 6px}
-.mb .row{display:flex;gap:8px;margin-top:22px}
-.mb .row .btn{padding:9px 18px}
-.mb .row .btn.pri{background:var(--fg);color:var(--bg)}
-.st{color:var(--mut);font-size:13px;margin-top:12px;min-height:20px;white-space:pre-wrap}
-.cur{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:13px}
-.cur img{width:48px;height:64px;object-fit:cover;border:1px solid var(--fg)}
-@media(max-width:640px){.prof{grid-template-columns:1fr}.prof .ph{max-width:260px}.pr{flex-direction:column}.pr .im{width:100%;height:200px;border-right:0;border-bottom:1px solid var(--fg)}}
+.mb{background:var(--bg);border:1px solid var(--line);max-width:520px;margin:0 auto;padding:16px}
+.mb h3{margin:0 0 4px;font-size:15px;font-weight:800}
+.mb label{display:block;font:600 11px/1.5 var(--sans);color:var(--mut);margin:12px 0 4px}
+.mb .row{display:flex;gap:5px;margin-top:16px}
+.mb .row .btn{padding:5px 14px}
+.mb .row .btn.pri{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.sr{border:1px solid var(--line);padding:8px;margin-top:6px;display:grid;gap:5px}
+.sr .btn{justify-self:end}
+.st{color:var(--mut);font-size:12px;margin-top:8px;min-height:18px;white-space:pre-wrap}
+.cur{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px}
+.cur img{width:40px;height:54px;object-fit:cover;border:1px solid var(--line)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.gal div{aspect-ratio:3/4;border:1px solid var(--line);overflow:hidden;cursor:zoom-in}
+.gal div:hover{border-color:var(--fg)}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.gedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.mb .gi{margin:0;font-weight:500}
+.gi img{width:56px;height:74px;object-fit:cover;border:1px solid var(--line);display:block}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:30;cursor:zoom-out;padding:16px}
+#lb[hidden]{display:none}
+#lb img{max-width:100%;max-height:100%;object-fit:contain}
+@media(max-width:640px){.prof{grid-template-columns:1fr}.prof .ph{max-width:300px}.pr{flex-direction:column}.pr .im{width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <a class="logo" href="#/characters">PROMPT NOTE</a>
+  <a class="logo" href="#/characters">r<svg class="hrt" viewBox="0 0 24 24" aria-label="o"><path d="M12 21s-7-4.6-9.5-9C.8 8.8 2.6 5 6.2 5c2.2 0 3.8 1.3 5.8 3.4C14 6.3 15.6 5 17.8 5c3.6 0 5.4 3.8 3.7 7-2.5 4.4-9.5 9-9.5 9z"/></svg>sie <span class="lg2">prompt</span></a>
   <nav>
-    <a href="#/characters" id="n1">PROFILE</a>
-    <a href="#/prompts" id="n2">PROMPT</a>
-    <button class="btn" id="adm">ADMIN</button>
+    <a href="#/characters" id="n1">profile</a>
+    <a href="#/prompts" id="n2">prompt</a>
     <button class="btn" id="theme" title="테마">◐</button>
   </nav>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap">PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
+<footer><div class="wrap"><button id="adm">✦</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
+<div id="lb" hidden></div>
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -111,7 +133,10 @@ async function load(){
   if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
   CH = c.data; PR = p.data; return true;
 }
-const textOf = k => k[0]==='p' ? (PR.find(p => p.id===+k.slice(1))||{}).text : (CH.find(c => c.id===+k.slice(1))||{}).prompt;
+const textOf = k => {
+  if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
+  return k[0]==='p' ? (PR.find(p => p.id===+k.slice(1))||{}).text : (CH.find(c => c.id===+k.slice(1))||{}).prompt;
+};
 const num = p => PR.findIndex(x => x.id===p.id) + 1;
 const chName = id => (CH.find(c => c.id===id)||{}).name;
 
@@ -144,7 +169,9 @@ function pageChar(id){
       <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
+  ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal">${c.gallery.map(u => `<div data-act="zoom" data-src="${esc(u)}">${img(u,'')}</div>`).join('')}</div>` : ''}
   ${c.prompt ? `<h2>CHARACTER PROMPT</h2><div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}
+  ${(c.subs||[]).length ? `<h2>SUB PROMPTS</h2>${c.subs.map((x,i) => `<div class="pr"><div class="bd"><div class="hd"><span>${esc(x.t || 'SUB ' + (i+1))}</span><button class="btn" data-act="copy" data-k="s${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div></div>`).join('')}` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2>${rel.map(promptBox).join('')}` : ''}`;
 }
 
@@ -232,16 +259,29 @@ const parseInfo = t => t.split('\n').map(l => l.trim()).filter(Boolean).map(l =>
   const m = l.match(/^([^:：]+)[:：]\s*(.*)$/); return m ? [m[1].trim(), m[2].trim()] : [l, ''];
 }).filter(([k,v]) => k && v);
 
+const FIX = [['성별',['성별']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
+const subRow = (x={}) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea><button class="btn" type="button" data-act="del-sub">REMOVE</button></div>`;
+
 function formC(c){
-  const info = c ? (c.info||[]).map(([k,v]) => `${k}: ${v}`).join('\n') : '이름: \n나이: \n키: \n생일: \n성격: \n특징: ';
+  const inf = c ? (c.info||[]) : [];
+  const get = ks => (inf.find(([k]) => ks.includes(k))||[])[1] || '';
+  const used = FIX.flatMap(([,ks]) => ks);
+  const extra = c ? inf.filter(([k]) => !used.includes(k)).map(([k,v]) => `${k}: ${v}`).join('\n') : '나이: \n성격: \n특징: ';
   openM(`<h3>${c ? '캐릭터 수정' : '캐릭터 추가'}</h3>
   <form id="f">
-    <label>이름</label><input name="name" required value="${esc(c ? c.name : '')}">
-    <label>태그 (주인공, 조연 등)</label><input name="tag" value="${esc(c ? c.tag : '')}">
+    <div class="g2">
+      <div><label>이름</label><input name="name" required value="${esc(c ? c.name : '')}"></div>
+      <div><label>태그 (주인공, 조연 등)</label><input name="tag" value="${esc(c ? c.tag : '')}"></div>
+      ${FIX.map(([k,ks],i) => `<div><label>${k}</label><input name="fx${i}" value="${esc(get(ks))}" ${k==='DOB' ? 'placeholder="YYYY-MM-DD"' : ''}></div>`).join('')}
+    </div>
     ${imgField(c && c.img)}
-    <label>프로필 정보 — 한 줄에 "항목: 값" (값이 비면 표시 안 됨)</label><textarea name="info" rows="8">${esc(info)}</textarea>
-    <label>설명</label><textarea name="descr" rows="5">${esc(c ? c.descr : '')}</textarea>
+    <label>갤러리 (여러 장 선택 가능)</label><input type="file" name="gfiles" accept="image/*" multiple>
+    ${((c && c.gallery) || []).length ? `<div class="gedit">${c.gallery.map((u,i) => `<label class="gi">${img(u,'')}<input type="checkbox" name="grm" value="${i}" style="width:auto"> 삭제</label>`).join('')}</div>` : ''}
+    <label>추가 프로필 정보 — 한 줄에 "항목: 값" (값이 비면 표시 안 됨)</label><textarea name="info" rows="4">${esc(extra)}</textarea>
+    <label>설명</label><textarea name="descr" rows="4">${esc(c ? c.descr : '')}</textarea>
     <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
+    <label>서브 프롬프트</label><div id="subs">${((c && c.subs) || []).map(subRow).join('')}</div>
+    <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
     ${btns('SAVE')}
   </form>`);
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
@@ -249,7 +289,13 @@ function formC(c){
       let im = c ? c.img : '';
       if(fd.get('rmimg')) im = '';
       const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'characters'); }
-      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: parseInfo(fd.get('info')), descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim() };
+      const fixed = FIX.map(([k],i) => [k, (fd.get('fx'+i)||'').trim()]).filter(([,v]) => v);
+      const rm = fd.getAll('grm'), gallery = ((c && c.gallery) || []).filter((_,i) => !rm.includes(String(i)));
+      const gf = fd.getAll('gfiles').filter(x => x && x.size);
+      for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
+      const t = fd.getAll('sub_t'), x = fd.getAll('sub_x');
+      const subs = x.map((v,i) => ({ t: (t[i]||'').trim(), x: v.trim() })).filter(o => o.x);
+      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), subs, gallery };
       const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
       if(r.error) throw r.error;
     }); };
@@ -286,6 +332,9 @@ document.addEventListener('click', async e => {
   const a = b.dataset.act, id = +b.dataset.id || null;
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
+  if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
+  if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow());
+  if(a==='del-sub') return b.closest('.sr').remove();
   if(a==='new-p') return formP();
   if(a==='edit-p') return formP(PR.find(p => p.id===id));
   if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
@@ -293,11 +342,13 @@ document.addEventListener('click', async e => {
   if(a==='edit-c') return formC(CH.find(c => c.id===id));
   if(a==='del-c') { if(await del('characters', id, '캐릭터')) location.hash==='#/characters' ? route() : location.hash = '#/characters'; }
 });
+$('#lb').onclick = () => { $('#lb').hidden = true; };
+addEventListener('keydown', e => { if(e.key==='Escape'){ $('#lb').hidden = true; closeM(); } });
 $('#theme').onclick = () => {
   const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
   r.dataset.theme = dark ? 'light' : 'dark';
 };
-const syncAdm = () => $('#adm').textContent = admin ? 'LOGOUT' : 'ADMIN';
+const syncAdm = () => $('#adm').textContent = admin ? '✧' : '✦';
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { admin = !!s; syncAdm(); if(CH.length || PR.length) route(); });
 addEventListener('hashchange', route);
