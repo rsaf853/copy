@@ -165,7 +165,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const pad = n => String(n).padStart(3, '0');
 const okPos = p => /^\d+(\.\d+)?% \d+(\.\d+)?%$/.test(p || '') ? p : '';
 const img = (src, alt, pos) => src ? `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy"${okPos(pos) ? ` style="object-position:${okPos(pos)}"` : ''}>` : '';
-const fullOf = c => ((c.info || []).find(([k]) => k === '본명') || [])[1] || '';
+const fullOf = c => ((c.info || []).find(([k]) => ['Alias','alias','ALIAS','별칭'].includes(k)) || [])[1] || '';
 const sortCh = () => [...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0) || (a.sort_order ?? 1e9) - (b.sort_order ?? 1e9) || a.id - b.id);
 let ORD = false;
 const initial = n => esc([...n][0] || '?');
@@ -337,7 +337,7 @@ const parseInfo = t => t.split('\n').map(l => l.trim()).filter(Boolean).map(l =>
   const m = l.match(/^([^:：]+)[:：]\s*(.*)$/); return m ? [m[1].trim(), m[2].trim()] : [l, ''];
 }).filter(([k,v]) => k && v);
 
-const FIX = [['본명',['본명','풀네임','Full name','full name']], ['성별',['성별']], ['나이',['나이','Age','age','AGE']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
+const FIX = [['본명',['본명','풀네임','Full name','full name']], ['Alias',['Alias','alias','ALIAS','별칭']], ['성별',['성별']], ['나이',['나이','Age','age','AGE']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
 const subRow = (x={}) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
   <input type="hidden" name="sub_img" value="${esc(x.img)}">
   <label style="margin:2px 0 0">이미지 ${x.img ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="sub_file" accept="image/*">
