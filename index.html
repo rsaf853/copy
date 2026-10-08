@@ -66,6 +66,8 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 @media(max-width:640px){.rg{grid-template-columns:repeat(2,1fr);gap:8px}}
 .rcard{position:relative;display:block;border:1px solid var(--line);text-decoration:none;color:inherit;background:var(--bg,#fff)}
 .rcard:hover{border-color:var(--fg)}
+.rcard.ext{cursor:default}
+.rcard.ext:hover{border-color:var(--line)}
 .rcard .ph{aspect-ratio:4/3;font-size:34px}
 .rcard .rce{position:absolute;top:6px;right:6px;z-index:2;background:var(--bg);border:1px solid var(--fg);font:700 10px/1 var(--sans);padding:4px 7px;cursor:pointer}
 .rcard .rm{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 10px}
@@ -275,7 +277,7 @@ function pageChar(id){
   ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}
   ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : ''}
   ${(c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
-  ${rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS · ${relOf(c).filter(o => CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : ''}
+  ${rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
   const sp = $('#sps');
   if(sp && admin && window.Sortable && (c.subs || []).length > 1) Sortable.create(sp, { animation:150, draggable:'.sp', handle:'.dh', ghostClass:'drag',
@@ -439,16 +441,22 @@ const subRow = (x={}, ph=false) => `<div class="sr"><input name="sub_t" placehol
 /* ---------- related characters ---------- */
 const nz = v => String(v || '50% 50%').split(' ').slice(0, 2).map(x => (parseFloat(x) || 0).toFixed(1)).join(' ');
 const relOf = c => [...(c.related || []), ...CH.filter(t => t.id !== c.id && (t.related || []).some(o => o.id === c.id) && !(c.related || []).some(o => o.id === t.id)).map(t => ({ id: t.id }))];
-const relCards = c => relOf(c).map(o => { const t = CH.find(x => x.id===o.id); if(!t) return '';
+const relCards = c => relOf(c).map(o => {
+  if(o.ext){
+    const src = o.img || '', pos = o.pos || '', pz = xyOf(pos), nm = o.name || '';
+    const thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(nm)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, nm, pos);
+    return `<div class="rcard ext">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-uid="${esc(o.uid || '')}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(nm || '?')}</div><div class="rm"><b>${esc(nm)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></div>`;
+  }
+  const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
   const pz = xyOf(pos), thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
   return `<a class="rcard" href="#/c/${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
-const rrHtml = (o, t) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || ((o && o.img) ? 1 : zOf(t.img_pos));
-  return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
+const rrHtml = (o, t, uid) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || ((o && o.img) ? 1 : zOf(t.img_pos));
+  return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"${uid ? ` data-ext="1" data-uid="${esc(uid)}"` : ''}><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
   <div class="pe" style="width:240px;aspect-ratio:4/3">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
   <input type="range" class="rz" min="1" max="3" step="0.05" value="${z}" style="width:240px;padding:0;margin-top:6px">
   <input type="file" class="rf" accept="image/*" style="margin-top:6px"><input type="hidden" class="ri" value="${esc((o && o.img) || '')}"><input type="hidden" class="rp" value="${esc(pos)}">
-  ${o && o.img ? '<label style="margin:4px 0 0;font-weight:500"><input type="checkbox" class="rx" style="width:auto"> 올린 썸네일 삭제 (대표 사진으로 되돌리기)</label>' : ''}</div></div>`; };
+  ${o && o.img ? `<label style="margin:4px 0 0;font-weight:500"><input type="checkbox" class="rx" style="width:auto"> ${uid ? '올린 썸네일 삭제' : '올린 썸네일 삭제 (대표 사진으로 되돌리기)'}</label>` : ''}</div></div>`; };
 function bindRow(r){
   const rb = r.querySelector('.rb'), box = r.querySelector('.pe'), file = r.querySelector('.rf'), hid = r.querySelector('.rp'), rz = r.querySelector('.rz');
   let im = box.querySelector('img'); if(!im){ im = document.createElement('img'); im.alt = ''; box.appendChild(im); }
@@ -475,7 +483,7 @@ function bindRow(r){
 async function readRel(){
   const rows = [...document.querySelectorAll('#rrw .rr')], out = [];
   for(let i = 0; i < rows.length; i++){
-    const r = rows[i], o = { id: +r.dataset.id }; let im = r.querySelector('.ri').value; const kw = ($('#rkw') || { value: '' }).value.trim(); if(kw) o.k = kw;
+    const r = rows[i], o = r.dataset.ext ? { ext: 1, uid: r.dataset.uid, name: (($('#rname') || { value: '' }).value || '').trim() } : { id: +r.dataset.id }; let im = r.querySelector('.ri').value; const kw = ($('#rkw') || { value: '' }).value.trim(); if(kw) o.k = kw;
     const rx = r.querySelector('.rx'); if(rx && rx.checked) im = '';
     const f = r.querySelector('.rf').files[0]; if(f && f.size){ st(`관련 캐릭터 썸네일 업로드 중… ${i+1}/${rows.length}`); im = await upload(f, 'characters'); }
     const pp = r.querySelector('.rp').value, zz = parseFloat(r.querySelector('.rz').value) || 1; if(zz > 1.001) o.z = +zz.toFixed(2);
@@ -485,27 +493,35 @@ async function readRel(){
   return out;
 }
 
-function formRel(c, rid){
-  const list = relOf(c), cur = rid ? list.find(o => o.id === rid) : null, isNew = !rid;
+function formRel(c, rid, uid){
+  const list = relOf(c), cur = uid ? list.find(o => o.uid === uid) : rid ? list.find(o => o.id === rid) : null, isNew = !rid && !uid;
   const cand = sortCh().filter(t => t.id !== c.id && !list.some(o => o.id === t.id));
-  if(isNew && !cand.length) return alert('추가할 수 있는 다른 캐릭터가 없어요.');
-  const t0 = isNew ? cand[0] : CH.find(x => x.id === rid); if(!t0) return;
+  const extT = { id: '', name: '', img: '', img_pos: '50% 50%' }, euid = uid || ('x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+  const startExt = !!uid || (isNew && !cand.length);
+  const t0 = startExt ? extT : (isNew ? cand[0] : CH.find(x => x.id === rid)); if(!t0) return;
+  const nameVal = (cur && cur.ext && cur.name) || '';
   openM(`<h3>${isNew ? '관련 캐릭터 추가' : '관련 캐릭터 수정'}</h3>
   <form id="f">
-    <label>캐릭터</label>${isNew ? `<select id="rsel">${cand.map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select>` : `<div style="font-weight:800">${esc(t0.name)}</div>`}
+    <label>캐릭터</label>${isNew ? `<select id="rsel">${cand.map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('')}<option value="__ext"${startExt ? ' selected' : ''}>＋ 사이트에 없는 캐릭터 (직접 입력)</option></select>` : (uid ? '' : `<div style="font-weight:800">${esc(t0.name)}</div>`)}
+    <div id="rnamew"${startExt ? '' : ' hidden'}>${isNew ? '<label>이름</label>' : ''}<input id="rname" placeholder="캐릭터 이름" value="${esc(nameVal)}"></div>
     <label>관계 (키워드)</label><input id="rkw" placeholder="친구, 라이벌 …" value="${esc((cur && cur.k) || '')}">
-    <label>썸네일</label><div id="rrw">${rrHtml(cur, t0)}</div>
+    <label>썸네일</label><div id="rrw">${rrHtml(cur, t0, startExt ? euid : '')}</div>
     ${btns('SAVE')}
-    ${isNew ? '' : `<button class="btn" type="button" data-act="del-rel" data-id="${c.id}" data-rid="${rid}" style="margin-top:6px">DELETE THIS</button>`}
+    ${isNew ? '' : `<button class="btn" type="button" data-act="del-rel" data-id="${c.id}" data-rid="${rid || ''}" data-uid="${uid || ''}" style="margin-top:6px">DELETE THIS</button>`}
   </form>`);
   bindRow($('#rrw .rr'));
-  if(isNew) $('#rsel').onchange = e => { const t = CH.find(x => x.id === +e.target.value); if(!t) return; $('#rrw').innerHTML = rrHtml(null, t); bindRow($('#rrw .rr')); };
+  if(isNew) $('#rsel').onchange = e => {
+    if(e.target.value === '__ext'){ $('#rnamew').hidden = false; $('#rrw').innerHTML = rrHtml(null, extT, euid); }
+    else { const t = CH.find(x => x.id === +e.target.value); if(!t) return; $('#rnamew').hidden = true; $('#rrw').innerHTML = rrHtml(null, t); }
+    bindRow($('#rrw .rr')); };
   $('#f').onsubmit = e => { e.preventDefault();
     finish(async () => {
-      const [o] = await readRel(), stored = [...(c.related || [])], k = stored.findIndex(x => x.id === o.id);
+      const [o] = await readRel(), stored = [...(c.related || [])];
+      if(o.ext && !o.name) throw new Error('이름을 입력해 주세요');
+      const k = o.ext ? stored.findIndex(x => x.uid === o.uid) : stored.findIndex(x => x.id === o.id);
       if(k >= 0) stored[k] = o; else stored.push(o);
       const ops = [sb.from('characters').update({ related: stored }).eq('id', c.id)];
-      const t = CH.find(x => x.id === o.id);
+      const t = o.ext ? null : CH.find(x => x.id === o.id);
       if(t && !(t.related || []).some(x => x.id === c.id)) ops.push(sb.from('characters').update({ related: [...(t.related || []), { id: c.id }] }).eq('id', t.id));
       const er = (await Promise.all(ops)).find(x => x.error); if(er) throw er.error;
     }); };
@@ -643,9 +659,9 @@ document.addEventListener('click', async e => {
   if(a==='order'){ ORD = !ORD; return pageChars(); }
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
-  if(a==='edit-rel'){ e.preventDefault(); const c = CH.find(x => x.id===id); if(c) formRel(c, +b.dataset.rid || 0); return; }
-  if(a==='del-rel'){ const c = CH.find(x => x.id===id), rid = +b.dataset.rid; if(!c || !confirm('이 관련 캐릭터를 삭제할까요?')) return;
-    const t = CH.find(x => x.id===rid), ops = [sb.from('characters').update({ related: (c.related || []).filter(x => x.id !== rid) }).eq('id', c.id)];
+  if(a==='edit-rel'){ e.preventDefault(); const c = CH.find(x => x.id===id); if(c) formRel(c, +b.dataset.rid || 0, b.dataset.uid || ''); return; }
+  if(a==='del-rel'){ const c = CH.find(x => x.id===id), rid = +b.dataset.rid, uid = b.dataset.uid || ''; if(!c || !confirm('이 관련 캐릭터를 삭제할까요?')) return;
+    const t = rid ? CH.find(x => x.id===rid) : null, ops = [sb.from('characters').update({ related: (c.related || []).filter(x => uid ? x.uid !== uid : x.id !== rid) }).eq('id', c.id)];
     if(t) ops.push(sb.from('characters').update({ related: (t.related || []).filter(x => x.id !== c.id) }).eq('id', t.id));
     const er = (await Promise.all(ops)).find(x => x.error); if(er) return alert('삭제 실패: ' + er.error.message);
     closeM(); await load(); route(); return; }
