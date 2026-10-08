@@ -56,6 +56,8 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .grid.ordering .card img{-webkit-user-drag:none;pointer-events:none}
 .grid.ordering .card.drag{opacity:.35}
 .sps .sp.drag{opacity:.35}
+.dh{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:var(--mut);font:700 14px/1 var(--sans);padding:4px 8px 4px 0;flex:none}
+.dh:hover{color:var(--fg)}
 .bo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .bo.one{grid-template-columns:1fr}
 .bo .pr{margin:0}
@@ -116,7 +118,7 @@ td{white-space:pre-wrap;word-break:break-word}
 .sp .bd{min-width:0}
 /* LIST: 왼쪽 썸네일 */
 [data-v=a] .sp{display:flex}
-[data-v=a] .sp .sim:not(.no){display:block;width:150px;aspect-ratio:3/4;min-height:0;align-self:flex-start;flex:none;border-right:1px solid var(--line)}
+[data-v=a] .sp .sim:not(.no){display:block;width:90px;aspect-ratio:3/4;min-height:0;align-self:flex-start;flex:none;border-right:1px solid var(--line)}
 [data-v=a] .sp .sim img{position:absolute;inset:0}
 [data-v=a] .sp .bd{flex:1}
 /* GRID: 카드 */
@@ -126,7 +128,7 @@ td{white-space:pre-wrap;word-break:break-word}
 [data-v=c] .sp .sim.no{display:none}
 [data-v=c] .sp .bd{flex:1}
 [data-v=c] .sp .tx{max-height:110px;overflow-y:auto}
-@media(max-width:640px){[data-v=a] .sp{flex-direction:column}[data-v=a] .sp .sim:not(.no){width:100%;height:240px;min-height:0;border-right:0;border-bottom:1px solid var(--line)}}
+@media(max-width:640px){[data-v=a] .sp .sim:not(.no){width:72px}}
 h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
 .empty{color:var(--mut);padding:32px 0;text-align:center}
 .acts{display:flex;gap:5px;margin-top:12px}
@@ -146,10 +148,11 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .cur{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px}
 .cur img{width:40px;height:54px;object-fit:cover;border:1px solid var(--line)}
 .gal{display:flex;flex-wrap:wrap;gap:6px}
-.gal div{height:200px;aspect-ratio:3/4;flex:none;max-width:100%;border:1px solid var(--line);overflow:hidden;cursor:zoom-in;background:var(--soft)}
+.gal div{height:200px;min-width:60px;flex:none;max-width:100%;border:1px solid var(--line);overflow:hidden;cursor:zoom-in;background:var(--soft)}
 .gal div:hover{border-color:var(--fg)}
-.gal img{height:100%;width:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
-.gal.adm div{touch-action:none;cursor:grab}
+.gal img{height:100%;width:auto;max-width:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
+.gal.adm div{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.gal div.drag{opacity:.35}
 .gedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .mb .gi{margin:0;font-weight:500}
 .gi img{width:56px;height:74px;object-fit:cover;border:1px solid var(--line);display:block}
@@ -206,7 +209,7 @@ function subBox(c, x, i, pre='s'){
   }
   const z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
   return `<div class="sp" data-si="${i}"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t,x.pos) : initial(t)}</div>
-  <div class="bd"><div class="hd"><span class="tt"><span>${esc(t)}</span></span><div>${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="${i}">EDIT</button>` : ''}<button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div></div>
+  <div class="bd"><div class="hd"><span class="tt">${admin && (c.subs||[]).length > 1 ? '<span class="dh" title="끌어서 순서 변경">⠿</span>' : ''}<span>${esc(t)}</span></span><div>${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="${i}">EDIT</button>` : ''}<button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div></div>
   <pre class="tx">${esc(x.x)}</pre></div></div>`;
 }
 
@@ -266,18 +269,28 @@ function pageChar(id){
       <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
-  ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal${admin ? ' adm' : ''}">${c.gallery.map(u => { const gp = okPos((c.gallery_pos || {})[u]); return `<div data-act="zoom" data-src="${esc(u)}" data-gu="${esc(u)}" data-gid="${c.id}">${img(u,'',gp)}</div>`; }).join('')}</div>` : ''}
+  ${(c.gallery||[]).length ? `<h2>GALLERY · ${c.gallery.length}</h2><div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}
   ${c.prompt || c.outfit ? `<h2>CHARACTER PROMPT</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : ''}
   ${(c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : ''}
   ${rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS · ${relOf(c).filter(o => CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : ''}
   ${rel.length ? `<h2>RELATED PROMPTS</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : ''}`;
   const sp = $('#sps');
-  if(sp && admin && window.Sortable && (c.subs || []).length > 1) Sortable.create(sp, { animation:150, draggable:'.sp', ghostClass:'drag', delay:200, touchStartThreshold:5, filter:'.btn', preventOnFilter:false,
+  if(sp && admin && window.Sortable && (c.subs || []).length > 1) Sortable.create(sp, { animation:150, draggable:'.sp', handle:'.dh', ghostClass:'drag',
     onEnd: async () => {
       const order = [...sp.querySelectorAll('.sp')].map(el => +el.dataset.si), subs = order.map(i => c.subs[i]);
       if(order.every((v, k) => v === k)) return;
       const r = await sb.from('characters').update({ subs }).eq('id', c.id);
       if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.subs = subs;
+      pageChar(c.id);
+    } });
+  const gl = $('.gal.adm');
+  if(gl && window.Sortable && (c.gallery || []).length > 1) Sortable.create(gl, { animation:150, draggable:'div[data-gi]', ghostClass:'drag', delay:200, delayOnTouchOnly:true, touchStartThreshold:5,
+    onEnd: async () => {
+      gsorted = true; setTimeout(() => { gsorted = false; }, 150);
+      const order = [...gl.querySelectorAll('div[data-gi]')].map(el => +el.dataset.gi), gallery = order.map(i => c.gallery[i]);
+      if(order.every((v, k) => v === k)) return;
+      const r = await sb.from('characters').update({ gallery }).eq('id', c.id);
+      if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.gallery = gallery;
       pageChar(c.id);
     } });
 }
@@ -604,37 +617,9 @@ function copy(b){
     document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(_){} a.remove(); done(); };
   (navigator.clipboard && window.isSecureContext) ? navigator.clipboard.writeText(t).then(done, fb) : fb();
 }
-/* gallery: 관리자는 사진을 드래그해서 위치 조정 (놓으면 자동 저장) */
-let gd = null, gmoved = false;
-document.addEventListener('click', e => { if(gmoved){ e.stopPropagation(); e.preventDefault(); gmoved = false; } }, true);
-document.addEventListener('pointerdown', e => {
-  const t = admin && e.target.closest('.gal.adm div[data-gu]'); if(!t) return;
-  const im = t.querySelector('img'); if(!im) return;
-  let p = String(im.style.objectPosition || '50% 50%').split(' ').map(parseFloat); if(p.length < 2 || p.some(isNaN)) p = [50, 50];
-  gd = { t, im, x:e.clientX, y:e.clientY, p, pos:[...p], moved:false }; gmoved = false;
-});
-document.addEventListener('pointermove', e => {
-  if(!gd || !gd.im.naturalWidth) return;
-  const dx = e.clientX - gd.x, dy = e.clientY - gd.y;
-  if(!gd.moved && Math.hypot(dx, dy) < 4) return;
-  gd.moved = true;
-  const r = gd.t.getBoundingClientRect(), sc = Math.max(r.width / gd.im.naturalWidth, r.height / gd.im.naturalHeight);
-  const ox = gd.im.naturalWidth * sc - r.width, oy = gd.im.naturalHeight * sc - r.height, cl = v => Math.max(0, Math.min(100, v));
-  if(ox > 1) gd.pos[0] = cl(gd.p[0] - dx / ox * 100);
-  if(oy > 1) gd.pos[1] = cl(gd.p[1] - dy / oy * 100);
-  gd.im.style.objectPosition = `${gd.pos[0].toFixed(1)}% ${gd.pos[1].toFixed(1)}%`;
-});
-const gend = async () => {
-  if(!gd) return; const g = gd; gd = null;
-  if(!g.moved) return;
-  gmoved = true; setTimeout(() => { gmoved = false; }, 100);
-  const c = CH.find(x => x.id === +g.t.dataset.gid); if(!c) return;
-  const map = { ...(c.gallery_pos || {}), [g.t.dataset.gu]: g.im.style.objectPosition };
-  const r = await sb.from('characters').update({ gallery_pos: map }).eq('id', c.id);
-  if(r.error) return alert('위치 저장 실패: ' + r.error.message);
-  c.gallery_pos = map;
-};
-document.addEventListener('pointerup', gend); document.addEventListener('pointercancel', gend);
+/* gallery: 관리자는 사진을 드래그해서 순서 조정 (놓으면 자동 저장) */
+let gsorted = false;
+document.addEventListener('click', e => { if(gsorted){ e.stopPropagation(); e.preventDefault(); gsorted = false; } }, true);
 
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if(!b) return;
