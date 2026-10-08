@@ -19,6 +19,10 @@ button,input,textarea,select{letter-spacing:inherit;line-height:inherit}
 a{color:inherit}
 img{pointer-events:none;-webkit-user-drag:none;user-drag:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 body{-webkit-touch-callout:none}
+::selection{background:var(--fg);color:var(--fg)}
+::-moz-selection{background:var(--fg);color:var(--fg)}
+input::selection,textarea::selection{background:Highlight;color:HighlightText}
+input::-moz-selection,textarea::-moz-selection{background:Highlight;color:HighlightText}
 .wrap{max-width:1014px;margin:0 auto;padding:0 16px}
 header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:2px solid var(--fg);z-index:5}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:44px}
@@ -184,7 +188,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
   </nav>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap"><button id="adm">♥︎</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
+<footer><div class="wrap"><button id="adm">✦</button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
 <div id="lb" hidden></div>
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
@@ -718,7 +722,7 @@ $('#theme').onclick = () => {
 };
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
 paintTheme();
-const syncAdm = () => $('#adm').textContent = admin ? '♡' : '♥︎';
+const syncAdm = () => $('#adm').textContent = admin ? '✧' : '✦';
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)) route(); });
 addEventListener('hashchange', route);
