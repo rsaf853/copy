@@ -45,6 +45,15 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .card .meta{padding:8px 10px;border-top:2px solid var(--fg)}
 .card b{display:block;font-size:13px;font-weight:800}
 .card span{color:var(--mut);font-size:11px;font-weight:500}
+.card .meta .fn{display:block;min-height:1.5em;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.hint{color:var(--mut);font:500 11px/1.5 var(--sans);margin:-8px 0 12px}
+.grid.ordering .card{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.grid.ordering .card img{-webkit-user-drag:none;pointer-events:none}
+.grid.ordering .card.drag{opacity:.35}
+.pe{width:150px;aspect-ratio:3/4;border:1px solid var(--line);overflow:hidden;background:var(--soft);touch-action:none;cursor:grab;margin-top:6px}
+.pe img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
+.pe:active{cursor:grabbing}
 .bar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;align-items:center}
 .chip{font:600 11px/1.5 var(--sans);border:1px solid var(--line);background:none;color:var(--mut);padding:2px 9px;cursor:pointer}
 .chip:hover{color:var(--fg);border-color:var(--fg)}
@@ -87,17 +96,17 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .st{color:var(--mut);font-size:12px;margin-top:8px;min-height:18px;white-space:pre-wrap}
 .cur{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px}
 .cur img{width:40px;height:54px;object-fit:cover;border:1px solid var(--line)}
-.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
-.gal div{aspect-ratio:3/4;border:1px solid var(--line);overflow:hidden;cursor:zoom-in}
+.gal{display:flex;flex-wrap:wrap;gap:6px}
+.gal div{height:200px;flex:none;max-width:100%;border:1px solid var(--line);overflow:hidden;cursor:zoom-in;background:var(--soft)}
 .gal div:hover{border-color:var(--fg)}
-.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.gal img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
 .gedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .mb .gi{margin:0;font-weight:500}
 .gi img{width:56px;height:74px;object-fit:cover;border:1px solid var(--line);display:block}
 #lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:30;cursor:zoom-out;padding:16px}
 #lb[hidden]{display:none}
 #lb img{max-width:100%;max-height:100%;object-fit:contain}
-@media(max-width:640px){.prof{grid-template-columns:1fr}.prof .ph{max-width:300px}.pr{flex-direction:column}.pr .im{width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
+@media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}.card .meta{padding:7px 8px}.gal div{height:150px}.prof{grid-template-columns:1fr}.prof .ph{max-width:300px}.pr{flex-direction:column}.pr .im{width:100%;height:160px;border-right:0;border-bottom:1px solid var(--line)}}
 .h2s{display:flex;justify-content:space-between;align-items:center}
 .vs{display:flex;gap:3px}.vs .chip{padding:0 8px}
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
@@ -144,6 +153,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
 const SUPABASE_URL = "https://sxnijnngeatcscwyxhep.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4bmlqbm5nZWF0Y3Njd3l4aGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjE0MjIsImV4cCI6MjEwNzAzNzQyMn0.zT-jmsg7M14H7BFnqWFSclc6wnANJNDnHiVuCY9SoI8";
@@ -153,7 +163,11 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = s => document.querySelector(s), app = $('#app');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pad = n => String(n).padStart(3, '0');
-const img = (src, alt) => src ? `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : '';
+const okPos = p => /^\d+(\.\d+)?% \d+(\.\d+)?%$/.test(p || '') ? p : '';
+const img = (src, alt, pos) => src ? `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy"${okPos(pos) ? ` style="object-position:${okPos(pos)}"` : ''}>` : '';
+const fullOf = c => ((c.info || []).find(([k]) => k === '본명') || [])[1] || '';
+const sortCh = () => [...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0) || (a.sort_order ?? 1e9) - (b.sort_order ?? 1e9) || a.id - b.id);
+let ORD = false;
 const initial = n => esc([...n][0] || '?');
 let CH = [], PR = [], admin = false, dirty = false;
 let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!'abc'.includes(SV)) SV = 'a';
@@ -190,10 +204,22 @@ function promptBox(p){
 
 function pageChars(){
   app.innerHTML = `<div class="top"><div><h1>PERSONA</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
-  ${admin ? '<button class="btn" data-act="new-c">+ NEW</button>' : ''}</div>
-  ${CH.length ? `<div class="grid">${[...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0)).map(c => `<a class="card" href="#/c/${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
-    <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
-    <div class="meta"><b>${esc(c.name)}</b><span>${esc(tagsOf(c.tag).join(' · '))}</span></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
+  ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
+  ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
+  ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${sortCh().map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
+    <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
+    <div class="meta"><b>${esc(c.name)}</b><span class="fn">${esc(fullOf(c))}</span></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
+  const g = $('#cg');
+  if(g && admin && ORD){
+    g.addEventListener('click', e => { if(!e.target.closest('[data-act]')) e.preventDefault(); });
+    if(window.Sortable) Sortable.create(g, { animation:150, draggable:'.card', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: saveOrder });
+  }
+}
+async function saveOrder(){
+  const ids = [...document.querySelectorAll('#cg .card')].map(a => +a.dataset.cid), ops = [];
+  ids.forEach((id,i) => { const c = CH.find(x => x.id===id); if(c && c.sort_order !== i){ c.sort_order = i; ops.push(sb.from('characters').update({ sort_order: i }).eq('id', id)); } });
+  const er = (await Promise.all(ops)).find(r => r.error);
+  if(er){ alert('순서 저장 실패: ' + er.error.message); await load(); pageChars(); }
 }
 
 function pageChar(id){
@@ -202,7 +228,7 @@ function pageChar(id){
   const rel = PR.filter(p => p.char_id===c.id).reverse();
   app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
   <div class="prof">
-    <div class="ph">${c.img ? img(c.img,c.name) : initial(c.name)}</div>
+    <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
       <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>
       <div style="white-space:pre-wrap">${esc(c.descr||'')}</div>
@@ -240,6 +266,7 @@ function list(){
 
 function route(){
   const [a,b] = (location.hash.slice(2) || 'characters').split('/');
+  if(a==='prompts' || a==='c') ORD = false;
   $('#n1').classList.toggle('on', a!=='prompts'); $('#n2').classList.toggle('on', a==='prompts');
   a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
@@ -310,7 +337,7 @@ const parseInfo = t => t.split('\n').map(l => l.trim()).filter(Boolean).map(l =>
   const m = l.match(/^([^:：]+)[:：]\s*(.*)$/); return m ? [m[1].trim(), m[2].trim()] : [l, ''];
 }).filter(([k,v]) => k && v);
 
-const FIX = [['성별',['성별']], ['나이',['나이','Age','age','AGE']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
+const FIX = [['본명',['본명','풀네임','Full name','full name']], ['성별',['성별']], ['나이',['나이','Age','age','AGE']], ['키',['키']], ['DOB',['DOB','생일']], ['국적',['국적']]];
 const subRow = (x={}) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
   <input type="hidden" name="sub_img" value="${esc(x.img)}">
   <label style="margin:2px 0 0">이미지 ${x.img ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="sub_file" accept="image/*">
@@ -321,15 +348,18 @@ function formC(c){
   const inf = c ? (c.info||[]) : [];
   const get = ks => (inf.find(([k]) => ks.includes(k))||[])[1] || '';
   const used = FIX.flatMap(([,ks]) => ks);
+  const fx = i => `<div><label>${FIX[i][0]}</label><input name="fx${i}" value="${esc(get(FIX[i][1]))}" ${FIX[i][0]==='DOB' ? 'placeholder="YYYY-MM-DD"' : ''}></div>`;
   const extra = c ? inf.filter(([k]) => !used.includes(k)).map(([k,v]) => `${k}: ${v}`).join('\n') : '';
   openM(`<h3>${c ? '캐릭터 수정' : '캐릭터 추가'}</h3>
   <form id="f">
     <div class="g2">
       <div><label>이름</label><input name="name" required value="${esc(c ? c.name : '')}"></div>
-      <div><label>태그 (쉼표로 구분: 주인공, 조연 …)</label><input name="tag" value="${esc(c ? c.tag : '')}"></div>
-      ${FIX.map(([k,ks],i) => `<div><label>${k}</label><input name="fx${i}" value="${esc(get(ks))}" ${k==='DOB' ? 'placeholder="YYYY-MM-DD"' : ''}></div>`).join('')}
+      ${fx(0)}
+      <div style="grid-column:1/-1"><label>태그 (쉼표로 구분: 주인공, 조연 …) — 상세 페이지에만 표시</label><input name="tag" value="${esc(c ? c.tag : '')}"></div>
+      ${FIX.map((_,i) => i ? fx(i) : '').join('')}
     </div>
     ${imgField(c && c.img)}
+    <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞춰요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((c && c.img_pos) || '50% 50%')}"></div>
     <label>갤러리 (여러 장 선택 가능)</label><input type="file" name="gfiles" accept="image/*" multiple>
     ${((c && c.gallery) || []).length ? `<div class="gedit">${c.gallery.map((u,i) => `<label class="gi">${img(u,'')}<input type="checkbox" name="grm" value="${i}" style="width:auto"> 삭제</label>`).join('')}</div>` : ''}
     <label>추가 프로필 정보 — 한 줄에 "항목: 값" (값이 비면 표시 안 됨)</label><textarea name="info" rows="4">${esc(extra)}</textarea>
@@ -339,6 +369,7 @@ function formC(c){
     <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
     ${btns('SAVE')}
   </form>`);
+  initPos(c && c.img, c && c.img_pos);
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
       let im = c ? c.img : '';
@@ -349,10 +380,36 @@ function formC(c){
       const gf = fd.getAll('gfiles').filter(x => x && x.size);
       for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
       const subs = await readSubs(fd);
-      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), subs, gallery };
+      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), subs, gallery, img_pos: fd.get('img_pos') || '50% 50%' };
       const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
       if(r.error) throw r.error;
     }); };
+}
+
+function initPos(src0, pos0){
+  const box = $('#pbox'), im = $('#pimg'), wrap = $('#pe-wrap'), hid = $('#f [name=img_pos]'), file = $('#f [name=file]');
+  let pos = String(pos0 || '50% 50%').split(' ').map(parseFloat); if(pos.length < 2 || pos.some(isNaN)) pos = [50, 50];
+  let blob = '';
+  const apply = () => { im.style.objectPosition = `${pos[0]}% ${pos[1]}%`; hid.value = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; };
+  const show = src => { if(src){ im.src = src; wrap.hidden = false; } else wrap.hidden = true; };
+  show(src0); apply();
+  file.addEventListener('change', () => {
+    const f = file.files[0];
+    if(blob) URL.revokeObjectURL(blob);
+    if(f){ blob = URL.createObjectURL(f); pos = [50, 50]; show(blob); apply(); } else { blob = ''; show(src0); }
+  });
+  let d = null;
+  box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
+  box.addEventListener('pointermove', e => {
+    if(!d || !im.naturalWidth) return;
+    const r = box.getBoundingClientRect(), sc = Math.max(r.width / im.naturalWidth, r.height / im.naturalHeight);
+    const ox = im.naturalWidth * sc - r.width, oy = im.naturalHeight * sc - r.height, cl = v => Math.max(0, Math.min(100, v));
+    if(ox > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / ox * 100);
+    if(oy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / oy * 100);
+    apply(); dirty = true;
+  });
+  const end = () => { d = null; };
+  box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
 }
 
 function formLogin(){
@@ -385,6 +442,7 @@ document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if(!b) return;
   const a = b.dataset.act, id = +b.dataset.id || null;
   if(a==='pin'){ e.preventDefault(); const c = CH.find(x => x.id===id); const r = await sb.from('characters').update({ pinned: !c.pinned }).eq('id', id); if(r.error) return alert('핀 실패: ' + r.error.message); await load(); return pageChars(); }
+  if(a==='order'){ ORD = !ORD; return pageChars(); }
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
