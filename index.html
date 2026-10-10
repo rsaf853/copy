@@ -181,6 +181,15 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .pin:hover{color:var(--fg);border-color:var(--fg)}
 .pin.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 #set{border:0;background:none;color:inherit;padding:0;margin:0 0 0 auto;font:inherit;letter-spacing:inherit;line-height:inherit;cursor:pointer}
+@media(min-width:641px){.wrap{max-width:none;width:70vw;min-width:min(1014px,100%)}}
+.vb{position:absolute;top:6px;left:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--fg);color:var(--bg);border:1px solid var(--fg)}
+.ph svg{width:30px;height:30px}
+.lk{display:flex;flex-direction:column;align-items:center;gap:8px;padding:36px 16px;border:1px solid var(--line);text-align:center}
+.pr .lk{border:0}
+.lk svg{width:22px;height:22px}
+.lk form{display:flex;gap:5px;width:100%;max-width:280px}
+.lk input{flex:1;min-width:0}
+.lk .st{margin-top:0;min-height:16px}
 </style>
 </head>
 <body>
@@ -218,6 +227,25 @@ let ORD = false;
 const initial = n => esc([...n][0] || '?');
 let CH = [], PR = [], admin = false, dirty = false;
 let SET = {};
+const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const vis = r => r.visibility || 'public';
+const canSee = r => vis(r) !== 'private' || admin;
+let UNL = new Set(); try{ UNL = new Set(JSON.parse(sessionStorage.getItem('unl') || '[]')); }catch(_){}
+const isLocked = (r, k) => vis(r) === 'locked' && !admin && !UNL.has(k);
+const vbadge = r => vis(r) !== 'public' && (admin || vis(r) === 'locked') ? `<span class="vb">${vis(r) === 'private' ? 'PRIVATE' : 'LOCKED'}</span>` : '';
+const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join('');
+const mkLock = async pw => { const salt = crypto.randomUUID().slice(0, 8); return salt + '$' + await sha(salt + pw); };
+const chkLock = async (r, pw) => { const [salt, h] = String(r.lock_hash || '').split('$'); return !!h && await sha(salt + pw) === h; };
+const lockHtml = k => `<div class="lk">${LOCK}<div style="font-weight:800">LOCKED</div><form data-lk="${k}"><input type="password" placeholder="비밀번호" autocomplete="off" required><button class="btn" type="submit">OPEN</button></form><div class="st" data-lkerr></div></div>`;
+const visField = r => { const v = vis(r || {}); return `<label>공개 설정</label><select name="vis" id="vsel">${[['public','공개'],['private','나만 보기'],['locked','비밀번호 잠금']].map(([k,t]) => `<option value="${k}"${v===k ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="password" name="lockpw" id="lpw" autocomplete="new-password" placeholder="${v==='locked' ? '새 비밀번호 (비우면 기존 유지)' : '비밀번호'}" style="margin-top:5px"${v==='locked' ? '' : ' hidden'}>`; };
+const bindVis = () => { const s = $('#vsel'); if(s) s.onchange = () => { $('#lpw').hidden = s.value !== 'locked'; }; };
+async function visRow(fd, r){
+  const v = fd.get('vis') || 'public', pw = (fd.get('lockpw') || '').trim(), o = {};
+  if(v !== vis(r || {})) o.visibility = v;
+  if(v === 'locked'){ if(pw) o.lock_hash = await mkLock(pw); else if(!(r && r.lock_hash)) throw new Error('비밀번호를 입력해 주세요'); }
+  else if(r && r.lock_hash) o.lock_hash = '';
+  return o;
+}
 const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin); };
 const pv = k => SET[k]==='admin' ? ' · PRIVATE' : '';
 const tagsOf = s => !show('tags') ? [] : String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
@@ -237,7 +265,7 @@ function subBox(c, x, i, pre='s'){
 async function load(){
   const [c, p] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id')]);
   if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
-  CH = c.data; PR = p.data;
+  CH = c.data.filter(canSee); PR = p.data.filter(canSee);
   const st2 = await sb.from('site_settings').select('*'); if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
   return true;
 }
@@ -253,8 +281,9 @@ const chName = id => (CH.find(c => c.id===id)||{}).name;
 /* ---------- views ---------- */
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
+  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)} · LOCKED</span></div>${lockHtml('p'+p.id)}</div></div>`;
   return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
-  <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}</span>
+  <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' · ' + (vis(p) === 'private' ? 'PRIVATE' : 'LOCKED') : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
   <pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
 }
@@ -264,7 +293,7 @@ function pageChars(){
   ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
   ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
   ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${sortCh().map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
-    <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
+    ${vbadge(c)}<div class="ph">${isLocked(c,'c'+c.id) ? LOCK : c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
   const g = $('#cg');
   if(g && admin && ORD){
@@ -282,6 +311,7 @@ async function saveOrder(){
 function pageChar(id){
   const c = CH.find(x => x.id===+id);
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
+  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)}</h1><p class="sub">LOCKED</p>${lockHtml('c'+c.id)}`; return; }
   const rel = PR.filter(p => p.char_id===c.id).reverse(), rcs = relCards(c);
   app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
   <div class="prof">
@@ -338,7 +368,7 @@ function pagePrompts(){
 }
 function list(){
   const s = q.trim().toLowerCase();
-  const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || p.text.toLowerCase().includes(s))).reverse();
+  const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || (!isLocked(p, 'p'+p.id) && p.text.toLowerCase().includes(s)))).reverse();
   $('#list').innerHTML = rows.length
     ? `<div class="pgrid">${rows.slice(0,shown).map(promptBox).join('')}</div>` + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
     : '<p class="empty">I\'m feeling lucky!</p>';
@@ -428,16 +458,17 @@ function formP(p){
     <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞추고, 확대도 할 수 있어요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((p && p.img_pos) || '50% 50%')}"></div>
     <label>서브 프롬프트</label><div id="subs">${((p && p.subs) || []).map(x => subRow(x)).join('')}</div>
     <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
+    ${visField(p)}
     ${btns('SAVE')}
   </form>`);
-  initPos(p && p.img, p && p.img_pos);
+  initPos(p && p.img, p && p.img_pos); bindVis();
   $('#csel').onchange = e => { const t = $('#ctxt'), n = e.target.value === '__n'; t.hidden = !n; t.required = n; if(n) t.focus(); };
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
       let im = p ? p.img : '';
       if(fd.get('rmimg')) im = '';
       const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'prompts'); }
-      const row = { cat: (fd.get('csel') === '__n' ? fd.get('cat') : fd.get('csel')).trim(), text: fd.get('text').trim(), img: im, img_pos: fd.get('img_pos') || '50% 50%', char_id: fd.get('char_id') ? +fd.get('char_id') : null, subs: await readSubs(fd) };
+      const row = { cat: (fd.get('csel') === '__n' ? fd.get('cat') : fd.get('csel')).trim(), text: fd.get('text').trim(), img: im, img_pos: fd.get('img_pos') || '50% 50%', char_id: fd.get('char_id') ? +fd.get('char_id') : null, subs: await readSubs(fd), ...await visRow(fd, p) };
       const r = p ? await sb.from('prompts').update(row).eq('id', p.id) : await sb.from('prompts').insert(row);
       if(r.error) throw r.error;
     }); };
@@ -473,7 +504,7 @@ const relCards = c => relOf(c).map(o => {
   const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
   const pz = xyOf(pos), thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
-  return `<a class="rcard" href="#/c/${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
+  return `<a class="rcard" href="#/c/${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${isLocked(t,'c'+t.id) ? LOCK : src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
 const rrHtml = (o, t, uid) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || ((o && o.img) ? 1 : zOf(t.img_pos));
   return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"${uid ? ` data-ext="1" data-uid="${esc(uid)}"` : ''}><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
   <div class="pe" style="width:240px;aspect-ratio:4/3">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
@@ -579,9 +610,10 @@ function formC(c){
     <label>설명</label><textarea name="descr" rows="4">${esc(c ? c.descr : '')}</textarea>
     <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
     <label>아웃핏 프롬프트 (OUTFIT)</label><textarea class="m" name="outfit" rows="3">${esc(c ? (c.outfit || '') : '')}</textarea>
+    ${visField(c)}
     ${btns('SAVE')}
   </form>`);
-  initPos(c && c.img, c && c.img_pos);
+  initPos(c && c.img, c && c.img_pos); bindVis();
   $('#gsel').onchange = e => { const t = $('#gtxt'); t.hidden = e.target.value !== '__o'; if(!t.hidden) t.focus(); };
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
@@ -595,7 +627,7 @@ function formC(c){
         return [k, v];
       }).filter(([,v]) => v);
       const gallery = (c && c.gallery) || [];
-      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), outfit: fd.get('outfit').trim(), gallery, img_pos: fd.get('img_pos') || '50% 50%' };
+      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), outfit: fd.get('outfit').trim(), gallery, img_pos: fd.get('img_pos') || '50% 50%', ...await visRow(fd, c) };
       const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
       if(r.error) throw r.error;
     }); };
@@ -686,6 +718,18 @@ function copy(b){
     document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(_){} a.remove(); done(); };
   (navigator.clipboard && window.isSecureContext) ? navigator.clipboard.writeText(t).then(done, fb) : fb();
 }
+/* 잠금 해제 폼 */
+document.addEventListener('submit', async e => {
+  const f = e.target.closest('form[data-lk]'); if(!f) return; e.preventDefault();
+  const k = f.dataset.lk, r = k[0]==='c' ? CH.find(x => x.id===+k.slice(1)) : PR.find(x => x.id===+k.slice(1));
+  const inp = f.querySelector('input'), err = f.parentElement.querySelector('[data-lkerr]'); if(!r) return;
+  let ok = false;
+  try{ ok = await chkLock(r, inp.value); }catch(_){ err.textContent = '이 브라우저에서는 잠금을 열 수 없어요 (https 필요)'; return; }
+  if(!ok){ err.textContent = '비밀번호가 맞지 않아요'; inp.select(); return; }
+  UNL.add(k); try{ sessionStorage.setItem('unl', JSON.stringify([...UNL])); }catch(_){}
+  const [a, b] = location.hash.slice(2).split('/');
+  if(a==='c') pageChar(b); else if($('#list')) list(); else route();
+});
 /* gallery: 관리자는 사진을 드래그해서 순서 조정 (놓으면 자동 저장) */
 let gsorted = false;
 document.addEventListener('click', e => { if(gsorted){ e.stopPropagation(); e.preventDefault(); gsorted = false; } }, true);
@@ -750,7 +794,7 @@ function formSettings(){
 }
 $('#set').onclick = formSettings;
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
-sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)) route(); });
+sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)){ CH = CH.filter(canSee); PR = PR.filter(canSee); route(); setTimeout(async () => { if(await load()) route(); }, 0); } });
 addEventListener('hashchange', route);
 
 (async () => {
