@@ -78,6 +78,7 @@ h1{font-size:22px;font-weight:800;margin:0 0 2px}
 .rcard:hover{border-color:var(--fg)}
 .rcard.ext{cursor:default}
 .rcard.ext:hover{border-color:var(--line)}
+.rg .rcard.drag{opacity:.35}
 .rcard .ph{aspect-ratio:4/3;font-size:34px}
 .rcard .rce{position:absolute;top:6px;right:6px;z-index:2;background:var(--bg);border:1px solid var(--fg);font:700 10px/1 var(--sans);padding:4px 7px;cursor:pointer}
 .rcard .rm{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 10px}
@@ -324,7 +325,7 @@ function pageChar(id){
   ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
   ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
   ${!show('gal') ? '' : ((c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY${pv('gal')} · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : '')}
-  ${!show('rel') ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg">${rcs}</div>` : ''}` : '')}
+  ${!show('rel') ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg" id="rg">${rcs}</div>` : ''}` : '')}
   ${!show('relp') ? '' : (rel.length ? `<h2>RELATED PROMPTS${pv('relp')}</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : '')}`;
   document.querySelectorAll('.gal div[data-gi] img').forEach(im => {
     const f = () => { if(im.naturalWidth) im.parentElement.style.setProperty('--r', (im.naturalWidth / im.naturalHeight).toFixed(3)); };
@@ -337,6 +338,18 @@ function pageChar(id){
       if(order.every((v, k) => v === k)) return;
       const r = await sb.from('characters').update({ subs }).eq('id', c.id);
       if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.subs = subs;
+      pageChar(c.id);
+    } });
+  const rg = $('#rg');
+  if(rg && admin && window.Sortable && rg.children.length > 1) Sortable.create(rg, { animation:150, draggable:'.rcard', ghostClass:'drag', delay:200, delayOnTouchOnly:true, touchStartThreshold:5,
+    onEnd: async () => {
+      gsorted = true; setTimeout(() => { gsorted = false; }, 150);
+      const kOf = o => o.ext ? 'x:' + (o.uid || '') : 'i:' + o.id, all = relOf(c), keys = [...rg.querySelectorAll('.rcard')].map(el => el.dataset.rk);
+      const ordered = keys.map(k => all.find(o => kOf(o) === k)).filter(Boolean), rest = (c.related || []).filter(o => !keys.includes(kOf(o)));
+      const related = [...ordered, ...rest], old = c.related || [];
+      if(related.length === old.length && related.every((o, i) => o === old[i])) return;
+      const r = await sb.from('characters').update({ related }).eq('id', c.id);
+      if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.related = related;
       pageChar(c.id);
     } });
   const gl = $('.gal.adm');
@@ -499,12 +512,12 @@ const relCards = c => relOf(c).map(o => {
   if(o.ext){
     const src = o.img || '', pos = o.pos || '', pz = xyOf(pos), nm = o.name || '';
     const thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(nm)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, nm, pos);
-    return `<div class="rcard ext">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-uid="${esc(o.uid || '')}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(nm || '?')}</div><div class="rm"><b>${esc(nm)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></div>`;
+    return `<div class="rcard ext" data-rk="x:${esc(o.uid || '')}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-uid="${esc(o.uid || '')}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(nm || '?')}</div><div class="rm"><b>${esc(nm)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></div>`;
   }
   const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
   const pz = xyOf(pos), thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
-  return `<a class="rcard" href="#/c/${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${isLocked(t,'c'+t.id) ? LOCK : src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
+  return `<a class="rcard" href="#/c/${t.id}" data-rk="i:${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${isLocked(t,'c'+t.id) ? LOCK : src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
 const rrHtml = (o, t, uid) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || ((o && o.img) ? 1 : zOf(t.img_pos));
   return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"${uid ? ` data-ext="1" data-uid="${esc(uid)}"` : ''}><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
   <div class="pe" style="width:240px;aspect-ratio:4/3">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
