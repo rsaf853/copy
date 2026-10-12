@@ -209,6 +209,12 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .oc-r.open .btn{background:var(--bg);color:var(--fg);border-color:var(--bg)}
 .oc-r.open .btn:hover{background:transparent;color:var(--bg);border-color:var(--bg)}
 @media(max-width:640px){.oc-body{padding-left:10px}}
+.oc-t .tg.x18{background:var(--fg);color:var(--bg)}
+.oc-r.open .tg.x18{background:var(--bg);color:var(--fg);border-color:var(--bg)}
+.oc-body{cursor:auto}
+.oc-r.open .btn.on{background:transparent;color:var(--bg);border-color:var(--bg);box-shadow:inset 0 0 0 1px var(--bg)}
+.bar.ordering .chip[data-t]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.bar.ordering .chip.drag{opacity:.35}
 </style>
 </head>
 <body>
@@ -290,7 +296,7 @@ async function load(){
   return true;
 }
 const textOf = k => {
-  if(k[0]==='g') return (OC.find(o => o.id===+k.slice(1))||{}).content;
+  if(k[0]==='g'){ const o = OC.find(o => o.id===+k.slice(1)); return o ? ocText(o) : ''; }
   if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
   if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
   if(k[0]==='o') return (CH.find(c => c.id===+k.slice(1))||{}).outfit;
@@ -414,26 +420,47 @@ function list(){
 }
 
 const ocTags = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
+const is18 = t => /^[RG]-?18$/i.test(t);
+/* 태그 순서: site_settings.ooc_tags(JSON). 저장된 순서 먼저, 새 태그는 뒤에 */
+let OTO = false;
+const ocOrder = () => { try{ const a = JSON.parse(SET.ooc_tags || '[]'); return Array.isArray(a) ? a : []; }catch(_){ return []; } };
+const ocAll = () => { const seen = [...new Set(OC.flatMap(o => ocTags(o.tags)))], ord = ocOrder(); return [...ord.filter(t => seen.includes(t)), ...seen.filter(t => !ord.includes(t))]; };
+const ocSorted = tags => { const all = ocAll(); return [...new Set(tags)].sort((a, b) => all.indexOf(a) - all.indexOf(b)); };
+/* {{user}} ↔ {{char}} 교체 (이 탭에서만 유지) */
+const OSW = new Set();
+const swapUC = t => String(t ?? '').replace(/\{\{\s*(user|char)\s*\}\}/gi, (m, k) => { const n = k.toLowerCase() === 'user' ? 'char' : 'user'; return '{{' + (k === k.toUpperCase() ? n.toUpperCase() : k[0] === k[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n) + '}}'; });
+const hasPH = t => /\{\{\s*(user|char)\s*\}\}/i.test(t || '');
+const ocText = o => OSW.has(o.id) ? swapUC(o.content) : (o.content || '');
+async function saveOcTagOrder(){
+  const ord = [...document.querySelectorAll('#ochips .chip[data-t]')].map(x => x.dataset.t).filter(t => t !== 'all'), val = JSON.stringify(ord);
+  const r = await sb.from('site_settings').upsert({ key: 'ooc_tags', value: val });
+  if(r.error){ alert('태그 순서 저장 실패: ' + r.error.message); await load(); pageOoc(); return; }
+  SET.ooc_tags = val; drawOoc();
+}
 function pageOoc(){
-  const tags = [...new Set(OC.flatMap(o => ocTags(o.tags)))];
+  const tags = ocAll();
+  if(OTO) otag = 'all';
   if(otag!=='all' && !tags.includes(otag)) otag = 'all';
   app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">ARCHIVE · ${OC.length} SAVED</p></div>
-  ${admin ? '<button class="btn" data-act="new-o">+ NEW</button>' : ''}</div>
+  ${admin ? `<div style="display:flex;gap:5px">${tags.length > 1 ? `<button class="btn ${OTO ? 'on' : ''}" data-act="otag-order">${OTO ? 'DONE' : 'TAG ORDER'}</button>` : ''}<button class="btn" data-act="new-o">+ NEW</button></div>` : ''}</div>
+  ${admin && OTO ? '<p class="hint">태그를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (OOC 목록의 태그도 같은 순서로 보여요)</p>' : ''}
   <input type="search" id="oq" placeholder="search" aria-label="search" value="${esc(oq)}">
-  <div class="bar" id="ochips">${['all',...tags].map(k => `<button class="chip ${k===otag?'on':''}" data-t="${esc(k)}">${esc(k)}</button>`).join('')}</div>
+  <div class="bar${admin && OTO ? ' ordering' : ''}" id="ochips">${['all',...tags].map(k => `<button class="chip ${k===otag?'on':''}" data-t="${esc(k)}">${esc(k)}</button>`).join('')}</div>
   <div class="oc" id="olist"></div>`;
   $('#oq').oninput = e => { oq = e.target.value; drawOoc(); };
-  $('#ochips').onclick = e => { const b = e.target.closest('[data-t]'); if(!b) return; otag = b.dataset.t;
+  $('#ochips').onclick = e => { const b = e.target.closest('[data-t]'); if(!b || OTO) return; otag = b.dataset.t;
     document.querySelectorAll('#ochips .chip').forEach(x => x.classList.toggle('on', x===b)); drawOoc(); };
-  $('#olist').onclick = e => { if(e.target.closest('[data-act]')) return; const r = e.target.closest('.oc-r'); if(!r) return;
+  if(admin && OTO && window.Sortable) Sortable.create($('#ochips'), { animation:150, draggable:'.chip[data-t]:not([data-t="all"])', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: saveOcTagOrder });
+  /* 접기/펼치기는 헤더(번호·제목·태그 줄)를 눌렀을 때만 */
+  $('#olist').onclick = e => { const t = e.target.closest('.oc-top'); if(!t) return; const r = t.closest('.oc-r');
     const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(x => x.classList.remove('open')); r.classList.toggle('open', !was); };
   drawOoc();
 }
 function drawOoc(){
   const s = oq.trim().toLowerCase();
   const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
-  $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => `<div class="oc-r"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocTags(o.tags).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(o.content)}</small></div></div>
-    <div class="oc-body"><pre>${esc(o.content)}</pre><div class="oc-bar">${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`).join('') : '<p class="empty">I\'m feeling lucky!</p>';
+  $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => `<div class="oc-r"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
+    <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`).join('') : '<p class="empty">I\'m feeling lucky!</p>';
 }
 function formOoc(o){
   openM(`<h3>${o ? 'OOC 수정' : 'OOC 추가'}</h3>
@@ -457,6 +484,7 @@ function route(){
   if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
   if(a==='prompts' || a==='c' || a==='ooc') ORD = false;
+  if(a!=='ooc') OTO = false;
   $('#n1').classList.toggle('on', a!=='prompts' && a!=='ooc'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
   a==='ooc' ? pageOoc() : a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
@@ -835,6 +863,11 @@ document.addEventListener('click', async e => {
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
   if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow({}, !!$('#subs').dataset.ph));
   if(a==='del-sub') return b.closest('.sr').remove();
+  if(a==='otag-order'){ OTO = !OTO; return pageOoc(); }
+  if(a==='swap-o'){ const k = +b.dataset.id, o = OC.find(x => x.id===k), r = b.closest('.oc-r'); if(!o) return;
+    OSW.has(k) ? OSW.delete(k) : OSW.add(k);
+    if(r){ r.querySelector('pre').textContent = ocText(o); r.querySelector('small').textContent = ocText(o); }
+    b.classList.toggle('on', OSW.has(k)); return; }
   if(a==='new-o') return formOoc();
   if(a==='edit-o') return formOoc(OC.find(o => o.id===id));
   if(a==='del-o') { if(await del('ooc', id, 'OOC')) route(); return; }
