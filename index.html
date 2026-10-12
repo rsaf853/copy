@@ -191,6 +191,24 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .lk form{display:flex;gap:5px;width:100%;max-width:280px}
 .lk input{flex:1;min-width:0}
 .lk .st{margin-top:0;min-height:16px}
+#oq{margin-bottom:18px}
+.oc{border-top:2px solid var(--fg)}
+.oc-r{border-bottom:1px solid var(--line)}
+.oc-top{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;align-items:start;padding:12px 10px;cursor:pointer}
+.oc-n{font:500 11px var(--mono);letter-spacing:0;color:var(--mut);padding-top:1px}
+.oc-t strong{display:block;font-weight:600}
+.oc-t .tags{display:flex;flex-wrap:wrap;gap:3px;margin:5px 0 6px}
+.oc-t .tg{white-space:nowrap}
+.oc-t small{display:block;color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-body{display:none;padding:0 10px 12px 46px}
+.oc-body pre{margin:0;white-space:pre-wrap;word-break:break-word;font:400 12px/1.75 var(--mono)}
+.oc-bar{margin-top:10px;display:flex;justify-content:flex-end;gap:5px}
+.oc-r.open{background:var(--fg);color:var(--bg);border-bottom-color:var(--fg)}
+.oc-r.open small{display:none}.oc-r.open .oc-n{color:var(--bg);opacity:.6}.oc-r.open .oc-body{display:block}
+.oc-r.open .tg{background:transparent;color:var(--bg);border-color:var(--bg)}
+.oc-r.open .btn{background:var(--bg);color:var(--fg);border-color:var(--bg)}
+.oc-r.open .btn:hover{background:transparent;color:var(--bg);border-color:var(--bg)}
+@media(max-width:640px){.oc-body{padding-left:10px}}
 </style>
 </head>
 <body>
@@ -199,6 +217,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
   <nav>
     <a href="#/characters" id="n1">persona</a>
     <a href="#/prompts" id="n2">prompt</a>
+    <a href="#/ooc" id="n3">ooc</a>
     <button class="tg2" id="theme" type="button" aria-label="테마 전환"></button>
   </nav>
 </div></header>
@@ -226,7 +245,7 @@ const fullOf = c => ((c.info || []).find(([k]) => ['Alias','alias','ALIAS','별�
 const sortCh = () => [...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0) || (a.sort_order ?? 1e9) - (b.sort_order ?? 1e9) || a.id - b.id);
 let ORD = false;
 const initial = n => esc([...n][0] || '?');
-let CH = [], PR = [], admin = false, dirty = false;
+let CH = [], PR = [], OC = [], admin = false, dirty = false, ptag = 'all', oq = '', otag = 'all';
 let SET = {};
 const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 const vis = r => r.visibility || 'public';
@@ -264,13 +283,14 @@ function subBox(c, x, i, pre='s'){
 
 /* ---------- data ---------- */
 async function load(){
-  const [c, p] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id')]);
+  const [c, p, o] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id'), sb.from('ooc').select('*').order('id')]);
   if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
-  CH = c.data.filter(canSee); PR = p.data.filter(canSee);
+  CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = o.error ? [] : o.data;
   const st2 = await sb.from('site_settings').select('*'); if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
   return true;
 }
 const textOf = k => {
+  if(k[0]==='g') return (OC.find(o => o.id===+k.slice(1))||{}).content;
   if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
   if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
   if(k[0]==='o') return (CH.find(c => c.id===+k.slice(1))||{}).outfit;
@@ -290,12 +310,17 @@ function promptBox(p){
 }
 
 function pageChars(){
+  const ptags = [...new Set(CH.filter(c => !isLocked(c,'c'+c.id)).flatMap(c => tagsOf(c.tag)))];
+  if(ORD || (ptag!=='all' && !ptags.includes(ptag))) ptag = 'all';
+  const list = sortCh().filter(c => ptag==='all' || (!isLocked(c,'c'+c.id) && tagsOf(c.tag).includes(ptag)));
   app.innerHTML = `<div class="top"><div><h1>PERSONA</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
   ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
   ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
-  ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${sortCh().map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
+  ${ptags.length && !ORD ? `<div class="bar" id="pchips">${['all',...ptags].map(k => `<button class="chip ${k===ptag?'on':''}" data-pt="${esc(k)}">${esc(k)}</button>`).join('')}</div>` : ''}
+  ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
     ${vbadge(c)}<div class="ph">${isLocked(c,'c'+c.id) ? LOCK : c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
+  const pc = $('#pchips'); if(pc) pc.onclick = e => { const b = e.target.closest('[data-pt]'); if(b){ ptag = b.dataset.pt; pageChars(); } };
   const g = $('#cg');
   if(g && admin && ORD){
     g.addEventListener('click', e => { if(!e.target.closest('[data-act]')) e.preventDefault(); });
@@ -388,13 +413,52 @@ function list(){
   const m = $('#more'); if(m) m.onclick = () => { shown += 20; list(); };
 }
 
+const ocTags = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
+function pageOoc(){
+  const tags = [...new Set(OC.flatMap(o => ocTags(o.tags)))];
+  if(otag!=='all' && !tags.includes(otag)) otag = 'all';
+  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">ARCHIVE · ${OC.length} SAVED</p></div>
+  ${admin ? '<button class="btn" data-act="new-o">+ NEW</button>' : ''}</div>
+  <input type="search" id="oq" placeholder="search" aria-label="search" value="${esc(oq)}">
+  <div class="bar" id="ochips">${['all',...tags].map(k => `<button class="chip ${k===otag?'on':''}" data-t="${esc(k)}">${esc(k)}</button>`).join('')}</div>
+  <div class="oc" id="olist"></div>`;
+  $('#oq').oninput = e => { oq = e.target.value; drawOoc(); };
+  $('#ochips').onclick = e => { const b = e.target.closest('[data-t]'); if(!b) return; otag = b.dataset.t;
+    document.querySelectorAll('#ochips .chip').forEach(x => x.classList.toggle('on', x===b)); drawOoc(); };
+  $('#olist').onclick = e => { if(e.target.closest('[data-act]')) return; const r = e.target.closest('.oc-r'); if(!r) return;
+    const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(x => x.classList.remove('open')); r.classList.toggle('open', !was); };
+  drawOoc();
+}
+function drawOoc(){
+  const s = oq.trim().toLowerCase();
+  const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
+  $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => `<div class="oc-r"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocTags(o.tags).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(o.content)}</small></div></div>
+    <div class="oc-body"><pre>${esc(o.content)}</pre><div class="oc-bar">${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`).join('') : '<p class="empty">I\'m feeling lucky!</p>';
+}
+function formOoc(o){
+  openM(`<h3>${o ? 'OOC 수정' : 'OOC 추가'}</h3>
+  <form id="f">
+    <label>제목</label><input name="title" value="${esc(o ? o.title : '')}" required autocomplete="off">
+    <label>태그 (쉼표로 구분: 진행, 정리 …)</label><input name="tags" value="${esc(o ? o.tags : '')}" autocomplete="off">
+    <label>내용 (복사할 내용)</label><textarea class="m" name="content" rows="9" required>${esc(o ? o.content : '')}</textarea>
+    ${btns('SAVE')}
+  </form>`);
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      const row = { title: fd.get('title').trim(), tags: fd.get('tags').trim(), content: fd.get('content').trim() };
+      const r = o ? await sb.from('ooc').update(row).eq('id', o.id) : await sb.from('ooc').insert(row);
+      if(r.error) throw r.error;
+    }); };
+}
+
 function route(){
   const [a,b] = (location.hash.slice(2) || 'characters').split('/');
-  $('#n2').style.display = show('pp') ? '' : 'none';
+  $('#n2').style.display = show('pp') ? '' : 'none'; $('#n3').style.display = show('oo') ? '' : 'none';
+  if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
-  if(a==='prompts' || a==='c') ORD = false;
-  $('#n1').classList.toggle('on', a!=='prompts'); $('#n2').classList.toggle('on', a==='prompts');
-  a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
+  if(a==='prompts' || a==='c' || a==='ooc') ORD = false;
+  $('#n1').classList.toggle('on', a!=='prompts' && a!=='ooc'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
+  a==='ooc' ? pageOoc() : a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
 
@@ -771,6 +835,9 @@ document.addEventListener('click', async e => {
   if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
   if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow({}, !!$('#subs').dataset.ph));
   if(a==='del-sub') return b.closest('.sr').remove();
+  if(a==='new-o') return formOoc();
+  if(a==='edit-o') return formOoc(OC.find(o => o.id===id));
+  if(a==='del-o') { if(await del('ooc', id, 'OOC')) route(); return; }
   if(a==='new-p') return formP();
   if(a==='edit-p') return formP(PR.find(p => p.id===id));
   if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
@@ -796,7 +863,7 @@ $('#theme').onclick = () => {
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
 paintTheme();
 const syncAdm = () => { $('#adm').classList.toggle('on', admin); $('#set').hidden = !admin; };
-const FEATS = [['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그']];
+const FEATS = [['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그'],['oo','OOC 페이지']];
 function formSettings(){
   openM(`<h3>SETTINGS</h3><form id="f">${FEATS.map(([k,l]) => `<label>${l}</label><select name="${k}">${[['on','공개'],['admin','나만 보기'],['off','끔']].map(([v,t]) => `<option value="${v}"${(SET[k]||'on')===v ? ' selected' : ''}>${t}</option>`).join('')}</select>`).join('')}${btns('SAVE')}</form>`);
   $('#f').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e.target); st('저장 중…');
