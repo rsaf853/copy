@@ -4,188 +4,917 @@
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>e4e5</title>
-<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<title>r♡sieprompt</title>
+<script>try{var t=localStorage.getItem('rosie-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" type="image/png" href="images/moai.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-jp@1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-kopubworld@1.0/css/all.css">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,700;1,400&family=Noto+Serif+KR:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--ac:#ff7ebd;--bg:#fff;--fg:#000;--mut:#9a9a9a;--line:#e4e4e4;--soft:#f6f6f6;--sans:"Pretendard JP Variable",Pretendard,-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;padding-top:env(safe-area-inset-top,0)}
-:root[data-theme=dark]{--ac:#ffc9e7;--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--ac:#ffc9e7;--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}}
+:root{--bg:#fff;--fg:#000;--mut:#9a9a9a;--line:#e4e4e4;--soft:#f6f6f6;--sans:"Pretendard JP Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}}
+:root[data-theme="dark"]{--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;border-radius:0}
-body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 var(--sans);letter-spacing:-.03em;-webkit-font-smoothing:antialiased}
-button,input,textarea,select{font:inherit;letter-spacing:inherit}a{color:inherit}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5;letter-spacing:-0.03em;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{letter-spacing:inherit;line-height:inherit}
+a{color:inherit}
+img{pointer-events:none;-webkit-user-drag:none;user-drag:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+body{-webkit-touch-callout:none}
+::selection{background:var(--fg);color:var(--fg)}
+::-moz-selection{background:var(--fg);color:var(--fg)}
+input::selection,textarea::selection{background:Highlight;color:HighlightText}
+input::-moz-selection,textarea::-moz-selection{background:Highlight;color:HighlightText}
 .wrap{max-width:1014px;margin:0 auto;padding:0 16px}
-header{position:sticky;top:env(safe-area-inset-top,0);background:var(--bg);border-bottom:2px solid var(--fg);z-index:5}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:2px solid var(--fg);z-index:5}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:44px}
-.logo{font-weight:800;font-size:16px;text-decoration:none}
+.logo{font-family:"Pretendard JP Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;font-weight:800;font-size:16px;letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;white-space:pre}
+.hrt{width:.95em;height:.95em;margin:0 .02em;fill:none;stroke:var(--fg);stroke-width:3.2;stroke-linejoin:round;transform:translateY(1px)}
+.lg2{font-size:14px;font-weight:500;color:var(--fg)}
 nav{display:flex;gap:2px;align-items:center}
-nav a,nav button{font-size:14px;font-weight:600;text-decoration:none;color:var(--mut);padding:3px 6px;border:0;background:none;cursor:pointer}
-nav a.on{color:var(--fg);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
-nav a:hover,nav button:hover{color:var(--fg)}nav button svg{display:block}
+nav a,.btn{font:600 11px/1.5 var(--sans);text-decoration:none;border:1px solid transparent;padding:3px 8px;background:none;color:var(--fg);cursor:pointer}
+nav a{color:var(--mut);font-size:14px;padding:3px 6px}
+nav a.on{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.tg2{margin-left:0;padding:3px 6px;border:0;background:none;color:var(--mut);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.tg2:hover{color:var(--fg)}
+.tg2 svg{width:15px;height:15px;display:block;position:relative;top:1px}
+nav a.on,nav a:hover{color:var(--fg)}
+nav .btn{color:var(--mut);border:0}
+nav .btn:hover{background:none;color:var(--mut);border:0}
+footer .wrap{display:flex;align-items:center;gap:8px}
+#adm{border:0;background:none;color:inherit;padding:4px;margin:-4px;display:inline-flex;align-items:center;cursor:default;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;outline:0}
+#adm svg{width:11px;height:11px;display:block}
+#adm.on path{fill:currentColor}
+.btn{border-color:var(--line)}
+.btn:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:disabled{opacity:.4;pointer-events:none}
 main{padding:24px 0 56px;min-height:70vh}
-h1{font-size:22px;font-weight:800;letter-spacing:-.05em;margin:0 0 2px}
+h1{font-size:22px;font-weight:800;letter-spacing:-0.05em;margin:0 0 2px}
 .sub{color:var(--mut);font:500 11px/1.5 var(--sans);margin:0 0 18px}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.btn,.chip{font:600 11px/1.5 var(--sans);border:1px solid var(--line);background:none;color:var(--fg);padding:3px 9px;cursor:pointer;text-decoration:none}
-.btn:hover,.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-.chip{color:var(--mut)}.chip:hover{color:var(--fg);border-color:var(--fg)}
-.bar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
-.tg{font-size:11px;color:var(--mut);cursor:pointer;margin-right:6px}.tg:hover{color:var(--ac)}
-.vb{font:700 9px/1 var(--sans);border:1px solid var(--fg);padding:2px 4px;margin-left:6px;vertical-align:middle}
-input,select,textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:7px 10px;outline:none;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(211px,1fr));gap:10px}
+.card{display:block;border:1px solid var(--line);text-decoration:none}
+.card:hover{border-color:var(--fg)}
+.ph{aspect-ratio:3/4;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:var(--mut);overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card .meta{padding:8px 10px;border-top:2px solid var(--fg)}
+.card b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card span{color:var(--mut);font-size:11px;font-weight:500}
+.card .meta .al{display:inline;margin-left:6px;font-size:10.5px;font-weight:500;color:var(--mut);opacity:.85}
+.btn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.hint{color:var(--mut);font:500 11px/1.5 var(--sans);margin:-8px 0 12px}
+.grid.ordering .card{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.grid.ordering .card img{-webkit-user-drag:none;pointer-events:none}
+.grid.ordering .card.drag{opacity:.35}
+.sps .sp.drag{opacity:.35}
+.dh{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:var(--mut);font:700 14px/1 var(--sans);padding:4px 8px 4px 0;flex:none}
+.dh:hover{color:var(--fg)}
+.bo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.bo.one{grid-template-columns:1fr}
+.bo .pr{margin:0}
+@media(max-width:640px){.bo{grid-template-columns:1fr}}
+.rg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media(max-width:640px){.rg{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
+.rcard{position:relative;display:block;border:1px solid var(--line);text-decoration:none;color:inherit;background:var(--bg,#fff)}
+.rcard:hover{border-color:var(--fg)}
+.rcard.ext{cursor:default}
+.rcard.ext:hover{border-color:var(--line)}
+.rg .rcard.drag{opacity:.35}
+.rcard .ph{aspect-ratio:4/3;font-size:34px}
+.rcard .rce{position:absolute;top:6px;right:6px;z-index:2;background:var(--bg);border:1px solid var(--fg);font:700 10px/1 var(--sans);padding:4px 7px;cursor:pointer}
+.rcard .rm{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 10px}
+.rcard b{font-size:13px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcard .rk{flex:none;max-width:60%;font-size:11px;font-weight:600;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pe{width:150px;aspect-ratio:3/4;border:1px solid var(--line);overflow:hidden;background:var(--soft);touch-action:none;cursor:grab;margin-top:6px}
+.pe img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
+.pe:active{cursor:grabbing}
+.bar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;align-items:center}
+.chip{font:600 11px/1.5 var(--sans);border:1px solid var(--line);background:none;color:var(--mut);padding:2px 9px;cursor:pointer}
+.chip:hover{color:var(--fg);border-color:var(--fg)}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+input,select,textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:7px 10px;font:13px/1.5 var(--sans);outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--fg)}
-#sq{margin-bottom:10px}#q{margin-bottom:8px}textarea{min-height:140px;resize:vertical}label{display:block;font:600 11px var(--sans);color:var(--mut);margin:8px 0 3px}
-.row{display:flex;gap:12px;align-items:baseline;border-bottom:1px solid var(--line);padding:10px 0;text-decoration:none}
-.row:hover b{text-decoration:underline}.row b{font-weight:800;flex:1;min-width:0}.row small{color:var(--mut);font-size:11px}
-.mas{column-width:211px;column-gap:10px}
-.gi{break-inside:avoid;margin-bottom:10px;border:1px solid var(--line);position:relative;cursor:zoom-in}
-.gi:hover{border-color:var(--fg)}.gi img{width:100%;display:block;-webkit-user-drag:none}
-.gi .cp{padding:6px 9px;font-size:12px;border-top:1px solid var(--line)}
-.lk{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:var(--soft);color:var(--mut);font-weight:800;cursor:pointer}
-.eb{position:absolute;top:6px;right:6px;background:var(--bg);border:1px solid var(--fg);font:700 10px/1 var(--sans);padding:4px 7px;cursor:pointer}
-.mm{break-inside:avoid;border:1px solid var(--line);border-left:3px solid var(--fg);padding:10px 12px;margin-bottom:10px;white-space:pre-wrap;word-break:break-word}
-.mm b{display:block;font-weight:800;margin-bottom:4px}.mm .ft{margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:11px;color:var(--mut)}
-.ln{display:flex;gap:14px;padding:7px 0;border-left:2px solid var(--ac);padding-left:12px;margin-left:4px;position:relative}
-.ln time{flex:none;width:92px;font-size:11px;color:var(--mut);padding-top:2px}.ln span.t{flex:1;white-space:pre-wrap;word-break:break-word}
-#md,#lb{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
-#md[hidden],#lb[hidden]{display:none}
-.mb{background:var(--bg);border:2px solid var(--fg);padding:16px;width:100%;max-width:520px;max-height:90vh;overflow:auto}
-.mb h3{margin:0 0 8px;font-size:14px;font-weight:800}.acts{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
-#lb img{max-width:100%;max-height:100%}
-footer{border-top:1px solid var(--line);padding:14px 0;font-size:11px;color:var(--mut)}footer .wrap{display:flex;gap:8px;align-items:center}
-#adm{border:0;background:none;color:inherit;padding:4px;cursor:default;display:inline-flex}#adm.on{color:var(--ac)}
-/* reader */
-.rtool{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-.set{display:none;border:1px solid var(--line);padding:10px;margin-bottom:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 14px}.set.on{display:grid}
-.set input[type=range]{accent-color:var(--ac);padding:0;border:0;margin:0}
-.bk{overflow:hidden;height:calc(100svh - 215px);min-height:320px}
-.pg{height:100%;column-fill:auto;transition:transform .28s ease;font-family:var(--rf);font-size:var(--rs);line-height:var(--rl);letter-spacing:var(--rc);word-break:keep-all;overflow-wrap:break-word}
-.pg>:first-child{margin-top:0}.pg h1{font-size:1.7em;letter-spacing:inherit;margin:0 0 .8em}.pg h2,.pg h3{margin:1.2em 0 .5em;break-after:avoid}
-.pg p{margin:0 0 .9em}.pg img{max-width:100%;max-height:70%;break-inside:avoid}.pg blockquote{margin:1em 0;padding-left:1em;border-left:3px solid var(--fg);color:var(--mut)}
-.pg pre,.pg code{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft)}.pg pre{padding:10px;overflow:auto;break-inside:avoid}
-.pg hr{border:0;border-top:1px solid var(--line);margin:1.5em 0}
-.pn{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+#q{margin-bottom:10px}
+textarea.m{font-family:var(--mono);font-size:12px}
+.pr{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px;display:flex;min-width:0}
+.pr .im{position:relative;width:36%;min-width:120px;max-width:170px;min-height:230px;flex:none;border-right:1px solid var(--line);background:var(--soft);cursor:zoom-in;overflow:hidden}
+.pr .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pr .bd{flex:1;min-width:0;display:flex;flex-direction:column}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pgrid .pr{margin:0}
+.sb{border-top:1px solid var(--line)}
+.sb:first-child{border-top:0}
+.sb .hd{border-bottom:0;padding:5px 10px}
+.hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
+.hd .btn{padding:0 7px;font-size:10.5px}
+.hd div{display:flex;gap:4px}
+.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--fg) transparent}
+.tx::-webkit-scrollbar{width:4px}.tx::-webkit-scrollbar-thumb{background:var(--fg)}
+.more{display:block;margin:16px auto 0}
+.back{display:inline-block;margin-bottom:14px;font:600 11px/1.5 var(--sans);color:var(--mut);text-decoration:none}
+.back:hover{color:var(--fg)}
+.prof{display:grid;grid-template-columns:300px 1fr;gap:24px;margin-bottom:24px}
+.prof .ph{border:1px solid var(--line);border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;margin:10px 0 14px;border-top:2px solid var(--fg)}
+th,td{text-align:left;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:700;vertical-align:top}
+th{width:72px;color:var(--mut);font:500 11px/1.5 var(--sans);padding-top:6px}
+td{white-space:pre-wrap;word-break:break-word}
+.fxa{field-sizing:content;resize:none;overflow:hidden}
+.cmw{position:relative}
+.cmw input{padding-right:30px}
+.cmw span{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;pointer-events:none}
+.h2s{display:flex;justify-content:space-between;align-items:center}
+.vs{display:flex;gap:3px}.vs .chip{padding:0 8px}
+.sp{border:1px solid var(--line);border-left:3px solid var(--fg);margin-bottom:10px;min-width:0}
+.sp .tt{display:flex;align-items:center;gap:7px;min-width:0}
+.sp .sim{display:none;position:relative;background:var(--soft);overflow:hidden;cursor:zoom-in}
+.sp .sim img{width:100%;height:100%;object-fit:cover;display:block}
+.sp .bd{min-width:0}
+/* LIST: 왼쪽 썸네일 */
+[data-v=a] .sp{display:flex}
+[data-v=a] .sp .sim:not(.no){display:block;width:120px;aspect-ratio:3/4;min-height:0;align-self:flex-start;flex:none;border-right:1px solid var(--line)}
+[data-v=a] .sp .sim img{position:absolute;inset:0}
+[data-v=a] .sp .bd{flex:1;min-width:0}
+[data-v=a] .sp .tx{max-height:125px}
+/* GRID: 카드 */
+[data-v=c]{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+[data-v=c] .sp{margin:0;border-left:1px solid var(--line);display:flex;flex-direction:column}
+[data-v=c] .sp .sim{display:flex;aspect-ratio:4/3;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--mut);border-bottom:2px solid var(--fg)}
+[data-v=c] .sp .sim.no{display:none}
+[data-v=c] .sp .bd{flex:1}
+[data-v=c] .sp .tx{max-height:110px;overflow-y:auto}
+@media(max-width:640px){[data-v=a] .sp .sim:not(.no){width:96px}[data-v=a] .sp .tx{max-height:90px}}
+h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
+.empty{color:var(--mut);padding:32px 0;text-align:center}
+.acts{display:flex;gap:5px;margin-top:12px}
+footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500 11px/1.5 var(--sans)}
+#md{position:fixed;inset:0;background:rgba(0,0,0,.55);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 12px 20px;z-index:20}
+#md[hidden]{display:none}
+.mb{background:var(--bg);border:1px solid var(--line);max-width:520px;margin:0 auto;padding:16px}
+.mb h3{margin:0 0 4px;font-size:15px;font-weight:800}
+.mb label{display:block;font:600 11px/1.5 var(--sans);color:var(--mut);margin:12px 0 4px}
+.mb .row{display:flex;gap:5px;margin-top:16px}
+.mb .row .btn{padding:5px 14px}
+.mb .row .btn.pri{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.sr{border:1px solid var(--line);padding:8px;margin-top:6px;display:grid;gap:5px}
+.sr .btn{justify-self:end}
+.st{color:var(--mut);font-size:12px;margin-top:8px;min-height:18px;white-space:pre-wrap}
+.cur{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px}
+.cur img{width:40px;height:54px;object-fit:cover;border:1px solid var(--line)}
+.gal{display:flex;flex-wrap:wrap;gap:6px}
+.gal div{height:200px;min-width:60px;flex:none;max-width:100%;border:1px solid var(--line);overflow:hidden;cursor:zoom-in;background:var(--soft)}
+.gal div:hover{border-color:var(--fg)}
+.gal img{height:100%;width:auto;max-width:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
+.gal.adm div{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.gal div.drag{opacity:.35}
+.gedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.mb .gi{margin:0;font-weight:500}
+.gi img{width:56px;height:74px;object-fit:cover;border:1px solid var(--line);display:block}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:30;cursor:zoom-out;padding:16px}
+#lb[hidden]{display:none}
+#lb img{max-width:min(100%,760px);max-height:min(100%,88vh);object-fit:contain}
+@media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}.card .meta{padding:7px 8px}.gal div{height:150px}.prof{grid-template-columns:1fr}.prof .ph{max-width:300px}.pgrid{grid-template-columns:1fr}.pr{flex-direction:column}.pr .im{width:100%;max-width:none;min-width:0;min-height:0;height:240px;border-right:0;border-bottom:1px solid var(--line)}}
+@media(max-width:640px){.gal div{flex:calc(var(--r,.75)*100) 1 calc(var(--r,.75)*150px);max-width:100%}.gal img{width:100%;height:100%}.gal::after{content:'';flex:999 1 0}}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
+.tg{font:600 11px/1.5 var(--sans);border:1px solid var(--fg);padding:0 8px}
+.card{position:relative}
+.pin{position:absolute;top:6px;right:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--bg);color:var(--mut);border:1px solid var(--line);cursor:pointer}
+.pin:hover{color:var(--fg);border-color:var(--fg)}
+.pin.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+#set{border:0;background:none;color:inherit;padding:0;margin:0 0 0 auto;font:inherit;letter-spacing:inherit;line-height:inherit;cursor:pointer}
+@media(min-width:641px){.wrap{max-width:none;width:77vw;min-width:min(1014px,100%)}}
+.vb{position:absolute;top:6px;left:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--fg);color:var(--bg);border:1px solid var(--fg)}
+.ph svg{width:30px;height:30px}
+.lk{display:flex;flex-direction:column;align-items:center;gap:8px;padding:36px 16px;border:1px solid var(--line);text-align:center}
+.pr .lk{border:0}
+.lk svg{width:22px;height:22px}
+.lk form{display:flex;gap:5px;width:100%;max-width:280px}
+.lk input{flex:1;min-width:0}
+.lk .st{margin-top:0;min-height:16px}
+#oq{margin-bottom:18px}
+.oc{border-top:2px solid var(--fg)}
+.oc-r{border-bottom:1px solid var(--line)}
+.oc-top{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;align-items:start;padding:12px 10px;cursor:pointer}
+.oc-n{font:500 11px var(--mono);letter-spacing:0;color:var(--mut);padding-top:1px}
+.oc-t strong{display:block;font-weight:600}
+.oc-t .tags{display:flex;flex-wrap:wrap;gap:3px;margin:5px 0 6px}
+.oc-t .tg{white-space:nowrap}
+.oc-t small{display:block;color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-body{display:none;padding:0 10px 12px 46px}
+.oc-body pre{margin:0;white-space:pre-wrap;word-break:break-word;font:400 12px/1.75 var(--mono)}
+.oc-bar{margin-top:10px;display:flex;justify-content:flex-end;gap:5px}
+.oc-r.open{background:var(--fg);color:var(--bg);border-bottom-color:var(--fg)}
+.oc-r.open small{display:none}.oc-r.open .oc-n{color:var(--bg);opacity:.6}.oc-r.open .oc-body{display:block}
+.oc-r.open .tg{background:transparent;color:var(--bg);border-color:var(--bg)}
+.oc-r.open .btn{background:var(--bg);color:var(--fg);border-color:var(--bg)}
+.oc-r.open .btn:hover{background:transparent;color:var(--bg);border-color:var(--bg)}
+@media(max-width:640px){.oc-body{padding-left:10px}}
+.oc-t .tg.x18{background:var(--fg);color:var(--bg)}
+.oc-r.open .tg.x18{background:var(--bg);color:var(--fg);border-color:var(--bg)}
+.oc-body{cursor:auto}
+.oc-r.open .btn.on{background:transparent;color:var(--bg);border-color:var(--bg);box-shadow:inset 0 0 0 1px var(--bg)}
+.bar.ordering .chip[data-t]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.bar.ordering .chip.drag{opacity:.35}
 </style>
 </head>
 <body>
-<header><div class="wrap"><a class="logo" href="#/posts">e4e5</a>
-<nav><a href="#/posts" data-n="posts">archive</a><a href="#/gallery" data-n="gallery">img</a><a href="#/memo" data-n="memo">memo</a><a href="#/lines" data-n="lines">txt</a><button id="theme" aria-label="테마">◐</button></nav></div></header>
+<header><div class="wrap">
+  <a class="logo" href="#/characters">r♡sie <span class="lg2">prompt</span></a>
+  <nav>
+    <a href="#/characters" id="n1">persona</a>
+    <a href="#/prompts" id="n2">prompt</a>
+    <a href="#/ooc" id="n3">ooc</a>
+    <button class="tg2" id="theme" type="button" aria-label="테마 전환"></button>
+  </nav>
+</div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap"><button id="adm" aria-label="관리자"><svg width="11" height="11" viewBox="0 0 24 24"><path d="M12 20.5C5 15.5 2.5 12 2.5 8.6 2.5 6 4.5 4 7 4c1.9 0 3.7 1 5 2.8C13.3 5 15.1 4 17 4c2.5 0 4.5 2 4.5 4.6 0 3.4-2.5 6.9-9.5 11.9z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg></button>PERSONAL ARCHIVE · NO REDISTRIBUTION</div></footer>
-<div id="md" hidden><div class="mb" id="mb"></div></div><div id="lb" hidden></div>
+<footer><div class="wrap"><button id="adm" aria-label="관리자"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5C5 15.5 2.5 12 2.5 8.6 2.5 6 4.5 4 7 4c1.9 0 3.7 1 5 2.8C13.3 5 15.1 4 17 4c2.5 0 4.5 2 4.5 4.6 0 3.4-2.5 6.9-9.5 11.9z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg></button>PERSONAL ARCHIVE · NO REDISTRIBUTION<button id="set" hidden>SETTINGS</button></div></footer>
+<div id="lb" hidden></div>
+<div id="md" hidden><div class="mb" id="mb"></div></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
-const SB_URL='https://pqktacursqpgmdyxwlxm.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxa3RhY3Vyc3FwZ21keXh3bHhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5OTQ1NzAsImV4cCI6MjEwODU3MDU3MH0.TPlYNV9t5EkhkYKTDank8nQp8BUnWs6ge9nOVaHgQN8';
-const sb=supabase.createClient(SB_URL,SB_KEY);
-const $=s=>document.querySelector(s),app=$('#app');
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const KIND={posts:'post',gallery:'gallery',memo:'memo',lines:'line'},LBL={post:'archive',gallery:'img',memo:'memo',line:'txt'};
-let admin=false,ITEMS=[],TAG='',UNL={};
-const date=(d,t)=>{const x=new Date(d),p=n=>String(n).padStart(2,'0');return`${x.getFullYear()}-${p(x.getMonth()+1)}-${p(x.getDate())}`+(t?` ${p(x.getHours())}:${p(x.getMinutes())}`:'')};
-const G=i=>UNL[i.id]?{...i,...UNL[i.id]}:i,locked=i=>i.visibility==='locked'&&!admin&&!UNL[i.id];
-const vb=i=>i.visibility==='public'?'':`<span class="vb">${i.visibility==='private'?'PRIVATE':'LOCKED'}</span>`;
-const tags=i=>(i.tags||[]).map(t=>`<span class="tg" data-tag="${esc(t)}">#${esc(t)}</span>`).join('');
-const eb=i=>admin?`<button class="btn" data-ed="${i.id}">EDIT</button>`:'';
-const openM=h=>{$('#mb').innerHTML=h;$('#md').hidden=false},closeM=()=>$('#md').hidden=true;
-$('#md').onclick=e=>{if(e.target.id==='md')closeM()};$('#lb').onclick=()=>$('#lb').hidden=true;
-const msg=t=>{const e=$('#st');if(e)e.textContent=t};
-/* theme */
-const SUN='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',MOON='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
-const isDark=()=>{const r=document.documentElement;return r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches};
-const paintTheme=()=>{const d=isDark(),b=$('#theme'),t=d?'라이트 모드로 전환':'다크 모드로 전환';b.innerHTML=d?MOON:SUN;b.setAttribute('aria-label',t);b.title=t};
-$('#theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=isDark()?'light':'dark';try{localStorage.setItem('theme',r.dataset.theme)}catch(e){}paintTheme()};
-matchMedia('(prefers-color-scheme:dark)').addEventListener('change',paintTheme);paintTheme();
-/* data */
-async function load(){const r=await sb.from(admin?'items':'feed').select('*').order('created_at',{ascending:false});ITEMS=r.data||[];return!r.error||(app.innerHTML='<p>불러오기 실패: '+esc(r.error.message)+'</p>',false)}
-function unlock(id){openM(`<h3>LOCKED</h3><form id="f"><input type="password" name="pw" placeholder="비밀번호" autofocus required><p id="st" class="sub"></p><div class="acts"><button type="button" class="btn" data-x>CANCEL</button><button class="btn">UNLOCK</button></div></form>`);
- $('#f').onsubmit=async e=>{e.preventDefault();const r=await sb.rpc('unlock',{p_id:id,p_pw:new FormData(e.target).get('pw')});if(r.error||!r.data?.length)return msg('비밀번호가 맞지 않아요');UNL[id]=r.data[0];closeM();route()}}
-/* reader */
-marked.use({breaks:true,renderer:{code(c,l){return(l||'').trim()==='html'?c:false}}});
-const FONTS={pre:'"Pretendard JP Variable",Pretendard,sans-serif',bat:'"KoPubWorld Batang","Noto Serif KR",serif',kg:'"KoPubWorld Dotum",Pretendard,sans-serif',tnr:'"Times New Roman",Times,"Noto Serif KR",serif',nw:'Newsreader,"Noto Serif KR",serif',rb:'Roboto,Pretendard,sans-serif'};
-const FN={pre:'프리텐다드',bat:'KoPub 바탕',kg:'KoPub 고딕',tnr:'Times New Roman',nw:'Newsreader',rb:'Roboto'};
-let RS={f:'bat',s:17,l:1.8,c:-.01};try{Object.assign(RS,JSON.parse(localStorage.getItem('rs')||'{}'))}catch(e){}
-let pI=0,pN=1;const GAP=48;
-function applyRS(){const p=$('#pg');if(!p)return;p.style.setProperty('--rf',FONTS[RS.f]);p.style.setProperty('--rs',RS.s+'px');p.style.setProperty('--rl',RS.l);p.style.setProperty('--rc',RS.c+'em');try{localStorage.setItem('rs',JSON.stringify(RS))}catch(e){}layout()}
-function layout(){const b=$('#bk'),p=$('#pg');if(!b)return;const two=matchMedia('(min-width:900px) and (orientation:landscape)').matches;p.style.columnCount=two?2:1;p.style.columnGap=GAP+'px';p.style.height=b.clientHeight+'px';pN=Math.max(1,Math.round((p.scrollWidth+GAP)/(b.clientWidth+GAP)));go(pI)}
-function go(i){pI=Math.max(0,Math.min(pN-1,i));$('#pg').style.transform=`translateX(${-pI*($('#bk').clientWidth+GAP)}px)`;$('#pi').textContent=`${pI+1} / ${pN}`}
-function reader(it){const i=G(it);pI=0;
- app.innerHTML=`<a class="btn" href="#/posts">← BACK</a> ${eb(i)} <button class="btn" id="sb">Aa</button>
- <div class="set" id="set"><div><label>글꼴</label><select id="s-f">${Object.keys(FN).map(k=>`<option value="${k}"${RS.f===k?' selected':''}>${FN[k]}</option>`).join('')}</select></div>
- <div><label>크기 ${RS.s}px</label><input type="range" id="s-s" min="13" max="28" step="1" value="${RS.s}"></div>
- <div><label>줄간격 ${RS.l}</label><input type="range" id="s-l" min="1.3" max="2.6" step=".05" value="${RS.l}"></div>
- <div><label>자간 ${RS.c}em</label><input type="range" id="s-c" min="-.08" max=".12" step=".01" value="${RS.c}"></div></div>
- <div class="bk" id="bk" style="margin-top:12px"><div class="pg" id="pg"><h1>${esc(i.title)}</h1>${marked.parse(i.body||'')}</div></div>
- <div class="pn"><button class="btn" id="pv">← PREV</button><span class="sub" id="pi" style="margin:0"></span><button class="btn" id="nx">NEXT →</button></div>`;
- $('#sb').onclick=()=>$('#set').classList.toggle('on');
- for(const[k,id]of[['f','s-f'],['s','s-s'],['l','s-l'],['c','s-c']])$('#'+id).oninput=e=>{RS[k]=k==='f'?e.target.value:+e.target.value;if(k!=='f')e.target.previousElementSibling.textContent=e.target.previousElementSibling.textContent.replace(/[-\d.]+(px|em)?$/,RS[k]+(k==='s'?'px':k==='c'?'em':''));applyRS()};
- $('#pv').onclick=()=>go(pI-1);$('#nx').onclick=()=>go(pI+1);
- let x0;const b=$('#bk');b.ontouchstart=e=>x0=e.touches[0].clientX;b.ontouchend=e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)go(pI+(d<0?1:-1))};
- applyRS();document.fonts.ready.then(layout);b.querySelectorAll('img').forEach(m=>m.onload=layout)}
-document.addEventListener('keydown',e=>{if($('#pg')&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){if(e.key==='ArrowRight')go(pI+1);if(e.key==='ArrowLeft')go(pI-1)}});
-addEventListener('resize',layout);
-/* views */
-function head(k,t){return`<div class="top"><div><h1>${t}</h1><p class="sub">${ITEMS.filter(i=>i.kind===KIND[k]).length} ITEMS</p></div>${admin?`<button class="btn" data-new="${KIND[k]}">+ NEW</button>`:''}</div>`}
-function chips(list){const all=[...new Set(list.flatMap(i=>i.tags||[]))].sort();return all.length?`<div class="bar"><button class="chip${TAG?'':' on'}" data-tag="">ALL</button>${all.map(t=>`<button class="chip${TAG===t?' on':''}" data-tag="${esc(t)}">#${esc(t)}</button>`).join('')}</div>`:''}
-let Q='';
-const match=i=>!Q||[i.title,i.body,(i.tags||[]).join(' ')].join(' ').toLowerCase().includes(Q.toLowerCase());
-function list(k){const kind=KIND[k],L=ITEMS.filter(i=>i.kind===kind&&(!TAG||(i.tags||[]).includes(TAG))&&match(G(i)));let h='';
- if(kind==='post')h=L.map(i=>`<a class="row" href="#/post/${i.id}"><b>${esc(i.title)}${vb(i)}</b><span>${tags(i)}</span><small>${date(i.created_at)}</small></a>`).join('');
- if(kind==='gallery')h=`<div class="mas">${L.map(it=>{const i=G(it);return`<div class="gi" data-gi="${i.id}">${locked(i)?'<div class="lk">LOCKED</div>':`<img src="${esc(i.meta?.src)}" loading="lazy" alt="">`}${admin?`<button class="eb" data-ed="${i.id}">EDIT</button>`:''}${i.body||i.tags?.length?`<div class="cp">${esc(i.body||'')} ${tags(i)}${vb(i)}</div>`:''}</div>`}).join('')}</div>`;
- if(kind==='memo')h=`<div class="mas">${L.map(it=>{const i=G(it);return`<div class="mm">${i.title?`<b>${esc(i.title)}</b>`:''}${locked(i)?`<span data-un="${i.id}" style="cursor:pointer;color:var(--mut)">LOCKED — 클릭해서 열기</span>`:esc(i.body)}<div class="ft"><span>${tags(i)}${vb(i)} ${date(i.created_at)}</span>${eb(i)}</div></div>`}).join('')}</div>`;
- if(kind==='line')h=`<div style="margin-top:8px">${L.map(it=>{const i=G(it);return`<div class="ln"><time>${date(i.created_at,1)}</time><span class="t">${locked(i)?`<span data-un="${i.id}" style="cursor:pointer;color:var(--mut)">LOCKED</span>`:esc(i.body)} ${tags(i)}${vb(i)}</span>${eb(i)}</div>`}).join('')}</div>`;
- return L.length?h:'<p class="sub">비어 있어요</p>'}
-function view(k){const kind=KIND[k],all=ITEMS.filter(i=>i.kind===kind);
- app.innerHTML=head(k,LBL[kind])+`<input id="sq" placeholder="검색 (제목 · 본문 · 태그)" value="${esc(Q)}" autocomplete="off">`+(kind==='line'&&admin?`<form id="q"><input name="t" placeholder="한 줄 입력 후 Enter (#태그 가능)" autocomplete="off"></form>`:'')+chips(all)+`<div id="lst">${list(k)}</div>`;
- $('#sq').oninput=e=>{Q=e.target.value;$('#lst').innerHTML=list(k)};
- const q=$('#q');if(q)q.onsubmit=async e=>{e.preventDefault();const t=new FormData(q).get('t').trim();if(!t)return;await save({kind:'line',body:t,tags:hash(t),visibility:'public'})}}
-const hash=t=>[...t.matchAll(/(?:^|\s)#([^\s#]+)/g)].map(m=>m[1]);
-function route(){const h=location.hash.replace('#/','')||'posts',[a,b]=h.split('/');document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.n===a||(a==='post'&&x.dataset.n==='posts')));
- if(a==='post'){const it=ITEMS.find(i=>i.id==b);if(!it){app.innerHTML='<p>없는 글이에요</p>';return}if(locked(it))return app.innerHTML=`<a class="btn" href="#/posts">← BACK</a><h1 style="margin-top:14px">${esc(it.title)}</h1><p><button class="btn" data-un="${it.id}">비밀번호 입력</button></p>`;return reader(it)}
- view(KIND[a]?a:'posts')}
-/* admin forms */
-function form(kind,it){const i=it||{visibility:'public',tags:[],meta:{}},new_=!it;
- openM(`<h3>${LBL[kind]} ${new_?'NEW':'EDIT'}</h3><form id="f">
- ${kind==='post'||kind==='memo'?`<label>제목</label><input name="title" value="${esc(i.title)}">`:''}
- ${kind==='gallery'?`<label>이미지 URL (여러 줄 가능)</label><textarea name="urls" style="min-height:60px">${esc(i.meta?.src||'')}</textarea>${new_?'<label>또는 파일 업로드</label><input type="file" name="files" accept="image/*" multiple>':''}<label>캡션</label><input name="body" value="${esc(i.body)}">`
- :`<label>${kind==='post'?'본문 (Markdown · ```html 블록은 그대로 삽입)':'내용'}</label>${kind==='line'?`<input name="body" value="${esc(i.body)}">`:`<textarea name="body" style="min-height:${kind==='post'?320:140}px;font-family:ui-monospace,monospace;font-size:12px">${esc(i.body)}</textarea>`}`}
- ${kind==='post'?'<button type="button" class="btn" id="up">+ 이미지 업로드</button><input type="file" id="upf" accept="image/*" multiple hidden>':''}
- <label>해시태그 (쉼표/공백 구분)</label><input name="tags" value="${esc((i.tags||[]).join(' '))}">
- <label>공개 설정</label><select name="vis">${[['public','공개'],['private','비밀글 (나만 보기)'],['locked','보호글 (비밀번호)']].map(([k,t])=>`<option value="${k}"${i.visibility===k?' selected':''}>${t}</option>`).join('')}</select>
- <input type="password" name="pw" placeholder="보호글 비밀번호 (바꿀 때만 입력)" autocomplete="new-password">
- <p id="st" class="sub"></p><div class="acts">${new_?'':'<button type="button" class="btn" data-del>DELETE</button>'}<button type="button" class="btn" data-x>CANCEL</button><button class="btn">SAVE</button></div></form>`);
- $('[data-del]')&&($('[data-del]').onclick=async()=>{if(!confirm('삭제할까요?'))return;const r=await sb.from('items').delete().eq('id',i.id);if(r.error)return msg(r.error.message);closeM();await load();location.hash=kind==='post'?'#/posts':location.hash;route()});
- $('#up')&&($('#up').onclick=()=>$('#upf').click(),$('#upf').onchange=async e=>{const ta=$('#f [name=body]');for(const f of e.target.files){msg('업로드 중…');const p=Date.now()+'_'+Math.random().toString(36).slice(2,7)+'_'+f.name.replace(/[^\w.-]/g,'');const u=await sb.storage.from('img').upload(p,f);if(u.error)return msg('업로드 실패: '+u.error.message);ta.setRangeText(`\n![](${sb.storage.from('img').getPublicUrl(p).data.publicUrl})\n`,ta.selectionStart,ta.selectionEnd,'end')}msg('업로드 완료 — 본문에 삽입됐어요');e.target.value=''});
- $('#f').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target);msg('저장 중…');
-  const base={kind,title:fd.get('title')||null,tags:[...new Set([...(fd.get('tags')||'').split(/[,\s]+/).map(s=>s.replace(/^#/,'')).filter(Boolean),...(kind==='memo'||kind==='line'?hash(fd.get('body')||''):[])])],visibility:fd.get('vis')};
-  const pw=fd.get('pw');if(base.visibility==='locked'&&new_&&!pw)return msg('보호글은 비밀번호가 필요해요');
-  if(kind==='gallery'){const srcs=(fd.get('urls')||'').split('\n').map(s=>s.trim()).filter(Boolean);
-   for(const f of fd.getAll('files')){if(!f.size)continue;const p=Date.now()+'_'+Math.random().toString(36).slice(2,7)+'_'+f.name.replace(/[^\w.-]/g,'');const u=await sb.storage.from('img').upload(p,f);if(u.error)return msg('업로드 실패: '+u.error.message);srcs.push(sb.storage.from('img').getPublicUrl(p).data.publicUrl)}
-   if(!srcs.length)return msg('이미지를 넣어주세요');
-   if(!new_)return save({...base,body:fd.get('body'),meta:{src:srcs[0]}},i.id,pw);
-   for(const s of srcs)await save({...base,body:fd.get('body'),meta:{src:s}},null,pw,1);return done()}
-  save({...base,body:fd.get('body')},i.id,pw)}}
-async function save(row,id,pw,quiet){const r=id?await sb.from('items').update(row).eq('id',id).select('id').single():await sb.from('items').insert(row).select('id').single();
- if(r.error)return msg('저장 실패: '+r.error.message);if(pw)await sb.rpc('set_pw',{p_id:r.data.id,p_pw:pw});if(!quiet)done()}
-async function done(){closeM();await load();route()}
-/* events */
-document.addEventListener('click',e=>{const t=e.target,c=s=>t.closest(s);
- if(c('[data-x]'))return closeM();
- let x;if(x=c('[data-tag]')){TAG=x.dataset.tag===TAG?'':x.dataset.tag;return route()}
- if(x=c('[data-new]'))return form(x.dataset.new);
- if(x=c('[data-ed]')){e.stopPropagation();const i=ITEMS.find(i=>i.id==x.dataset.ed);return form(i.kind,G(i))}
- if(x=c('[data-un]'))return unlock(+x.dataset.un);
- if(x=c('[data-gi]')){const i=G(ITEMS.find(i=>i.id==x.dataset.gi));if(locked(i))return unlock(i.id);$('#lb').innerHTML=`<img src="${esc(i.meta.src)}" alt="">`;$('#lb').hidden=false}});
-addEventListener('hashchange',()=>{TAG='';Q='';route()});
-/* auth */
-const sync=()=>$('#adm').classList.toggle('on',admin);
-$('#adm').onclick=async()=>{if(admin){await sb.auth.signOut();return}
- openM(`<h3>ADMIN LOGIN</h3><form id="f"><label>이메일</label><input type="email" name="email" required autocomplete="username"><label>비밀번호</label><input type="password" name="pw" required autocomplete="current-password"><p id="st" class="sub"></p><div class="acts"><button type="button" class="btn" data-x>CANCEL</button><button class="btn">LOGIN</button></div></form>`);
- $('#f').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target);msg('로그인 중…');const r=await sb.auth.signInWithPassword({email:fd.get('email'),password:fd.get('pw')});if(r.error)return msg('실패: '+r.error.message);closeM()}};
-sb.auth.onAuthStateChange(async(_,s)=>{const was=admin;admin=!!s;sync();if(was!==admin&&ITEMS.length+1){UNL={};if(await load())route()}});
-(async()=>{const{data}=await sb.auth.getSession();admin=!!data.session;sync();if(await load())route()})();
+const SUPABASE_URL = "https://sxnijnngeatcscwyxhep.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4bmlqbm5nZWF0Y3Njd3l4aGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjE0MjIsImV4cCI6MjEwNzAzNzQyMn0.zT-jmsg7M14H7BFnqWFSclc6wnANJNDnHiVuCY9SoI8";
+const BUCKET = "images";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = s => document.querySelector(s), app = $('#app');
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad = n => String(n).padStart(3, '0');
+const okPos = p => /^\d+(\.\d+)?% \d+(\.\d+)?%( \d+(\.\d+)?)?$/.test(p || '') ? p : '';
+const xyOf = p => String(okPos(p) || '50% 50%').split(' ').slice(0, 2).join(' ');
+const zOf = p => { const z = parseFloat(String(okPos(p)).split(' ')[2]); return z > 1.001 && z <= 3 ? z : 1; };
+const img = (src, alt, pos) => src ? `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy"${okPos(pos) ? ` style="object-position:${xyOf(pos)}${zOf(pos) > 1 ? `;transform-origin:${xyOf(pos)};transform:scale(${zOf(pos)})` : ''}"` : ''}>` : '';
+const fullOf = c => ((c.info || []).find(([k]) => ['Alias','alias','ALIAS','별칭'].includes(k)) || [])[1] || '';
+const sortCh = () => [...CH].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0) || (a.sort_order ?? 1e9) - (b.sort_order ?? 1e9) || a.id - b.id);
+let ORD = false;
+const initial = n => esc([...n][0] || '?');
+let CH = [], PR = [], OC = [], admin = false, dirty = false, ptag = 'all', oq = '', otag = 'all';
+let SET = {};
+const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const vis = r => r.visibility || 'public';
+const canSee = r => vis(r) !== 'private' || admin;
+let UNL = new Set(); try{ UNL = new Set(JSON.parse(sessionStorage.getItem('unl') || '[]')); }catch(_){}
+const isLocked = (r, k) => vis(r) === 'locked' && !admin && !UNL.has(k);
+const vbadge = r => vis(r) !== 'public' && (admin || vis(r) === 'locked') ? `<span class="vb">${vis(r) === 'private' ? 'PRIVATE' : 'LOCKED'}</span>` : '';
+const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join('');
+const mkLock = async pw => { const salt = crypto.randomUUID().slice(0, 8); return salt + '$' + await sha(salt + pw); };
+const chkLock = async (r, pw) => { const [salt, h] = String(r.lock_hash || '').split('$'); return !!h && await sha(salt + pw) === h; };
+const lockHtml = k => `<div class="lk">${LOCK}<div style="font-weight:800">LOCKED</div><form data-lk="${k}"><input type="password" placeholder="비밀번호" autocomplete="off" required><button class="btn" type="submit">OPEN</button></form><div class="st" data-lkerr></div></div>`;
+const visField = r => { const v = vis(r || {}); return `<label>공개 설정</label><select name="vis" id="vsel">${[['public','공개'],['private','나만 보기'],['locked','비밀번호 잠금']].map(([k,t]) => `<option value="${k}"${v===k ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="password" name="lockpw" id="lpw" autocomplete="new-password" placeholder="${v==='locked' ? '새 비밀번호 (비우면 기존 유지)' : '비밀번호'}" style="margin-top:5px"${v==='locked' ? '' : ' hidden'}>`; };
+const bindVis = () => { const s = $('#vsel'); if(s) s.onchange = () => { $('#lpw').hidden = s.value !== 'locked'; }; };
+async function visRow(fd, r){
+  const v = fd.get('vis') || 'public', pw = (fd.get('lockpw') || '').trim(), o = {};
+  if(v !== vis(r || {})) o.visibility = v;
+  if(v === 'locked'){ if(pw) o.lock_hash = await mkLock(pw); else if(!(r && r.lock_hash)) throw new Error('비밀번호를 입력해 주세요'); }
+  else if(r && r.lock_hash) o.lock_hash = '';
+  return o;
+}
+const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin); };
+const pv = k => SET[k]==='admin' ? ' · PRIVATE' : '';
+const tagsOf = s => !show('tags') ? [] : String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
+let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!['a','c'].includes(SV)) SV = 'a';
+function subBox(c, x, i, pre='s'){
+  const t = x.t || 'SUB ' + (i+1);
+  if(pre!=='s'){
+    return `<div class="sb"><div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div>`;
+  }
+  const z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
+  return `<div class="sp" data-si="${i}"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t,x.pos) : initial(t)}</div>
+  <div class="bd"><div class="hd"><span class="tt">${admin && (c.subs||[]).length > 1 ? '<span class="dh" title="끌어서 순서 변경">⠿</span>' : ''}<span>${esc(t)}</span></span><div>${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="${i}">EDIT</button>` : ''}<button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div></div>
+  <pre class="tx">${esc(x.x)}</pre></div></div>`;
+}
+
+/* ---------- data ---------- */
+async function load(){
+  const [c, p, o] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id'), sb.from('ooc').select('*').order('id')]);
+  if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
+  CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = o.error ? [] : o.data;
+  const st2 = await sb.from('site_settings').select('*'); if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
+  return true;
+}
+const textOf = k => {
+  if(k[0]==='g'){ const o = OC.find(o => o.id===+k.slice(1)); return o ? ocText(o) : ''; }
+  if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
+  if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
+  if(k[0]==='o') return (CH.find(c => c.id===+k.slice(1))||{}).outfit;
+  return k[0]==='p' ? (PR.find(p => p.id===+k.slice(1))||{}).text : (CH.find(c => c.id===+k.slice(1))||{}).prompt;
+};
+const num = p => PR.findIndex(x => x.id===p.id) + 1;
+const chName = id => (CH.find(c => c.id===id)||{}).name;
+
+/* ---------- views ---------- */
+function promptBox(p){
+  const cn = p.char_id ? chName(p.char_id) : '';
+  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)} · LOCKED</span></div>${lockHtml('p'+p.id)}</div></div>`;
+  return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
+  <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' · ' + (vis(p) === 'private' ? 'PRIVATE' : 'LOCKED') : ''}</span>
+  <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
+  <pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
+}
+
+function pageChars(){
+  const ptags = [...new Set(CH.filter(c => !isLocked(c,'c'+c.id)).flatMap(c => tagsOf(c.tag)))];
+  if(ORD || (ptag!=='all' && !ptags.includes(ptag))) ptag = 'all';
+  const list = sortCh().filter(c => ptag==='all' || (!isLocked(c,'c'+c.id) && tagsOf(c.tag).includes(ptag)));
+  app.innerHTML = `<div class="top"><div><h1>PERSONA</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
+  ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
+  ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
+  ${ptags.length && !ORD ? `<div class="bar" id="pchips">${['all',...ptags].map(k => `<button class="chip ${k===ptag?'on':''}" data-pt="${esc(k)}">${esc(k)}</button>`).join('')}</div>` : ''}
+  ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
+    ${vbadge(c)}<div class="ph">${isLocked(c,'c'+c.id) ? LOCK : c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
+    <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
+  const pc = $('#pchips'); if(pc) pc.onclick = e => { const b = e.target.closest('[data-pt]'); if(b){ ptag = b.dataset.pt; pageChars(); } };
+  const g = $('#cg');
+  if(g && admin && ORD){
+    g.addEventListener('click', e => { if(!e.target.closest('[data-act]')) e.preventDefault(); });
+    if(window.Sortable) Sortable.create(g, { animation:150, draggable:'.card', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: saveOrder });
+  }
+}
+async function saveOrder(){
+  const ids = [...document.querySelectorAll('#cg .card')].map(a => +a.dataset.cid), ops = [];
+  ids.forEach((id,i) => { const c = CH.find(x => x.id===id); if(c && c.sort_order !== i){ c.sort_order = i; ops.push(sb.from('characters').update({ sort_order: i }).eq('id', id)); } });
+  const er = (await Promise.all(ops)).find(r => r.error);
+  if(er){ alert('순서 저장 실패: ' + er.error.message); await load(); pageChars(); }
+}
+
+function pageChar(id){
+  const c = CH.find(x => x.id===+id);
+  if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
+  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)}</h1><p class="sub">LOCKED</p>${lockHtml('c'+c.id)}`; return; }
+  const rel = PR.filter(p => p.char_id===c.id).reverse(), rcs = relCards(c);
+  app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
+  <div class="prof">
+    <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
+    <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
+      <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(lab(k))}</th><td>${esc(lab(k)==='Height' && /^\d+(\.\d+)?$/.test(String(v).trim()) ? String(v).trim() + 'cm' : v)}</td></tr>`).join('')}</table>
+      <div style="white-space:pre-wrap;font-size:12.5px">${esc(c.descr||'')}</div>
+      ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
+  </div>
+  ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
+  ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
+  ${!show('gal') ? '' : ((c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY${pv('gal')} · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : '')}
+  ${!show('rel') ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg" id="rg">${rcs}</div>` : ''}` : '')}
+  ${!show('relp') ? '' : (rel.length ? `<h2>RELATED PROMPTS${pv('relp')}</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : '')}`;
+  document.querySelectorAll('.gal div[data-gi] img').forEach(im => {
+    const f = () => { if(im.naturalWidth) im.parentElement.style.setProperty('--r', (im.naturalWidth / im.naturalHeight).toFixed(3)); };
+    im.loading = 'eager'; im.complete ? f() : im.addEventListener('load', f);
+  });
+  const sp = $('#sps');
+  if(sp && admin && window.Sortable && (c.subs || []).length > 1) Sortable.create(sp, { animation:150, draggable:'.sp', handle:'.dh', ghostClass:'drag',
+    onEnd: async () => {
+      const order = [...sp.querySelectorAll('.sp')].map(el => +el.dataset.si), subs = order.map(i => c.subs[i]);
+      if(order.every((v, k) => v === k)) return;
+      const r = await sb.from('characters').update({ subs }).eq('id', c.id);
+      if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.subs = subs;
+      pageChar(c.id);
+    } });
+  const rg = $('#rg');
+  if(rg && admin && window.Sortable && rg.children.length > 1) Sortable.create(rg, { animation:150, draggable:'.rcard', ghostClass:'drag', delay:200, delayOnTouchOnly:true, touchStartThreshold:5,
+    onEnd: async () => {
+      gsorted = true; setTimeout(() => { gsorted = false; }, 150);
+      const kOf = o => o.ext ? 'x:' + (o.uid || '') : 'i:' + o.id, all = relOf(c), keys = [...rg.querySelectorAll('.rcard')].map(el => el.dataset.rk);
+      const ordered = keys.map(k => all.find(o => kOf(o) === k)).filter(Boolean), rest = (c.related || []).filter(o => !keys.includes(kOf(o)));
+      const related = [...ordered, ...rest], old = c.related || [];
+      if(related.length === old.length && related.every((o, i) => o === old[i])) return;
+      const r = await sb.from('characters').update({ related }).eq('id', c.id);
+      if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.related = related;
+      pageChar(c.id);
+    } });
+  const gl = $('.gal.adm');
+  if(gl && window.Sortable && (c.gallery || []).length > 1) Sortable.create(gl, { animation:150, draggable:'div[data-gi]', ghostClass:'drag', delay:200, delayOnTouchOnly:true, touchStartThreshold:5,
+    onEnd: async () => {
+      gsorted = true; setTimeout(() => { gsorted = false; }, 150);
+      const order = [...gl.querySelectorAll('div[data-gi]')].map(el => +el.dataset.gi), gallery = order.map(i => c.gallery[i]);
+      if(order.every((v, k) => v === k)) return;
+      const r = await sb.from('characters').update({ gallery }).eq('id', c.id);
+      if(r.error) alert('순서 저장 실패: ' + r.error.message); else c.gallery = gallery;
+      pageChar(c.id);
+    } });
+}
+
+let cat = 'all', q = '', shown = 20;
+function pagePrompts(){
+  const cats = [...new Set(PR.map(p => p.cat))];
+  if(cat!=='all' && !cats.includes(cat)) cat = 'all';
+  const cnt = k => k==='all' ? PR.length : PR.filter(p => p.cat===k).length;
+  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">ARCHIVE · ${PR.length} SAVED</p></div>
+  ${admin ? '<button class="btn" data-act="new-p">+ NEW</button>' : ''}</div>
+  <input type="search" id="q" placeholder="search" aria-label="search" value="${esc(q)}">
+  <div class="bar" id="chips">${['all',...cats].map(k => `<button class="chip ${k===cat?'on':''}" data-c="${esc(k)}">${esc(k)} ${cnt(k)}</button>`).join('')}</div>
+  <div id="list"></div>`;
+  $('#q').oninput = e => { q = e.target.value; shown = 20; list(); };
+  $('#chips').onclick = e => { const b = e.target.closest('[data-c]'); if(!b) return; cat = b.dataset.c; shown = 20;
+    document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x===b)); list(); };
+  list();
+}
+function list(){
+  const s = q.trim().toLowerCase();
+  const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || (!isLocked(p, 'p'+p.id) && p.text.toLowerCase().includes(s)))).reverse();
+  $('#list').innerHTML = rows.length
+    ? `<div class="pgrid">${rows.slice(0,shown).map(promptBox).join('')}</div>` + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
+    : '<p class="empty">I\'m feeling lucky!</p>';
+  const m = $('#more'); if(m) m.onclick = () => { shown += 20; list(); };
+}
+
+const ocTags = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
+const is18 = t => /^[RG]-?18$/i.test(t);
+/* 태그 순서: site_settings.ooc_tags(JSON). 저장된 순서 먼저, 새 태그는 뒤에 */
+let OTO = false;
+const ocOrder = () => { try{ const a = JSON.parse(SET.ooc_tags || '[]'); return Array.isArray(a) ? a : []; }catch(_){ return []; } };
+const ocAll = () => { const seen = [...new Set(OC.flatMap(o => ocTags(o.tags)))], ord = ocOrder(); return [...ord.filter(t => seen.includes(t)), ...seen.filter(t => !ord.includes(t))]; };
+const ocSorted = tags => { const all = ocAll(); return [...new Set(tags)].sort((a, b) => all.indexOf(a) - all.indexOf(b)); };
+/* {{user}} ↔ {{char}} 교체 (이 탭에서만 유지) */
+const OSW = new Set();
+const swapUC = t => String(t ?? '').replace(/\{\{\s*(user|char)\s*\}\}/gi, (m, k) => { const n = k.toLowerCase() === 'user' ? 'char' : 'user'; return '{{' + (k === k.toUpperCase() ? n.toUpperCase() : k[0] === k[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n) + '}}'; });
+const hasPH = t => /\{\{\s*(user|char)\s*\}\}/i.test(t || '');
+const ocText = o => OSW.has(o.id) ? swapUC(o.content) : (o.content || '');
+async function saveOcTagOrder(){
+  const ord = [...document.querySelectorAll('#ochips .chip[data-t]')].map(x => x.dataset.t).filter(t => t !== 'all'), val = JSON.stringify(ord);
+  const r = await sb.from('site_settings').upsert({ key: 'ooc_tags', value: val });
+  if(r.error){ alert('태그 순서 저장 실패: ' + r.error.message); await load(); pageOoc(); return; }
+  SET.ooc_tags = val; drawOoc();
+}
+function pageOoc(){
+  const tags = ocAll();
+  if(OTO) otag = 'all';
+  if(otag!=='all' && !tags.includes(otag)) otag = 'all';
+  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">ARCHIVE · ${OC.length} SAVED</p></div>
+  ${admin ? `<div style="display:flex;gap:5px">${tags.length > 1 ? `<button class="btn ${OTO ? 'on' : ''}" data-act="otag-order">${OTO ? 'DONE' : 'TAG ORDER'}</button>` : ''}<button class="btn" data-act="new-o">+ NEW</button></div>` : ''}</div>
+  ${admin && OTO ? '<p class="hint">태그를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (OOC 목록의 태그도 같은 순서로 보여요)</p>' : ''}
+  <input type="search" id="oq" placeholder="search" aria-label="search" value="${esc(oq)}">
+  <div class="bar${admin && OTO ? ' ordering' : ''}" id="ochips">${['all',...tags].map(k => `<button class="chip ${k===otag?'on':''}" data-t="${esc(k)}">${esc(k)}</button>`).join('')}</div>
+  <div class="oc" id="olist"></div>`;
+  $('#oq').oninput = e => { oq = e.target.value; drawOoc(); };
+  $('#ochips').onclick = e => { const b = e.target.closest('[data-t]'); if(!b || OTO) return; otag = b.dataset.t;
+    document.querySelectorAll('#ochips .chip').forEach(x => x.classList.toggle('on', x===b)); drawOoc(); };
+  if(admin && OTO && window.Sortable) Sortable.create($('#ochips'), { animation:150, draggable:'.chip[data-t]:not([data-t="all"])', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: saveOcTagOrder });
+  /* 접기/펼치기는 헤더(번호·제목·태그 줄)를 눌렀을 때만 */
+  $('#olist').onclick = e => { const t = e.target.closest('.oc-top'); if(!t) return; const r = t.closest('.oc-r');
+    const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(x => x.classList.remove('open')); r.classList.toggle('open', !was); };
+  drawOoc();
+}
+function drawOoc(){
+  const s = oq.trim().toLowerCase();
+  const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
+  $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => `<div class="oc-r"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
+    <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`).join('') : '<p class="empty">I\'m feeling lucky!</p>';
+}
+function formOoc(o){
+  openM(`<h3>${o ? 'OOC 수정' : 'OOC 추가'}</h3>
+  <form id="f">
+    <label>제목</label><input name="title" value="${esc(o ? o.title : '')}" required autocomplete="off">
+    <label>태그 (쉼표로 구분: 진행, 정리 …)</label><input name="tags" value="${esc(o ? o.tags : '')}" autocomplete="off">
+    <label>내용 (복사할 내용)</label><textarea class="m" name="content" rows="9" required>${esc(o ? o.content : '')}</textarea>
+    ${btns('SAVE')}
+  </form>`);
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      const row = { title: fd.get('title').trim(), tags: fd.get('tags').trim(), content: fd.get('content').trim() };
+      const r = o ? await sb.from('ooc').update(row).eq('id', o.id) : await sb.from('ooc').insert(row);
+      if(r.error) throw r.error;
+    }); };
+}
+
+function route(){
+  const [a,b] = (location.hash.slice(2) || 'characters').split('/');
+  $('#n2').style.display = show('pp') ? '' : 'none'; $('#n3').style.display = show('oo') ? '' : 'none';
+  if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
+  if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
+  if(a==='prompts' || a==='c' || a==='ooc') ORD = false;
+  if(a!=='ooc') OTO = false;
+  $('#n1').classList.toggle('on', a!=='prompts' && a!=='ooc'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
+  a==='ooc' ? pageOoc() : a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
+  window.scrollTo(0,0);
+}
+
+/* ---------- modal & forms ---------- */
+const openM = h => { $('#mb').innerHTML = h; dirty = false; $('#md').hidden = false; };
+const closeM = () => { $('#md').hidden = true; $('#mb').innerHTML = ''; };
+$('#mb').addEventListener('input', () => { dirty = true; });
+const st = t => { const s = $('#st'); if(s) s.textContent = t; };
+const btns = label => `<div class="st" id="st"></div><div class="row"><button class="btn pri" type="submit" id="sv">${label}</button><button class="btn" type="button" data-act="close">CANCEL</button></div>`;
+
+async function upload(file, dir){
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+  const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width*s); cv.height = Math.round(bmp.height*s);
+  cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+  const blob = await new Promise(r => cv.toBlob(r, 'image/webp', .88));
+  const path = `${dir}/${crypto.randomUUID()}.webp`;
+  const { error } = await sb.storage.from(BUCKET).upload(path, blob, { contentType:'image/webp', cacheControl:'31536000' });
+  if(error) throw error;
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+const imgField = cur => `<label>이미지 ${cur ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="file" accept="image/*">
+  ${cur ? `<div class="cur">${img(cur,'')}<label style="margin:0"><input type="checkbox" name="rmimg" style="width:auto"> 이미지 삭제</label></div>` : ''}`;
+
+async function finish(fn){
+  const b = $('#sv'); b.disabled = true; st('저장 중…');
+  try{ await fn(); closeM(); await load(); route(); }
+  catch(err){ st('오류: ' + (err.message || err)); b.disabled = false; }
+}
+
+async function readSubs(){
+  const rows = [...document.querySelectorAll('#subs .sr')], out = [];
+  for(let i = 0; i < rows.length; i++){
+    const r = rows[i], x = r.querySelector('[name=sub_x]').value.trim(); if(!x) continue;
+    const o = { t: r.querySelector('[name=sub_t]').value.trim(), x };
+    const fi = r.querySelector('[name=sub_f]');
+    if(fi){
+      let im = (r.querySelector('[name=sub_i]') || {}).value || '';
+      const rm = r.querySelector('[name=sub_rm]'); if(rm && rm.checked) im = '';
+      const f = fi.files[0]; if(f && f.size){ st(`서브 사진 업로드 중… ${i+1}/${rows.length}`); im = await upload(f, 'subs'); }
+      if(im){ o.img = im; const pp = (r.querySelector('[name=sub_p]') || {}).value; if(okPos(pp)) o.pos = pp; }
+    }
+    out.push(o);
+  }
+  return out;
+}
+function formSub(c, i){
+  const subs = [...(c.subs || [])], isNew = i < 0, x = isNew ? {} : (subs[i] || {});
+  const row = subRow(x, true).replace('<button class="btn" type="button" data-act="del-sub">REMOVE</button>', '').replace('rows="3"', 'rows="10"');
+  openM(`<h3>${isNew ? '서브 프롬프트 추가' : '서브 프롬프트 수정'}${c.name ? ' · ' + esc(c.name) : ''}</h3>
+  <form id="f"><div id="subs" data-ph="1">${row}</div>
+  <div id="pe-wrap" hidden><label>썸네일 위치 — 어느 쪽이든 드래그하면 LIST와 GRID에 보이는 부분이 같이 바뀌고, 확대도 같이 적용돼요</label><div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap"><div><div style="font-size:11px;color:var(--mut)">LIST</div><div class="pe" id="pbox" style="width:120px"><img id="pimg" alt=""></div></div><div><div style="font-size:11px;color:var(--mut)">GRID</div><div class="pe" id="pbox2" style="width:200px;aspect-ratio:4/3"><img id="pimg2" alt=""></div></div></div></div>
+  ${isNew ? '' : `<button class="btn" type="button" data-act="del-one-sub" data-id="${c.id}" data-i="${i}" style="margin-top:6px">DELETE THIS SUB</button>`}
+  ${btns('SAVE')}</form>`);
+  initPos(x.img, x.pos, 'sub_p', 'sub_f');
+  $('#f').onsubmit = e => { e.preventDefault();
+    finish(async () => {
+      const [o] = await readSubs();
+      if(!o) throw new Error('내용을 입력해주세요');
+      if(isNew) subs.push(o); else subs[i] = o;
+      const r = await sb.from('characters').update({ subs }).eq('id', c.id);
+      if(r.error) throw r.error;
+    }); };
+}
+function formP(p){
+  const cats = [...new Set(PR.map(x => x.cat))], cur0 = p ? p.cat : (cat !== 'all' && cats.includes(cat) ? cat : cats[0]);
+  openM(`<h3>${p ? '프롬프트 수정' : '프롬프트 추가'}</h3>
+  <form id="f">
+    <label>카테고리</label><select name="csel" id="csel">${cats.map(c => `<option value="${esc(c)}" ${c===cur0 ? 'selected' : ''}>${esc(c)}</option>`).join('')}<option value="__n" ${cats.length ? '' : 'selected'}>+ 새 카테고리</option></select>
+    <input name="cat" id="ctxt" placeholder="solo, duo, outfit …" autocomplete="off" style="margin-top:5px" ${cats.length ? 'hidden' : 'required'}>
+    <label>연결할 캐릭터 (선택)</label><select name="char_id"><option value="">없음</option>${CH.map(c => `<option value="${c.id}" ${p && p.char_id===c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+    <label>프롬프트</label><textarea class="m" name="text" rows="9" required>${esc(p ? p.text : '')}</textarea>
+    ${imgField(p && p.img)}
+    <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞추고, 확대도 할 수 있어요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((p && p.img_pos) || '50% 50%')}"></div>
+    <label>서브 프롬프트</label><div id="subs">${((p && p.subs) || []).map(x => subRow(x)).join('')}</div>
+    <button class="btn" type="button" data-act="add-sub" style="margin-top:6px">+ SUB</button>
+    ${visField(p)}
+    ${btns('SAVE')}
+  </form>`);
+  initPos(p && p.img, p && p.img_pos); bindVis();
+  $('#csel').onchange = e => { const t = $('#ctxt'), n = e.target.value === '__n'; t.hidden = !n; t.required = n; if(n) t.focus(); };
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      let im = p ? p.img : '';
+      if(fd.get('rmimg')) im = '';
+      const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'prompts'); }
+      const row = { cat: (fd.get('csel') === '__n' ? fd.get('cat') : fd.get('csel')).trim(), text: fd.get('text').trim(), img: im, img_pos: fd.get('img_pos') || '50% 50%', char_id: fd.get('char_id') ? +fd.get('char_id') : null, subs: await readSubs(fd), ...await visRow(fd, p) };
+      const r = p ? await sb.from('prompts').update(row).eq('id', p.id) : await sb.from('prompts').insert(row);
+      if(r.error) throw r.error;
+    }); };
+}
+
+const parseInfo = t => {
+  const out = [];
+  t.split('\n').forEach(raw => {
+    const l = raw.trim(); if(!l) return;
+    const m = l.match(/^([^:：]+)[:：]\s*(.*)$/);
+    if(m) out.push([m[1].trim(), m[2].trim()]);
+    else if(out.length) out[out.length-1][1] += '\n' + l;
+  });
+  return out.filter(([k,v]) => k && v);
+};
+
+const FIX = [['Name',['Name','Full Name','본명','풀네임','Full name','full name']], ['Alias',['Alias','alias','ALIAS','별칭']], ['Gender',['Gender','성별']], ['Age',['Age','나이','age','AGE']], ['Height',['Height','키']], ['DOB',['DOB','생일']], ['Nationality',['Nationality','국적']]];
+const lab = k => (FIX.find(([,ks]) => ks.includes(k)) || [k])[0];
+const subRow = (x={}, ph=false) => `<div class="sr"><input name="sub_t" placeholder="서브 프롬프트 이름" value="${esc(x.t)}"><textarea class="m" name="sub_x" rows="3">${esc(x.x)}</textarea>
+  ${ph ? `<input type="hidden" name="sub_i" value="${esc(x.img)}"><input type="hidden" name="sub_p" value="${esc(x.pos || '')}"><label style="margin:4px 0 0">사진 ${x.img ? '(새로 고르면 교체)' : '(선택)'}</label><input type="file" name="sub_f" accept="image/*">
+  ${x.img ? `<div class="cur">${img(x.img,'')}<label style="margin:0"><input type="checkbox" name="sub_rm" style="width:auto"> 사진 삭제</label></div>` : ''}` : ''}
+  <button class="btn" type="button" data-act="del-sub">REMOVE</button></div>`;
+
+/* ---------- related characters ---------- */
+const nz = v => String(v || '50% 50%').split(' ').slice(0, 2).map(x => (parseFloat(x) || 0).toFixed(1)).join(' ');
+const relOf = c => [...(c.related || []), ...CH.filter(t => t.id !== c.id && (t.related || []).some(o => o.id === c.id) && !(c.related || []).some(o => o.id === t.id)).map(t => ({ id: t.id }))];
+const relCards = c => relOf(c).map(o => {
+  if(o.ext){
+    const src = o.img || '', pos = o.pos || '', pz = xyOf(pos), nm = o.name || '';
+    const thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(nm)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, nm, pos);
+    return `<div class="rcard ext" data-rk="x:${esc(o.uid || '')}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-uid="${esc(o.uid || '')}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(nm || '?')}</div><div class="rm"><b>${esc(nm)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></div>`;
+  }
+  const t = CH.find(x => x.id===o.id); if(!t) return '';
+  const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
+  const pz = xyOf(pos), thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
+  return `<a class="rcard" href="#/c/${t.id}" data-rk="i:${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${isLocked(t,'c'+t.id) ? LOCK : src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
+const rrHtml = (o, t, uid) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || ((o && o.img) ? 1 : zOf(t.img_pos));
+  return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"${uid ? ` data-ext="1" data-uid="${esc(uid)}"` : ''}><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
+  <div class="pe" style="width:240px;aspect-ratio:4/3">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
+  <input type="range" class="rz" min="1" max="3" step="0.05" value="${z}" style="width:240px;padding:0;margin-top:6px">
+  <input type="file" class="rf" accept="image/*" style="margin-top:6px"><input type="hidden" class="ri" value="${esc((o && o.img) || '')}"><input type="hidden" class="rp" value="${esc(pos)}">
+  ${o && o.img ? `<label style="margin:4px 0 0;font-weight:500"><input type="checkbox" class="rx" style="width:auto"> ${uid ? '올린 썸네일 삭제' : '올린 썸네일 삭제 (대표 사진으로 되돌리기)'}</label>` : ''}</div></div>`; };
+function bindRow(r){
+  const rb = r.querySelector('.rb'), box = r.querySelector('.pe'), file = r.querySelector('.rf'), hid = r.querySelector('.rp'), rz = r.querySelector('.rz');
+  let im = box.querySelector('img'); if(!im){ im = document.createElement('img'); im.alt = ''; box.appendChild(im); }
+  let pos = String(hid.value).split(' ').map(parseFloat); if(pos.length < 2 || pos.some(isNaN)) pos = [50, 50];
+  let z = parseFloat(rz.value) || 1;
+  const apply = () => { const o = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`; im.style.objectPosition = o; im.style.transformOrigin = o; im.style.transform = `scale(${z})`; hid.value = o; };
+  apply();
+  file.addEventListener('change', () => { const f = file.files[0]; if(f){ im.src = URL.createObjectURL(f); pos = [50, 50]; z = 1; rz.value = 1; apply(); } });
+  rz.oninput = () => { z = parseFloat(rz.value) || 1; apply(); dirty = true; };
+  box.addEventListener('wheel', e => { e.preventDefault(); z = Math.max(1, Math.min(3, z - e.deltaY * 0.002)); rz.value = z; apply(); dirty = true; }, { passive:false });
+  let d = null;
+  box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
+  box.addEventListener('pointermove', e => {
+    if(!d || !im.naturalWidth) return;
+    const bb = box.getBoundingClientRect(), sc = Math.max(bb.width / im.naturalWidth, bb.height / im.naturalHeight);
+    const gx = z * (im.naturalWidth * sc - bb.width) + (z - 1) * bb.width, gy = z * (im.naturalHeight * sc - bb.height) + (z - 1) * bb.height, cl = v => Math.max(0, Math.min(100, v));
+    if(gx > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / gx * 100);
+    if(gy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / gy * 100);
+    apply(); dirty = true;
+  });
+  const end = () => { d = null; };
+  box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+}
+async function readRel(){
+  const rows = [...document.querySelectorAll('#rrw .rr')], out = [];
+  for(let i = 0; i < rows.length; i++){
+    const r = rows[i], o = r.dataset.ext ? { ext: 1, uid: r.dataset.uid, name: (($('#rname') || { value: '' }).value || '').trim() } : { id: +r.dataset.id }; let im = r.querySelector('.ri').value; const kw = ($('#rkw') || { value: '' }).value.trim(); if(kw) o.k = kw;
+    const rx = r.querySelector('.rx'); if(rx && rx.checked) im = '';
+    const f = r.querySelector('.rf').files[0]; if(f && f.size){ st(`관련 캐릭터 썸네일 업로드 중… ${i+1}/${rows.length}`); im = await upload(f, 'characters'); }
+    const pp = r.querySelector('.rp').value, zz = parseFloat(r.querySelector('.rz').value) || 1; if(zz > 1.001) o.z = +zz.toFixed(2);
+    if(im){ o.img = im; if(okPos(pp)) o.pos = pp; } else if(okPos(pp) && nz(pp) !== nz(r.dataset.dp)) o.pos = pp;
+    out.push(o);
+  }
+  return out;
+}
+
+function formRel(c, rid, uid){
+  const list = relOf(c), cur = uid ? list.find(o => o.uid === uid) : rid ? list.find(o => o.id === rid) : null, isNew = !rid && !uid;
+  const cand = sortCh().filter(t => t.id !== c.id && !list.some(o => o.id === t.id));
+  const extT = { id: '', name: '', img: '', img_pos: '50% 50%' }, euid = uid || ('x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+  const startExt = !!uid || (isNew && !cand.length);
+  const t0 = startExt ? extT : (isNew ? cand[0] : CH.find(x => x.id === rid)); if(!t0) return;
+  const nameVal = (cur && cur.ext && cur.name) || '';
+  openM(`<h3>${isNew ? '관련 캐릭터 추가' : '관련 캐릭터 수정'}</h3>
+  <form id="f">
+    <label>캐릭터</label>${isNew ? `<select id="rsel">${cand.map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('')}<option value="__ext"${startExt ? ' selected' : ''}>＋ 사이트에 없는 캐릭터 (직접 입력)</option></select>` : (uid ? '' : `<div style="font-weight:800">${esc(t0.name)}</div>`)}
+    <div id="rnamew"${startExt ? '' : ' hidden'}>${isNew ? '<label>이름</label>' : ''}<input id="rname" placeholder="캐릭터 이름" value="${esc(nameVal)}"></div>
+    <label>관계 (키워드)</label><input id="rkw" placeholder="친구, 라이벌 …" value="${esc((cur && cur.k) || '')}">
+    <label>썸네일</label><div id="rrw">${rrHtml(cur, t0, startExt ? euid : '')}</div>
+    ${btns('SAVE')}
+    ${isNew ? '' : `<button class="btn" type="button" data-act="del-rel" data-id="${c.id}" data-rid="${rid || ''}" data-uid="${uid || ''}" style="margin-top:6px">DELETE THIS</button>`}
+  </form>`);
+  bindRow($('#rrw .rr'));
+  if(isNew) $('#rsel').onchange = e => {
+    if(e.target.value === '__ext'){ $('#rnamew').hidden = false; $('#rrw').innerHTML = rrHtml(null, extT, euid); }
+    else { const t = CH.find(x => x.id === +e.target.value); if(!t) return; $('#rnamew').hidden = true; $('#rrw').innerHTML = rrHtml(null, t); }
+    bindRow($('#rrw .rr')); };
+  $('#f').onsubmit = e => { e.preventDefault();
+    finish(async () => {
+      const [o] = await readRel(), stored = [...(c.related || [])];
+      if(o.ext && !o.name) throw new Error('이름을 입력해 주세요');
+      const k = o.ext ? stored.findIndex(x => x.uid === o.uid) : stored.findIndex(x => x.id === o.id);
+      if(k >= 0) stored[k] = o; else stored.push(o);
+      const ops = [sb.from('characters').update({ related: stored }).eq('id', c.id)];
+      const t = o.ext ? null : CH.find(x => x.id === o.id);
+      if(t && !(t.related || []).some(x => x.id === c.id)) ops.push(sb.from('characters').update({ related: [...(t.related || []), { id: c.id }] }).eq('id', t.id));
+      const er = (await Promise.all(ops)).find(x => x.error); if(er) throw er.error;
+    }); };
+}
+
+function formC(c){
+  const inf = c ? (c.info||[]) : [];
+  const get = ks => (inf.find(([k]) => ks.includes(k))||[])[1] || '';
+  const used = FIX.flatMap(([,ks]) => ks);
+  const fx = i => {
+    const lb = FIX[i][0], v = get(FIX[i][1]);
+    if(lb==='Gender'){
+      const other = v && !['남성','여성'].includes(v);
+      return `<div><label>Gender</label><select name="gsel" id="gsel"><option value="">선택 안 함</option><option value="남성" ${v==='남성' ? 'selected' : ''}>남성</option><option value="여성" ${v==='여성' ? 'selected' : ''}>여성</option><option value="__o" ${other ? 'selected' : ''}>직접 입력</option></select>
+      <input name="fx${i}" id="gtxt" placeholder="직접 입력" value="${other ? esc(v) : ''}" style="margin-top:5px" ${other ? '' : 'hidden'}></div>`;
+    }
+    if(lb==='Height') return `<div><label>Height</label><div class="cmw"><input name="fx${i}" inputmode="decimal" placeholder="175" value="${esc(v.replace(/\s*cm$/i,''))}"><span>cm</span></div></div>`;
+    return `<div><label>${lb}</label><textarea class="fxa" name="fx${i}" rows="1" ${lb==='DOB' ? 'placeholder="YYYY-MM-DD"' : ''}>${esc(v)}</textarea></div>`;
+  };
+  const extra = c ? inf.filter(([k]) => !used.includes(k)).map(([k,v]) => `${k}: ${v}`).join('\n') : '';
+  openM(`<h3>${c ? '캐릭터 수정' : '캐릭터 추가'}</h3>
+  <form id="f">
+    <div class="g2">
+      <div><label>이름</label><input name="name" required value="${esc(c ? c.name : '')}"></div>
+      ${fx(0)}
+      <div style="grid-column:1/-1"><label>태그 (쉼표로 구분: 주인공, 조연 …) — 상세 페이지에만 표시</label><input name="tag" value="${esc(c ? c.tag : '')}"></div>
+      ${FIX.map((_,i) => i ? fx(i) : '').join('')}
+    </div>
+    ${imgField(c && c.img)}
+    <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞추고, 확대도 할 수 있어요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((c && c.img_pos) || '50% 50%')}"></div>
+    <label>추가 프로필 정보 — 한 줄에 "항목: 값" (콜론 없는 줄은 윗 항목 값에 줄바꿈으로 이어져요)</label><textarea name="info" rows="4">${esc(extra)}</textarea>
+    <label>설명</label><textarea name="descr" rows="4">${esc(c ? c.descr : '')}</textarea>
+    <label>캐릭터 기본 프롬프트</label><textarea class="m" name="prompt" rows="4">${esc(c ? c.prompt : '')}</textarea>
+    <label>아웃핏 프롬프트 (OUTFIT)</label><textarea class="m" name="outfit" rows="3">${esc(c ? (c.outfit || '') : '')}</textarea>
+    ${visField(c)}
+    ${btns('SAVE')}
+  </form>`);
+  initPos(c && c.img, c && c.img_pos); bindVis();
+  $('#gsel').onchange = e => { const t = $('#gtxt'); t.hidden = e.target.value !== '__o'; if(!t.hidden) t.focus(); };
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      let im = c ? c.img : '';
+      if(fd.get('rmimg')) im = '';
+      const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'characters'); }
+      const fixed = FIX.map(([k],i) => {
+        let v = (fd.get('fx'+i)||'').trim();
+        if(k==='Gender'){ const g = fd.get('gsel'); v = g==='__o' ? v : (g || ''); }
+        if(k==='Height' && /^\d+(\.\d+)?$/.test(v)) v += 'cm';
+        return [k, v];
+      }).filter(([,v]) => v);
+      const gallery = (c && c.gallery) || [];
+      const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), outfit: fd.get('outfit').trim(), gallery, img_pos: fd.get('img_pos') || '50% 50%', ...await visRow(fd, c) };
+      const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
+      if(r.error) throw r.error;
+    }); };
+}
+
+function formGal(c){
+  const g = c.gallery || [];
+  openM(`<h3>갤러리 · ${esc(c.name)}</h3>
+  <form id="f">
+    <label>사진 추가 (여러 장 선택 가능)</label><input type="file" name="gfiles" accept="image/*" multiple>
+    ${g.length ? `<label>기존 사진 — 체크하면 삭제돼요 (순서는 상세 페이지에서 드래그)</label><div class="gedit">${g.map((u,i) => `<label class="gi">${img(u,'')}<input type="checkbox" name="grm" value="${i}" style="width:auto"> 삭제</label>`).join('')}</div>` : ''}
+    ${btns('SAVE')}
+  </form>`);
+  $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
+    finish(async () => {
+      const rm = fd.getAll('grm'), gallery = g.filter((_,i) => !rm.includes(String(i)));
+      const gf = fd.getAll('gfiles').filter(x => x && x.size);
+      if(!gf.length && !rm.length) throw new Error('추가하거나 삭제할 사진을 선택해주세요');
+      for(let i = 0; i < gf.length; i++){ st(`갤러리 업로드 중… ${i+1}/${gf.length}`); gallery.push(await upload(gf[i], 'characters')); }
+      const r = await sb.from('characters').update({ gallery }).eq('id', c.id);
+      if(r.error) throw r.error;
+    }); };
+}
+
+function initPos(src0, pos0, hn = 'img_pos', fn = 'file'){
+  const boxes = [...document.querySelectorAll('#pe-wrap .pe')], ims = boxes.map(b => b.querySelector('img')), wrap = $('#pe-wrap'), hid = $('#f [name=' + hn + ']'), file = $('#f [name=' + fn + ']');
+  const tk = String(pos0 || '50% 50%').split(' ').map(parseFloat);
+  let pos = tk.length < 2 || isNaN(tk[0]) || isNaN(tk[1]) ? [50, 50] : [tk[0], tk[1]];
+  let z = tk[2] > 1 && tk[2] <= 3 ? tk[2] : 1;
+  let blob = '';
+  const zr = document.createElement('div');
+  zr.innerHTML = '<div style="font-size:11px;color:var(--mut);margin-top:8px">확대 · 슬라이더 / 마우스 휠</div><input type="range" class="pz" min="1" max="3" step="0.05" style="width:100%;max-width:240px;padding:0;margin-top:4px">';
+  wrap.appendChild(zr);
+  const zs = zr.querySelector('.pz'); zs.value = z;
+  const apply = () => {
+    const o = `${pos[0].toFixed(1)}% ${pos[1].toFixed(1)}%`;
+    ims.forEach(im => { im.style.objectPosition = o; im.style.transformOrigin = o; im.style.transform = z > 1.001 ? `scale(${z})` : ''; });
+    hid.value = o + (z > 1.001 ? ' ' + z.toFixed(2) : '');
+  };
+  const show = src => { if(src){ ims.forEach(im => { im.src = src; }); wrap.hidden = false; } else wrap.hidden = true; };
+  show(src0); apply();
+  file.addEventListener('change', () => {
+    const f = file.files[0];
+    if(blob) URL.revokeObjectURL(blob);
+    if(f){ blob = URL.createObjectURL(f); pos = [50, 50]; z = 1; zs.value = 1; show(blob); apply(); } else { blob = ''; show(src0); }
+  });
+  zs.addEventListener('input', () => { z = parseFloat(zs.value) || 1; apply(); dirty = true; });
+  boxes.forEach((box, bi) => {
+    const im = ims[bi]; let d = null;
+    box.addEventListener('wheel', e => { e.preventDefault(); z = Math.max(1, Math.min(3, z - e.deltaY * 0.002)); zs.value = z; apply(); dirty = true; }, { passive:false });
+    box.addEventListener('pointerdown', e => { d = { x:e.clientX, y:e.clientY, p:[...pos] }; box.setPointerCapture(e.pointerId); });
+    box.addEventListener('pointermove', e => {
+      if(!d || !im.naturalWidth) return;
+      const r = box.getBoundingClientRect(), sc = Math.max(r.width / im.naturalWidth, r.height / im.naturalHeight);
+      const gx = z * (im.naturalWidth * sc - r.width) + (z - 1) * r.width, gy = z * (im.naturalHeight * sc - r.height) + (z - 1) * r.height, cl = v => Math.max(0, Math.min(100, v));
+      if(gx > 1) pos[0] = cl(d.p[0] - (e.clientX - d.x) / gx * 100);
+      if(gy > 1) pos[1] = cl(d.p[1] - (e.clientY - d.y) / gy * 100);
+      apply(); dirty = true;
+    });
+    const end = () => { d = null; };
+    box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+  });
+}
+
+function formLogin(){
+  openM(`<h3>ADMIN LOGIN</h3><form id="f">
+    <label>이메일</label><input type="email" name="email" required autocomplete="username">
+    <label>비밀번호</label><input type="password" name="pw" required autocomplete="current-password">
+    ${btns('LOGIN')}</form>`);
+  $('#f').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e.target); st('로그인 중…');
+    const { error } = await sb.auth.signInWithPassword({ email: fd.get('email'), password: fd.get('pw') });
+    if(error) return st('로그인 실패: ' + error.message);
+    closeM(); route(); };
+}
+
+async function del(table, id, label){
+  if(!confirm(`이 ${label}를 삭제할까요?`)) return false;
+  const { error } = await sb.from(table).delete().eq('id', id);
+  if(error){ alert('삭제 실패: ' + error.message); return false; }
+  await load(); return true;
+}
+
+/* ---------- events ---------- */
+function copy(b){
+  const t = textOf(b.dataset.k) || '', o = b.textContent;
+  const done = () => { b.textContent = 'COPIED'; setTimeout(() => b.textContent = o, 1200); };
+  const fb = () => { const a = document.createElement('textarea'); a.value = t; a.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(_){} a.remove(); done(); };
+  (navigator.clipboard && window.isSecureContext) ? navigator.clipboard.writeText(t).then(done, fb) : fb();
+}
+/* 잠금 해제 폼 */
+document.addEventListener('submit', async e => {
+  const f = e.target.closest('form[data-lk]'); if(!f) return; e.preventDefault();
+  const k = f.dataset.lk, r = k[0]==='c' ? CH.find(x => x.id===+k.slice(1)) : PR.find(x => x.id===+k.slice(1));
+  const inp = f.querySelector('input'), err = f.parentElement.querySelector('[data-lkerr]'); if(!r) return;
+  let ok = false;
+  try{ ok = await chkLock(r, inp.value); }catch(_){ err.textContent = '이 브라우저에서는 잠금을 열 수 없어요 (https 필요)'; return; }
+  if(!ok){ err.textContent = '비밀번호가 맞지 않아요'; inp.select(); return; }
+  UNL.add(k); try{ sessionStorage.setItem('unl', JSON.stringify([...UNL])); }catch(_){}
+  const [a, b] = location.hash.slice(2).split('/');
+  if(a==='c') pageChar(b); else if($('#list')) list(); else route();
+});
+/* gallery: 관리자는 사진을 드래그해서 순서 조정 (놓으면 자동 저장) */
+let gsorted = false;
+document.addEventListener('click', e => { if(gsorted){ e.stopPropagation(); e.preventDefault(); gsorted = false; } }, true);
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const a = b.dataset.act, id = +b.dataset.id || null;
+  if(a==='pin'){ e.preventDefault(); const c = CH.find(x => x.id===id); const r = await sb.from('characters').update({ pinned: !c.pinned }).eq('id', id); if(r.error) return alert('핀 실패: ' + r.error.message); await load(); return pageChars(); }
+  if(a==='order'){ ORD = !ORD; return pageChars(); }
+  if(a==='copy') return copy(b);
+  if(a==='close') return closeM();
+  if(a==='edit-rel'){ e.preventDefault(); const c = CH.find(x => x.id===id); if(c) formRel(c, +b.dataset.rid || 0, b.dataset.uid || ''); return; }
+  if(a==='del-rel'){ const c = CH.find(x => x.id===id), rid = +b.dataset.rid, uid = b.dataset.uid || ''; if(!c || !confirm('이 관련 캐릭터를 삭제할까요?')) return;
+    const t = rid ? CH.find(x => x.id===rid) : null, ops = [sb.from('characters').update({ related: (c.related || []).filter(x => uid ? x.uid !== uid : x.id !== rid) }).eq('id', c.id)];
+    if(t) ops.push(sb.from('characters').update({ related: (t.related || []).filter(x => x.id !== c.id) }).eq('id', t.id));
+    const er = (await Promise.all(ops)).find(x => x.error); if(er) return alert('삭제 실패: ' + er.error.message);
+    closeM(); await load(); route(); return; }
+  if(a==='edit-gal'){ const c = CH.find(x => x.id===id); if(c) formGal(c); return; }
+  if(a==='edit-sub'){ const c = CH.find(x => x.id===id); if(c) formSub(c, +b.dataset.i); return; }
+  if(a==='del-one-sub'){ const c = CH.find(x => x.id===id); if(!c || !confirm('이 서브 프롬프트를 삭제할까요?')) return;
+    const subs = (c.subs || []).filter((_, k) => k !== +b.dataset.i);
+    const r = await sb.from('characters').update({ subs }).eq('id', c.id); if(r.error) return alert('삭제 실패: ' + r.error.message);
+    closeM(); await load(); route(); return; }
+  if(a==='expand'){ b.classList.toggle('open'); return; }
+  if(a==='subv'){ SV = b.dataset.sv; try{ localStorage.setItem('sv', SV); }catch(_){} const sp = $('#sps'); if(sp) sp.dataset.v = SV; document.querySelectorAll('[data-act=subv]').forEach(x => x.classList.toggle('on', x===b)); return; }
+  if(a==='zoom'){ const l = $('#lb'); l.innerHTML = `<img src="${esc(b.dataset.src)}">`; l.hidden = false; return; }
+  if(a==='add-sub') return $('#subs').insertAdjacentHTML('beforeend', subRow({}, !!$('#subs').dataset.ph));
+  if(a==='del-sub') return b.closest('.sr').remove();
+  if(a==='otag-order'){ OTO = !OTO; return pageOoc(); }
+  if(a==='swap-o'){ const k = +b.dataset.id, o = OC.find(x => x.id===k), r = b.closest('.oc-r'); if(!o) return;
+    OSW.has(k) ? OSW.delete(k) : OSW.add(k);
+    if(r){ r.querySelector('pre').textContent = ocText(o); r.querySelector('small').textContent = ocText(o); }
+    b.classList.toggle('on', OSW.has(k)); return; }
+  if(a==='new-o') return formOoc();
+  if(a==='edit-o') return formOoc(OC.find(o => o.id===id));
+  if(a==='del-o') { if(await del('ooc', id, 'OOC')) route(); return; }
+  if(a==='new-p') return formP();
+  if(a==='edit-p') return formP(PR.find(p => p.id===id));
+  if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
+  if(a==='new-c') return formC();
+  if(a==='edit-c') return formC(CH.find(c => c.id===id));
+  if(a==='del-c') { if(await del('characters', id, '캐릭터')) location.hash==='#/characters' ? route() : location.hash = '#/characters'; }
+});
+/* 이미지 저장 방지: 우클릭·꾹 누르기 메뉴·드래그 차단 (입력창/프롬프트 글자 영역은 복사·붙여넣기 메뉴 유지) */
+document.addEventListener('contextmenu', e => { if(!e.target.closest('input,textarea,select,pre,.tx,[contenteditable]')) e.preventDefault(); });
+document.addEventListener('dragstart', e => { if(e.target.tagName==='IMG' || e.target.closest('img')) e.preventDefault(); });
+$('#lb').onclick = () => { $('#lb').hidden = true; };
+addEventListener('keydown', e => { if(e.key==='Escape'){ if(!$('#lb').hidden){ $('#lb').hidden = true; return; } if(!$('#md').hidden && (!dirty || confirm('입력한 내용이 사라져요. 닫을까요?'))) closeM(); } });
+const SUN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>';
+const MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
+const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme:dark)').matches; };
+const paintTheme = () => { const d = isDark(), b = $('#theme'); b.innerHTML = d ? MOON : SUN; const t = d ? '라이트 모드로 전환' : '다크 모드로 전환'; b.setAttribute('aria-label', t); b.title = t; };
+$('#theme').onclick = () => {
+  const r = document.documentElement;
+  r.dataset.theme = isDark() ? 'light' : 'dark';
+  try{ localStorage.setItem('rosie-theme', r.dataset.theme); }catch(_){}
+  paintTheme();
+};
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
+paintTheme();
+const syncAdm = () => { $('#adm').classList.toggle('on', admin); $('#set').hidden = !admin; };
+const FEATS = [['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그'],['oo','OOC 페이지']];
+function formSettings(){
+  openM(`<h3>SETTINGS</h3><form id="f">${FEATS.map(([k,l]) => `<label>${l}</label><select name="${k}">${[['on','공개'],['admin','나만 보기'],['off','끔']].map(([v,t]) => `<option value="${v}"${(SET[k]||'on')===v ? ' selected' : ''}>${t}</option>`).join('')}</select>`).join('')}${btns('SAVE')}</form>`);
+  $('#f').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e.target); st('저장 중…');
+    const rows = FEATS.map(([k]) => ({ key: k, value: fd.get(k) }));
+    const r = await sb.from('site_settings').upsert(rows);
+    if(r.error) return st('저장 실패: ' + r.error.message);
+    rows.forEach(o => { SET[o.key] = o.value; }); closeM(); route(); };
+}
+$('#set').onclick = formSettings;
+$('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
+sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)){ CH = CH.filter(canSee); PR = PR.filter(canSee); route(); setTimeout(async () => { if(await load()) route(); }, 0); } });
+addEventListener('hashchange', route);
+
+(async () => {
+  app.innerHTML = '<p class="empty">LOADING…</p>';
+  const { data } = await sb.auth.getSession(); admin = !!data.session; syncAdm();
+  if(await load()) route();
+})();
 </script>
 </body>
 </html>
