@@ -215,6 +215,9 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .oc-r.open .btn.on{background:transparent;color:var(--bg);border-color:var(--bg);box-shadow:inset 0 0 0 1px var(--bg)}
 .bar.ordering .chip[data-t]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .bar.ordering .chip.drag{opacity:.35}
+a.btn{display:inline-block;text-decoration:none}
+.oc.one{margin-top:6px}
+.oc.one .oc-top{cursor:default}
 </style>
 </head>
 <body>
@@ -296,6 +299,7 @@ async function load(){
   return true;
 }
 const textOf = k => {
+  if(k[0]==='l') return location.href.split('#')[0] + '#/ooc/' + k.slice(1);
   if(k[0]==='g'){ const o = OC.find(o => o.id===+k.slice(1)); return o ? ocText(o) : ''; }
   if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
   if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
@@ -456,11 +460,21 @@ function pageOoc(){
     const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(x => x.classList.remove('open')); r.classList.toggle('open', !was); };
   drawOoc();
 }
+function ocRow(o, n, open){
+  return `<div class="oc-r${open ? ' open' : ''}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
+    <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button><button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
+}
 function drawOoc(){
   const s = oq.trim().toLowerCase();
   const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
-  $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => `<div class="oc-r"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
-    <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`).join('') : '<p class="empty">I\'m feeling lucky!</p>';
+  $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => ocRow(o, n, false)).join('') : '<p class="empty">I\'m feeling lucky!</p>';
+}
+/* OOC 하나만 보여주는 페이지: #/ooc/번호 (공유용 링크) */
+function pageOocOne(id){
+  const i = OC.findIndex(x => String(x.id) === String(id)), o = OC[i];
+  if(!o){ app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/ooc">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
+  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">${String(i+1).padStart(2,'0')} / ${String(OC.length).padStart(2,'0')}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
+  <div class="oc one">${ocRow(o, i+1, true)}</div>`;
 }
 function formOoc(o){
   openM(`<h3>${o ? 'OOC 수정' : 'OOC 추가'}</h3>
@@ -486,7 +500,7 @@ function route(){
   if(a==='prompts' || a==='c' || a==='ooc') ORD = false;
   if(a!=='ooc') OTO = false;
   $('#n1').classList.toggle('on', a!=='prompts' && a!=='ooc'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
-  a==='ooc' ? pageOoc() : a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
+  a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
 
@@ -870,7 +884,7 @@ document.addEventListener('click', async e => {
     b.classList.toggle('on', OSW.has(k)); return; }
   if(a==='new-o') return formOoc();
   if(a==='edit-o') return formOoc(OC.find(o => o.id===id));
-  if(a==='del-o') { if(await del('ooc', id, 'OOC')) route(); return; }
+  if(a==='del-o') { if(await del('ooc', id, 'OOC')){ if(/^#\/ooc\/./.test(location.hash)) location.hash = '#/ooc'; else route(); } return; }
   if(a==='new-p') return formP();
   if(a==='edit-p') return formP(PR.find(p => p.id===id));
   if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
