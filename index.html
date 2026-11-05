@@ -493,7 +493,7 @@ function formOoc(o){
 }
 
 function route(){
-  const [a,b] = (location.hash.slice(2) || 'characters').split('/');
+  const [a,b] = (location.hash.slice(2) || (show('oo') ? 'ooc' : 'characters')).split('/'); /* 첫 화면 = OOC (OOC 페이지가 꺼져 있으면 persona) */
   $('#n2').style.display = show('pp') ? '' : 'none'; $('#n3').style.display = show('oo') ? '' : 'none';
   if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
