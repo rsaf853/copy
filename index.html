@@ -101,6 +101,7 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .pr .bd{flex:1;min-width:0;display:flex;flex-direction:column}
 .pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .pgrid .pr{margin:0}
+.pgrid.one{grid-template-columns:1fr}
 .sb{border-top:1px solid var(--line)}
 .sb:first-child{border-top:0}
 .sb .hd{border-bottom:0;padding:5px 10px}
@@ -205,6 +206,10 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .oc-bar{margin-top:10px;display:flex;justify-content:flex-end;gap:5px}
 .oc-r.open{background:var(--fg);color:var(--bg);border-bottom-color:var(--fg)}
 .oc-r.open small{display:none}.oc-r.open .oc-n{color:var(--bg);opacity:.6}.oc-r.open .oc-body{display:block}
+.ovb{display:inline-block;vertical-align:1px;margin-left:4px;font:600 9px/1.5 var(--sans);padding:0 5px;border:1px solid currentColor}
+.oc-body .lk{border:0;padding:16px 0 4px}
+.oc-r.open .lk input{background:var(--bg);color:var(--fg)}
+.oc-r.open .oc-body .st{color:var(--bg)}
 .oc-r.open .tg{background:transparent;color:var(--bg);border-color:var(--bg)}
 .oc-r.open .btn{background:var(--bg);color:var(--fg);border-color:var(--bg)}
 .oc-r.open .btn:hover{background:transparent;color:var(--bg);border-color:var(--bg)}
@@ -294,12 +299,13 @@ function subBox(c, x, i, pre='s'){
 async function load(){
   const [c, p, o] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id'), sb.from('ooc').select('*').order('id')]);
   if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
-  CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = o.error ? [] : o.data;
+  CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = o.error ? [] : o.data.filter(canSee);
   const st2 = await sb.from('site_settings').select('*'); if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
   return true;
 }
 const textOf = k => {
   if(k[0]==='l') return location.href.split('#')[0] + '#/ooc/' + k.slice(1);
+  if(k[0]==='u') return location.href.split('#')[0] + '#/prompts/' + k.slice(1);
   if(k[0]==='g'){ const o = OC.find(o => o.id===+k.slice(1)); return o ? ocText(o) : ''; }
   if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
   if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
@@ -312,10 +318,11 @@ const chName = id => (CH.find(c => c.id===id)||{}).name;
 /* ---------- views ---------- */
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
-  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)} · LOCKED</span></div>${lockHtml('p'+p.id)}</div></div>`;
+  const lnk = `<button class="btn" data-act="copy" data-k="u${p.id}" title="이 프롬프트만 열리는 링크를 복사해요">LINK</button>`;
+  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)} · LOCKED</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
   return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
   <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' · ' + (vis(p) === 'private' ? 'PRIVATE' : 'LOCKED') : ''}</span>
-  <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
+  <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
   <pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
 }
 
@@ -423,6 +430,14 @@ function list(){
   const m = $('#more'); if(m) m.onclick = () => { shown += 20; list(); };
 }
 
+/* 프롬프트 하나만 보여주는 페이지: #/prompts/번호 (공유용 링크) */
+function pagePromptOne(id){
+  const p = PR.find(x => String(x.id) === String(id));
+  if(!p){ app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/prompts">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
+  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">#${num(p)} / ${PR.length}</p></div><a class="btn" href="#/prompts">← ALL</a></div>
+  <div class="pgrid one">${promptBox(p)}</div>`;
+}
+
 const ocTags = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
 const is18 = t => /^[RG]-?18$/i.test(t);
 /* 태그 순서: site_settings.ooc_tags(JSON). 저장된 순서 먼저, 새 태그는 뒤에 */
@@ -461,12 +476,16 @@ function pageOoc(){
   drawOoc();
 }
 function ocRow(o, n, open){
-  return `<div class="oc-r${open ? ' open' : ''}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
-    <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button><button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
+  const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
+  const vt = admin && vis(o) !== 'public' ? ` <span class="ovb">${vis(o) === 'private' ? 'PRIVATE' : 'LOCKED'}</span>` : '';
+  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)} <span class="ovb">LOCKED</span></strong><small>비밀번호가 필요해요</small></div></div>
+    <div class="oc-body">${lockHtml('o'+o.id)}<div class="oc-bar">${lnk}</div></div></div>`;
+  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
+    <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
 }
 function drawOoc(){
   const s = oq.trim().toLowerCase();
-  const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
+  const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (isLocked(o, 'o'+o.id) ? '' : o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
   $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => ocRow(o, n, false)).join('') : '<p class="empty">I\'m feeling lucky!</p>';
 }
 /* OOC 하나만 보여주는 페이지: #/ooc/번호 (공유용 링크) */
@@ -482,11 +501,13 @@ function formOoc(o){
     <label>제목</label><input name="title" value="${esc(o ? o.title : '')}" required autocomplete="off">
     <label>태그 (쉼표로 구분: 진행, 정리 …)</label><input name="tags" value="${esc(o ? o.tags : '')}" autocomplete="off">
     <label>내용 (복사할 내용)</label><textarea class="m" name="content" rows="9" required>${esc(o ? o.content : '')}</textarea>
+    ${visField(o)}
     ${btns('SAVE')}
   </form>`);
+  bindVis();
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
-      const row = { title: fd.get('title').trim(), tags: fd.get('tags').trim(), content: fd.get('content').trim() };
+      const row = { title: fd.get('title').trim(), tags: fd.get('tags').trim(), content: fd.get('content').trim(), ...await visRow(fd, o) };
       const r = o ? await sb.from('ooc').update(row).eq('id', o.id) : await sb.from('ooc').insert(row);
       if(r.error) throw r.error;
     }); };
@@ -500,7 +521,7 @@ function route(){
   if(a==='prompts' || a==='c' || a==='ooc') ORD = false;
   if(a!=='ooc') OTO = false;
   $('#n1').classList.toggle('on', a!=='prompts' && a!=='ooc'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
-  a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? pagePrompts() : a==='c' ? pageChar(b) : pageChars();
+  a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
 
@@ -840,13 +861,14 @@ function copy(b){
 /* 잠금 해제 폼 */
 document.addEventListener('submit', async e => {
   const f = e.target.closest('form[data-lk]'); if(!f) return; e.preventDefault();
-  const k = f.dataset.lk, r = k[0]==='c' ? CH.find(x => x.id===+k.slice(1)) : PR.find(x => x.id===+k.slice(1));
+  const k = f.dataset.lk, r = (k[0]==='c' ? CH : k[0]==='o' ? OC : PR).find(x => x.id===+k.slice(1));
   const inp = f.querySelector('input'), err = f.parentElement.querySelector('[data-lkerr]'); if(!r) return;
   let ok = false;
   try{ ok = await chkLock(r, inp.value); }catch(_){ err.textContent = '이 브라우저에서는 잠금을 열 수 없어요 (https 필요)'; return; }
   if(!ok){ err.textContent = '비밀번호가 맞지 않아요'; inp.select(); return; }
   UNL.add(k); try{ sessionStorage.setItem('unl', JSON.stringify([...UNL])); }catch(_){}
   const [a, b] = location.hash.slice(2).split('/');
+  if(k[0]==='o' && $('#olist')){ drawOoc(); const row = document.querySelector(`#olist .oc-r[data-oid="${r.id}"]`); if(row) row.classList.add('open'); return; }
   if(a==='c') pageChar(b); else if($('#list')) list(); else route();
 });
 /* gallery: 관리자는 사진을 드래그해서 순서 조정 (놓으면 자동 저장) */
@@ -887,7 +909,7 @@ document.addEventListener('click', async e => {
   if(a==='del-o') { if(await del('ooc', id, 'OOC')){ if(/^#\/ooc\/./.test(location.hash)) location.hash = '#/ooc'; else route(); } return; }
   if(a==='new-p') return formP();
   if(a==='edit-p') return formP(PR.find(p => p.id===id));
-  if(a==='del-p') { if(await del('prompts', id, '프롬프트')) route(); return; }
+  if(a==='del-p') { if(await del('prompts', id, '프롬프트')){ if(/^#\/prompts\/./.test(location.hash)) location.hash = '#/prompts'; else route(); } return; }
   if(a==='new-c') return formC();
   if(a==='edit-c') return formC(CH.find(c => c.id===id));
   if(a==='del-c') { if(await del('characters', id, '캐릭터')) location.hash==='#/characters' ? route() : location.hash = '#/characters'; }
