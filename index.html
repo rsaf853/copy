@@ -317,6 +317,12 @@ body.is-memo header{display:none}
 .memo-hd a:hover{text-decoration:underline;text-underline-offset:3px}
 .memo-hd small{font:500 10px var(--mono);color:var(--mut);letter-spacing:.02em}
 .memo .oc.one{margin-top:0}
+.memo .pgrid.one .pr{border-color:var(--fg)}
+/* 카드 하나가 화면을 차지할 때(링크 화면·잠긴 캐릭터)는 비밀번호 칸을 가운데로 */
+.oc.one .lk,.pgrid.one .lk,.lkfull .lk{justify-content:center;padding:44px 16px}
+.oc.one .lk form,.pgrid.one .lk form,.lkfull .lk form{flex:0 1 320px}
+.oc.one .lk .st,.pgrid.one .lk .st,.lkfull .lk .st{text-align:center}
+.lkfull{margin-top:14px}
 .oc.one .oc-r{border-color:var(--fg);border-top-width:6px;cursor:auto;margin:0}
 .oc.one .oc-top{padding:10px 14px 0;cursor:auto}
 .oc.one .oc-top strong{font-size:22px;letter-spacing:-.03em;white-space:normal}
@@ -537,7 +543,7 @@ async function saveOrder(){
 function pageChar(id){
   const c = byKey(CH, id);
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
-  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1>${lockHtml('c'+c.id)}`; return; }
+  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1><div class="lkfull">${lockHtml('c'+c.id)}</div>`; return; }
   const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c);
   app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
   <div class="prof">
@@ -616,9 +622,10 @@ function list(){
 /* 프롬프트 하나만 보여주는 페이지: #/prompts/번호 (공유용 링크) */
 function pagePromptOne(id){
   const p = byKey(PR, id);
-  if(!p){ app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/prompts">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
-  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">${num(p) ? `#${num(p)} / ${LP().length}` : 'LINK ONLY'}</p></div><a class="btn" href="#/prompts">← ALL</a></div>
-  <div class="pgrid one">${promptBox(p)}</div>`;
+  /* OOC 링크 화면과 같은 메모 모양 */
+  const hd = sub => `<div class="memo-hd"><a href="#/home">r♡sie archive</a><small>${sub}</small></div>`;
+  if(!p){ app.innerHTML = `<div class="memo">${hd('NOT FOUND')}<p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p></div>`; return; }
+  app.innerHTML = `<div class="memo">${hd(num(p) ? `PROMPT · #${num(p)} / ${LP().length}` : 'LINK ONLY')}<div class="pgrid one">${promptBox(p)}</div></div>`;
 }
 
 const ocTags = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
@@ -742,7 +749,7 @@ function route(){
   if(a!=='ooc') OTO = false;
   $('#n1').classList.toggle('on', a==='characters' || a==='c'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
   document.body.classList.toggle('is-home', a==='home');
-  document.body.classList.toggle('is-memo', a==='ooc' && !!b);
+  document.body.classList.toggle('is-memo', (a==='ooc' || a==='prompts') && !!b);
   a==='home' ? pageHome() : a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
