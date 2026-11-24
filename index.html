@@ -295,7 +295,7 @@ async function visRow(fd, r){
   return o;
 }
 const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin); };
-const pv = k => SET[k]==='admin' ? ' · PRIVATE' : '';
+const pv = k => SET[k]==='admin' ? ' ' + ico('private') : '';
 const tagsOf = s => !show('tags') ? [] : String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
 let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!['a','c'].includes(SV)) SV = 'a';
 function subBox(c, x, i, pre='s'){
