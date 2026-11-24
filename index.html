@@ -298,6 +298,14 @@ h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 .oc-r.locked .oc-pv{display:none}
 /* 링크 화면: 카드 하나 크게 + 다른 OOC */
 .oc.one{display:block;margin-top:6px}
+/* OOC 링크 화면: 메뉴줄 숨기고 550px 메모 */
+body.is-memo header{display:none}
+.memo{max-width:550px;margin:0 auto}
+.memo-hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+.memo-hd a{font:800 13px var(--sans);letter-spacing:-.03em;color:var(--fg);text-decoration:none}
+.memo-hd a:hover{text-decoration:underline;text-underline-offset:3px}
+.memo-hd small{font:500 10px var(--mono);color:var(--mut);letter-spacing:.02em}
+.memo .oc.one{margin-top:0}
 .oc.one .oc-r{border-color:var(--fg);border-top-width:6px;cursor:auto;margin:0}
 .oc.one .oc-top{padding:10px 14px 0;cursor:auto}
 .oc.one .oc-top strong{font-size:22px;letter-spacing:-.03em;white-space:normal}
@@ -681,9 +689,11 @@ addEventListener('resize', () => { if($('#olist') && ocCols() !== OCN) drawOoc()
 /* OOC 하나만 보여주는 페이지: #/ooc/번호 (공유용 링크) */
 function pageOocOne(id){
   const o = byKey(OC, id), i = o ? LO().indexOf(o) : -1;
-  if(!o){ app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/ooc">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
-  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">${i < 0 ? 'LINK ONLY' : `${String(i+1).padStart(2,'0')} / ${String(LO().length).padStart(2,'0')}`}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
-  <div class="oc one">${ocRow(o, i < 0 ? '–' : i+1, true)}</div>`;
+  /* 메모처럼: 메뉴줄 없이 좁은 카드 하나 + 위에 작은 로고 줄 */
+  const hd = sub => `<div class="memo-hd"><a href="#/home">r♡sie archive</a><small>${sub}</small></div>`;
+  if(!o){ app.innerHTML = `<div class="memo">${hd('NOT FOUND')}<p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p></div>`; return; }
+  app.innerHTML = `<div class="memo">${hd(i < 0 ? 'LINK ONLY' : `OOC · ${String(i+1).padStart(2,'0')} / ${String(LO().length).padStart(2,'0')}`)}
+  <div class="oc one">${ocRow(o, i < 0 ? '–' : i+1, true)}</div></div>`;
 }
 function formOoc(o){
   openM(`<h3>${o ? 'OOC 수정' : 'OOC 추가'}</h3>
@@ -713,6 +723,7 @@ function route(){
   if(a!=='ooc') OTO = false;
   $('#n1').classList.toggle('on', a==='characters' || a==='c'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
   document.body.classList.toggle('is-home', a==='home');
+  document.body.classList.toggle('is-memo', a==='ooc' && !!b);
   a==='home' ? pageHome() : a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
