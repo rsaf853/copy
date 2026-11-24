@@ -108,6 +108,9 @@ h1{font-size:22px;font-weight:800;letter-spacing:-0.05em;margin:0 0 2px}
 .chip:hover{color:var(--fg);border-color:var(--fg)}
 .chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .tpk{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.pcl{display:flex;gap:4px;margin-top:6px}
+.pcl input{flex:1;min-width:0;font:400 11px var(--mono)}
+#pcbox .hint{margin:6px 0 0}
 .tpk .chip{padding:1px 8px}
 input,select,textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:7px 10px;font:13px/1.5 var(--sans);outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--fg)}
@@ -410,7 +413,10 @@ async function fillOocKeys(){
   if(res.some(r => r.error)) keyFill = false;
 }
 const shareUrl = (path, r) => location.href.split('#')[0] + '#/' + path + '/' + keyOf(r);
-const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin); };
+/* 'link' = 비밀 링크(#/in/키)로 들어온 사람만 (그 탭을 닫기 전까지) */
+const hasPK = () => { try{ return !!SET.pc_key && sessionStorage.getItem('pk') === SET.pc_key; }catch(_){ return false; } };
+const pcUrl = () => location.href.split('#')[0] + '#/in/' + (SET.pc_key || '');
+const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin) || (m==='link' && (admin || hasPK())); };
 const pv = k => SET[k]==='admin' ? ' ' + ico('private') : '';
 const tagsOf = s => !show('tags') ? [] : String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
 let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!['a','c'].includes(SV)) SV = 'a';
@@ -449,6 +455,7 @@ async function load(pre, early){
   return true;
 }
 const textOf = k => {
+  if(k==='z') return pcUrl();
   if(k[0]==='l'){ const o = OC.find(x => x.id===+k.slice(1)); return o ? shareUrl('ooc', o) : ''; }
   if(k[0]==='u'){ const p = PR.find(x => x.id===+k.slice(1)); return p ? shareUrl('prompts', p) : ''; }
   if(k[0]==='k'){ const c = CH.find(x => x.id===+k.slice(1)); return c ? shareUrl('c', c) : ''; }
@@ -479,16 +486,16 @@ function promptBox(p){
 /* 메인: 큰 제목(오른쪽) · PIN 된 persona 앞 2명 + OOC 8개 · 최신 PROMPT 4개 (2단) */
 function pageHome(){
   const sl = sortCh().filter(listed), pins = sl.filter(c => c.pinned), ps = (pins.length ? pins : sl).slice(0, 2);
-  const so = show('oo'), sp = show('pp');
+  const so = show('oo'), sp = show('pp'), sc = show('pc');
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
-  const lead = [['persona', LC().length, 'characters'], so && ['ooc', LO().length, 'ooc'], sp && ['prompt', LP().length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
+  const lead = [sc && ['persona', LC().length, 'characters'], so && ['ooc', LO().length, 'ooc'], sp && ['prompt', LP().length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = LO().slice(0, 10).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
     return `<a class="oc1" href="#/ooc/${keyOf(o)}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
-  <div class="hm-two${so ? '' : ' one'}">
-    <div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
+  <div class="hm-two${so && sc ? '' : ' one'}">
+    ${sc ? `<div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>` : ''}
     ${so ? `<div class="hsec">${hsh('ooc', '', '#/ooc')}${orows || '<p class="empty">아직 OOC가 없어요.</p>'}</div>` : ''}
   </div>
   ${sp && LP().length ? `<div class="hsec">${hsh('prompt', '', '#/prompts')}<div class="pgrid">${LP().reverse().slice(0, 4).map(promptBox).join('')}</div></div>` : ''}`;
@@ -715,8 +722,12 @@ function formOoc(o){
 }
 
 function route(){
-  const [a,b] = (location.hash.slice(2) || 'home').split('/'); /* 첫 화면 = 메인 */
+  let [a,b] = (location.hash.slice(2) || 'home').split('/'); /* 첫 화면 = 메인 */
+  /* 비밀 링크로 들어오면 이 탭에 기억해 두고, 주소는 메인으로 바꿔서 메인부터 보여줌 */
+  if(a==='in'){ try{ if(b) sessionStorage.setItem('pk', b); }catch(_){} history.replaceState(null, '', location.pathname + location.search + '#/home'); a = 'home'; b = undefined; }
+  $('#n1').style.display = show('pc') ? '' : 'none';
   $('#n2').style.display = show('pp') ? '' : 'none'; $('#n3').style.display = show('oo') ? '' : 'none';
+  if((a==='characters' || (a==='c' && /^\d+$/.test(b || ''))) && !show('pc')){ location.hash = '#/home'; return; }
   if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
   if(a==='prompts' || a==='c' || a==='ooc' || a==='home') ORD = false;
@@ -1093,6 +1104,9 @@ document.addEventListener('click', async e => {
   if(a==='order'){ ORD = !ORD; return pageChars(); }
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
+  if(a==='pc-new'){ if(!confirm('새 링크를 만들면 예전 링크로는 더 이상 persona가 안 보여요. 만들까요?')) return;
+    const k = mkKey(), r = await sb.from('site_settings').upsert({ key: 'pc_key', value: k }); if(r.error) return alert('실패: ' + r.error.message);
+    SET.pc_key = k; const i = b.closest('.pcl').querySelector('input'); i.value = pcUrl(); return; }
   if(a==='pick-tag'){ const box = b.closest('.tpk'), inp = pickInput(box), t = b.dataset.t, has = splitTags(inp.value);
     inp.value = (has.includes(t) ? has.filter(x => x !== t) : [...has, t]).join(', '); dirty = true; syncPick(box); return; }
   if(a==='edit-rel'){ e.preventDefault(); const c = CH.find(x => x.id===id); if(c) formRel(c, +b.dataset.rid || 0, b.dataset.uid || ''); return; }
@@ -1147,11 +1161,15 @@ $('#theme').onclick = () => setTheme(isDark() ? 'light' : 'dark');
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', () => setTheme(null));
 setTheme(document.documentElement.dataset.theme);
 const syncAdm = () => { $('#adm').classList.toggle('on', admin); $('#set').hidden = !admin; };
-const FEATS = [['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그'],['oo','OOC 페이지']];
+const FEATS = [['pc','PERSONA 페이지'],['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그'],['oo','OOC 페이지']];
 function formSettings(){
-  openM(`<h3>SETTINGS</h3><form id="f">${FEATS.map(([k,l]) => `<label>${l}</label><select name="${k}">${[['on','공개'],['admin','나만 보기'],['off','끔']].map(([v,t]) => `<option value="${v}"${(SET[k]||'on')===v ? ' selected' : ''}>${t}</option>`).join('')}</select>`).join('')}${btns('SAVE')}</form>`);
+  const opts = k => k === 'pc' ? [['on','공개'],['link','링크로 들어온 사람만'],['admin','나만 보기']] : [['on','공개'],['admin','나만 보기'],['off','끔']];
+  const pcBox = () => SET.pc_key ? `<div class="pcl"><input readonly value="${esc(pcUrl())}" aria-label="PERSONA 비밀 링크"><button class="btn" type="button" data-act="copy" data-k="z">COPY</button><button class="btn" type="button" data-act="pc-new" title="새 링크를 만들면 예전 링크는 더 이상 안 돼요">NEW LINK</button></div>` : '<p class="hint">저장하면 비밀 링크가 만들어져요.</p>';
+  openM(`<h3>SETTINGS</h3><form id="f">${FEATS.map(([k,l]) => `<label>${l}</label><select name="${k}"${k === 'pc' ? ' id="pcsel"' : ''}>${opts(k).map(([v,t]) => `<option value="${v}"${(SET[k]||'on')===v ? ' selected' : ''}>${t}</option>`).join('')}</select>${k === 'pc' ? `<div id="pcbox"${(SET.pc||'on') === 'link' ? '' : ' hidden'}>${pcBox()}<p class="hint">이 링크로 들어온 사람만, 그 탭을 닫기 전까지 메뉴에 persona가 보여요. 처음엔 메인 화면이 떠요.</p></div>` : ''}`).join('')}${btns('SAVE')}</form>`);
+  $('#pcsel').onchange = e => { $('#pcbox').hidden = e.target.value !== 'link'; };
   $('#f').onsubmit = async e => { e.preventDefault(); const fd = new FormData(e.target); st('저장 중…');
     const rows = FEATS.map(([k]) => ({ key: k, value: fd.get(k) }));
+    if(fd.get('pc') === 'link' && !SET.pc_key) rows.push({ key: 'pc_key', value: mkKey() });
     const r = await sb.from('site_settings').upsert(rows);
     if(r.error) return st('저장 실패: ' + r.error.message);
     rows.forEach(o => { SET[o.key] = o.value; }); closeM(); route(); };
