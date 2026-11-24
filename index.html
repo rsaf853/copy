@@ -133,12 +133,11 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto}
 /* 스크롤바: 사이트 전체 한 가지 (얇고 각진, 테마 색) */
 /* 크롬·사파리·엣지는 아래 각진 스타일, 파이어폭스만 기본 얇은 막대 (표준 속성이 있으면 크롬이 각진 스타일을 무시해서 분리) */
-@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:transparent transparent}.scrolling{scrollbar-color:var(--fg) transparent}}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:transparent;border-radius:0}
-.scrolling::-webkit-scrollbar-thumb{background:var(--fg)}
-::-webkit-scrollbar-corner{background:transparent}
+/* 기본 스크롤바는 숨겨서 자리도 차지하지 않게. 스크롤하는 동안만 얇은 막대(#sbar)를 위에 그림 */
+*{scrollbar-width:none}
+::-webkit-scrollbar{width:0;height:0;display:none}
+#sbar{position:fixed;z-index:60;width:3px;right:0;top:0;height:0;background:var(--fg);opacity:0;pointer-events:none;transition:opacity .25s}
+#sbar.on{opacity:1;transition:opacity .05s}
 .more{display:block;margin:16px auto 0}
 .back{display:inline-block;margin-bottom:14px;font:600 11px/1.5 var(--sans);color:var(--mut);text-decoration:none}
 .back:hover{color:var(--fg)}
@@ -1150,9 +1149,18 @@ $('#set').onclick = formSettings;
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)){ CH = CH.filter(canSee); PR = PR.filter(canSee); route(); setTimeout(async () => { if(await load()) route(); }, 0); } });
 addEventListener('hashchange', route);
-/* 스크롤하는 동안에만 스크롤바 보이기 */
-document.addEventListener('scroll', e => { const t = e.target === document ? document.documentElement : e.target; if(!t.classList) return;
-  t.classList.add('scrolling'); clearTimeout(t._sbt); t._sbt = setTimeout(() => t.classList.remove('scrolling'), 900); }, { capture: true, passive: true });
+/* 스크롤하는 동안에만 보이는 얇은 막대 (페이지·카드 안 어디서든) */
+const SB = document.createElement('div'); SB.id = 'sbar'; SB.setAttribute('aria-hidden', 'true'); document.body.appendChild(SB);
+let sbT = 0;
+document.addEventListener('scroll', e => {
+  const root = e.target === document || e.target === document.documentElement, t = root ? document.documentElement : e.target;
+  if(!t || !t.getBoundingClientRect) return;
+  const sh = t.scrollHeight, ch = root ? innerHeight : t.clientHeight; if(sh <= ch + 1) return;
+  const r = root ? { top: 0, right: innerWidth, height: innerHeight } : t.getBoundingClientRect();
+  const h = Math.max(24, r.height * ch / sh), y = r.top + (r.height - h) * (t.scrollTop / (sh - ch));
+  SB.style.cssText = `top:${y}px;height:${h}px;left:${r.right - 3}px;right:auto`; SB.classList.add('on');
+  clearTimeout(sbT); sbT = setTimeout(() => SB.classList.remove('on'), 800);
+}, { capture: true, passive: true });
 
 (async () => {
   const shown = fromCache();
