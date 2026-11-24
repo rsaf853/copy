@@ -10,6 +10,9 @@
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <script>try{var t=localStorage.getItem('rosie-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="icon" type="image/png" href="images/moai.png">
+<link rel="preconnect" href="https://sxnijnngeatcscwyxhep.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-jp@1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -250,7 +253,7 @@ a.btn{display:inline-block;text-decoration:none}
 <div id="md" hidden><div class="mb" id="mb"></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <script>
 const SUPABASE_URL = "https://sxnijnngeatcscwyxhep.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4bmlqbm5nZWF0Y3Njd3l4aGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjE0MjIsImV4cCI6MjEwNzAzNzQyMn0.zT-jmsg7M14H7BFnqWFSclc6wnANJNDnHiVuCY9SoI8";
@@ -310,11 +313,21 @@ function subBox(c, x, i, pre='s'){
 }
 
 /* ---------- data ---------- */
-async function load(){
-  const [c, p, o] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id'), sb.from('ooc').select('*').order('id')]);
-  if(c.error || p.error){ app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
-  CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = o.error ? [] : o.data.filter(canSee);
-  const st2 = await sb.from('site_settings').select('*'); if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
+/* 마지막으로 받은 데이터를 이 브라우저에 저장해 두고, 다음 방문 때 먼저 그려줌 (나만 보기 항목은 저장 안 함) */
+const CK = 'rosie-cache-v1';
+let cacheSig = '';
+function fromCache(){
+  try{ const raw = localStorage.getItem(CK); if(!raw) return false; const d = JSON.parse(raw);
+    CH = d.c.filter(canSee); PR = d.p.filter(canSee); OC = d.o.filter(canSee); SET = d.s || {}; cacheSig = raw; return true; }catch(_){ return false; }
+}
+async function load(pre){
+  const [c, p, o, st2] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id'), sb.from('ooc').select('*').order('id'), sb.from('site_settings').select('*'), pre]);
+  if(c.error || p.error){ if(!CH.length && !PR.length) app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
+  const od = o.error ? [] : o.data;
+  CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = od.filter(canSee);
+  if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
+  const pub = a => a.filter(r => vis(r) !== 'private');
+  try{ const raw = JSON.stringify({ c: pub(c.data), p: pub(p.data), o: pub(od), s: SET }); const same = raw === cacheSig; cacheSig = raw; localStorage.setItem(CK, raw); if(same) return 'same'; }catch(_){}
   return true;
 }
 const textOf = k => {
@@ -963,9 +976,12 @@ sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(
 addEventListener('hashchange', route);
 
 (async () => {
-  app.innerHTML = '<p class="empty">LOADING…</p>';
-  const { data } = await sb.auth.getSession(); admin = !!data.session; syncAdm();
-  if(await load()) route();
+  const shown = fromCache();
+  if(shown) route(); else app.innerHTML = '<p class="empty">LOADING…</p>';
+  const sess = sb.auth.getSession().then(({ data }) => { admin = !!data.session; syncAdm(); });
+  const r = await load(sess);
+  /* 저장해 둔 것과 같으면 다시 그리지 않음 (보던 화면/입력 유지). 관리자면 나만 보기 항목 때문에 항상 다시 그림 */
+  if(r && (r !== 'same' || !shown || admin)) route();
 })();
 </script>
 </body>
