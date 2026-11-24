@@ -196,7 +196,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .tg{font:600 11px/1.5 var(--sans);border:1px solid var(--fg);padding:0 8px}
 /* 메인 */
 .ttl{text-align:right;border-bottom:2px solid var(--fg);padding-bottom:12px;margin-bottom:24px}
-.ttl .big{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1.05;margin:0}
+.ttl .big{font-size:34px;font-weight:900;letter-spacing:-.04em;line-height:1.05;margin:0}
 .ttl .lead{font:500 11px var(--mono);color:var(--mut);margin:6px 0 0;letter-spacing:.04em}
 .hm-two{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
 .hm-two.one{grid-template-columns:minmax(0,1fr);max-width:540px}
@@ -274,7 +274,6 @@ a.btn{display:inline-block;text-decoration:none}
 <header><div class="wrap">
   <a class="logo" href="#/home">r♡sie <span class="lg2">prompt</span></a>
   <nav>
-    <a href="#/home" id="n0">home</a>
     <a href="#/characters" id="n1">persona</a>
     <a href="#/prompts" id="n2">prompt</a>
     <a href="#/ooc" id="n3">ooc</a>
@@ -398,7 +397,7 @@ function pageHome(){
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}<small>${c}</small></h2><a href="${href}">ALL →</a></div>`;
   const lead = [`${CH.length} PERSONA`, so ? `${OC.length} OOC` : '', sp ? `${PR.length} PROMPT` : ''].filter(Boolean).join(' / ');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
-  const orows = OC.slice(0, 8).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags));
+  const orows = OC.slice(0, 8).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     return `<a class="oc1" href="#/ooc/${o.id}"><span class="n">#${i+1}</span><strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong><span class="tgs">${tg.map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</span><small>${lk ? '' : esc(ocText(o).slice(0, 120))}</small></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
   <div class="hm-two${so ? '' : ' one'}">
@@ -615,7 +614,7 @@ function route(){
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
   if(a==='prompts' || a==='c' || a==='ooc' || a==='home') ORD = false;
   if(a!=='ooc') OTO = false;
-  $('#n0').classList.toggle('on', a==='home'); $('#n1').classList.toggle('on', a==='characters' || a==='c'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
+  $('#n1').classList.toggle('on', a==='characters' || a==='c'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
   a==='home' ? pageHome() : a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
