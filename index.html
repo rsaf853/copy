@@ -128,11 +128,10 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .hd div{display:flex;gap:4px}
 .pt{padding:9px 12px 0;font-weight:800;font-size:13.5px;word-break:break-word}
 .pt + .tx{padding-top:4px}
-.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--fg) transparent}
-.tx::-webkit-scrollbar{width:4px}.tx::-webkit-scrollbar-thumb{background:var(--fg)}
+.tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto}
 /* 스크롤바: 사이트 전체 한 가지 (얇고 각진, 테마 색) */
-*{scrollbar-width:thin;scrollbar-color:var(--mut) transparent}
-*:hover{scrollbar-color:var(--fg) transparent}
+/* 크롬·사파리·엣지는 아래 각진 스타일, 파이어폭스만 기본 얇은 막대 (표준 속성이 있으면 크롬이 각진 스타일을 무시해서 분리) */
+@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:var(--mut) transparent}*:hover{scrollbar-color:var(--fg) transparent}}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--mut);border-radius:0}
