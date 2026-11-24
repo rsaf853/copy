@@ -5,6 +5,9 @@
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>r♡sieprompt</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <script>try{var t=localStorage.getItem('rosie-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="icon" type="image/png" href="images/moai.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-jp@1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.css">
@@ -12,7 +15,8 @@
 <style>
 :root{--bg:#fff;--fg:#000;--mut:#9a9a9a;--line:#e4e4e4;--soft:#f6f6f6;--sans:"Pretendard JP Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}}
-:root[data-theme="dark"]{--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;border-radius:0}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5;letter-spacing:-0.03em;-webkit-font-smoothing:antialiased}
@@ -923,14 +927,16 @@ const SUN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke=
 const MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
 const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme:dark)').matches; };
 const paintTheme = () => { const d = isDark(), b = $('#theme'); b.innerHTML = d ? MOON : SUN; const t = d ? '라이트 모드로 전환' : '다크 모드로 전환'; b.setAttribute('aria-label', t); b.title = t; };
-$('#theme').onclick = () => {
-  const r = document.documentElement;
-  r.dataset.theme = isDark() ? 'light' : 'dark';
-  try{ localStorage.setItem('rosie-theme', r.dataset.theme); }catch(_){}
-  paintTheme();
-};
-matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintTheme);
-paintTheme();
+/* 기본은 기기(인터페이스) 테마를 따라감. 버튼으로 바꾼 건 기기 테마와 다를 때만 저장하고, 기기 테마가 바뀌면 다시 기기 쪽을 따라감 */
+const sysDark = () => matchMedia('(prefers-color-scheme:dark)').matches;
+const setTheme = t => { const r = document.documentElement;
+  if(!t || (t==='dark') === sysDark()){ delete r.dataset.theme; try{ localStorage.removeItem('rosie-theme'); }catch(_){} }
+  else { r.dataset.theme = t; try{ localStorage.setItem('rosie-theme', t); }catch(_){} }
+  document.querySelectorAll('meta[name=theme-color]').forEach(m => { if(r.dataset.theme) m.content = r.dataset.theme==='dark' ? '#000000' : '#ffffff'; else m.content = /dark/.test(m.media) ? '#000000' : '#ffffff'; });
+  paintTheme(); };
+$('#theme').onclick = () => setTheme(isDark() ? 'light' : 'dark');
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change', () => setTheme(null));
+setTheme(document.documentElement.dataset.theme);
 const syncAdm = () => { $('#adm').classList.toggle('on', admin); $('#set').hidden = !admin; };
 const FEATS = [['pp','PROMPT 페이지'],['cp','캐릭터 프롬프트'],['subs','서브 프롬프트'],['gal','갤러리'],['rel','관련 캐릭터'],['relp','관련 프롬프트'],['tags','태그'],['oo','OOC 페이지']];
 function formSettings(){
