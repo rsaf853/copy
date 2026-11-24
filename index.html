@@ -260,6 +260,8 @@ body.is-home header .logo{visibility:hidden}
 @media(min-width:641px){.wrap{max-width:none;width:77vw;min-width:min(1014px,100%)}}
 .vb{position:absolute;top:7px;left:7px;z-index:1;line-height:0}
 .vb svg{display:block;width:14px;height:14px;overflow:visible}
+/* persona 그리드: 잠금 아이콘은 마우스를 올렸을 때만 (터치 기기는 항상 보임) */
+@media (hover:hover){#cg .card .vb{opacity:0;transition:opacity .15s}#cg .card:hover .vb,#cg .card:focus-visible .vb{opacity:1}}
 .ph svg{width:30px;height:30px}
 .lk{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:16px;border:1px solid var(--line)}
 .pr .lk{border:0}
