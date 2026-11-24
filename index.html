@@ -209,15 +209,22 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .hsh a:hover{color:var(--fg)}
 .hpp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hpp .card b{font-size:15px}
-.oc1{display:grid;grid-template-columns:30px auto minmax(0,1fr);align-items:baseline;gap:8px;padding:8px 6px;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
+.oc1{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);align-items:baseline;gap:8px;padding:8px 6px;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
 .oc1:hover{background:var(--soft)}
 .oc1 .n{font:500 11px var(--mono);color:var(--mut)}
 .oc1 strong{font-weight:600;font-size:12.5px;white-space:nowrap}
 .oc1 .tt{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
 .oc1 .tg{font-size:10px;padding:0 5px;white-space:nowrap}
 .oc1 .tg.x18{background:var(--fg);color:var(--bg)}
-.oc1 small{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-@media(max-width:720px){.hm-two{grid-template-columns:1fr}.oc1{grid-template-columns:30px minmax(0,1fr)}.oc1 small{display:none}.ttl .big{font-size:28px}}
+.oc1 .tt{min-width:0;overflow:hidden}
+.oc1 strong{overflow:hidden;text-overflow:ellipsis}
+/* 마우스 올리면 내용 미리보기 */
+@media (hover:hover){
+  .oc1[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:36px;top:calc(100% - 2px);z-index:6;width:min(380px,calc(100% - 36px));max-height:240px;overflow:hidden;padding:9px 11px;background:var(--fg);color:var(--bg);font:400 11.5px/1.6 var(--mono);white-space:pre-wrap;word-break:break-word;pointer-events:none;animation:tipin .12s ease-out .25s both}
+}
+@keyframes tipin{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.oc1[data-tip]:hover::after{animation:none}}
+@media(max-width:720px){.hm-two{grid-template-columns:1fr}.ttl .big{font-size:28px}}
 .card{position:relative}
 .pin{position:absolute;top:6px;right:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--bg);color:var(--mut);border:1px solid var(--line);cursor:pointer}
 .pin:hover{color:var(--fg);border-color:var(--fg)}
@@ -398,7 +405,8 @@ function pageHome(){
   const lead = [['persona', CH.length], so && ['ooc', OC.length], sp && ['prompt', PR.length]].filter(Boolean).map(([l, n]) => `<span>${l}<sup>${n}</sup></span>`).join('');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = OC.slice(0, 8).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
-    return `<a class="oc1" href="#/ooc/${o.id}"><span class="n">#${i+1}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span><small>${lk ? '' : esc(ocText(o).slice(0, 120))}</small></a>`; }).join('');
+    const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
+    return `<a class="oc1" href="#/ooc/${o.id}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">#${i+1}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
   <div class="hm-two${so ? '' : ' one'}">
     <div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
