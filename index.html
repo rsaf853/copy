@@ -125,7 +125,9 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .sb .hd{border-bottom:0;padding:5px 10px}
 .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
 .hd .btn{padding:0 7px;font-size:10.5px}
-.hd div{display:flex;gap:4px}
+.hd div{display:flex;gap:4px;align-items:center}
+.hd div:has(.oc-ib,.oc-tb){gap:0}
+.hd .oc-tb:last-of-type{margin-right:2px}
 .pt{padding:9px 12px 0;font-weight:800;font-size:13.5px;word-break:break-word}
 .pt + .tx{padding-top:4px}
 .tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto}
@@ -397,11 +399,11 @@ let SV = 'a'; try{ SV = localStorage.getItem('sv') || 'a'; }catch(_){} if(!['a',
 function subBox(c, x, i, pre='s'){
   const t = x.t || 'SUB ' + (i+1);
   if(pre!=='s'){
-    return `<div class="sb"><div class="hd"><span>${esc(t)}</span><button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div><pre class="tx">${esc(x.x)}</pre></div>`;
+    return `<div class="sb"><div class="hd"><span>${esc(t)}</span><button class="oc-ib cp" data-act="copy" data-k="${pre}${c.id}-${i}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(x.x)}</pre></div>`;
   }
   const z = x.img ? ` data-act="zoom" data-src="${esc(x.img)}"` : '';
   return `<div class="sp" data-si="${i}"><div class="sim${x.img ? '' : ' no'}"${z}>${x.img ? img(x.img,t,x.pos) : initial(t)}</div>
-  <div class="bd"><div class="hd"><span class="tt">${admin && (c.subs||[]).length > 1 ? '<span class="dh" title="끌어서 순서 변경">⠿</span>' : ''}<span>${esc(t)}</span></span><div>${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="${i}">EDIT</button>` : ''}<button class="btn" data-act="copy" data-k="${pre}${c.id}-${i}">COPY</button></div></div>
+  <div class="bd"><div class="hd"><span class="tt">${admin && (c.subs||[]).length > 1 ? '<span class="dh" title="끌어서 순서 변경">⠿</span>' : ''}<span>${esc(t)}</span></span><div>${admin ? `<button class="oc-tb" data-act="edit-sub" data-id="${c.id}" data-i="${i}">EDIT</button>` : ''}<button class="oc-ib cp" data-act="copy" data-k="${pre}${c.id}-${i}" aria-label="내용 복사">${ICL_CP}COPY</button></div></div>
   <pre class="tx">${esc(x.x)}</pre></div></div>`;
 }
 
@@ -448,11 +450,11 @@ const chName = id => (CH.find(c => c.id===id)||{}).name;
 /* ---------- views ---------- */
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
-  const lnk = `<button class="btn" data-act="copy" data-k="u${p.id}" title="이 프롬프트만 열리는 링크를 복사해요">LINK</button>`;
+  const lnk = `<button class="oc-ib ln" data-act="copy" data-k="u${p.id}" title="이 프롬프트만 열리는 링크를 복사해요" aria-label="링크 복사">${ICL_LN}<span class="lt">LINK</span></button>`;
   if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>${numT(p)} · ${esc(p.cat)}${p.title ? ' · ' + esc(p.title) : ''} ${ico('locked')}</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
   return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
   <div class="bd"><div class="hd"><span>${numT(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' ' + ico(vis(p)) : ''}</span>
-  <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
+  <div>${admin ? `<button class="oc-tb" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="oc-tb" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}${lnk}<button class="oc-ib cp" data-act="copy" data-k="p${p.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div></div>
   ${p.title ? `<div class="pt">${esc(p.title)}</div>` : ''}<pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
 }
 
@@ -512,7 +514,7 @@ function pageChar(id){
       <div style="white-space:pre-wrap;font-size:12.5px">${esc(c.descr||'')}</div>
       ${admin ? `<div class="acts">${vis(c) === 'unlisted' ? `<button class="btn" data-act="copy" data-k="k${c.id}" title="이 캐릭터 링크를 복사해요">LINK</button>` : ''}<button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
-  ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
+  ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="oc-ib cp" data-act="copy" data-k="c${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="oc-ib cp" data-act="copy" data-k="o${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
   ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
   ${!show('gal') ? '' : ((c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY${pv('gal')} · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : '')}
   ${!show('rel') ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg" id="rg">${rcs}</div>` : ''}` : '')}
