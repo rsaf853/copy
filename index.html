@@ -63,6 +63,9 @@ h1{font-size:22px;font-weight:800;letter-spacing:-0.05em;margin:0 0 2px}
 .card .meta{padding:8px 10px;border-top:2px solid var(--fg)}
 .card b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card span{color:var(--mut);font-size:11px;font-weight:500}
+.card.pd{border-color:var(--fg)}
+.card.pd .meta{background:var(--fg);color:var(--bg)}
+.card.pd .meta .al{color:var(--bg);opacity:.6}
 .card .meta .al{display:inline;margin-left:6px;font-size:10.5px;font-weight:500;color:var(--mut);opacity:.85}
 .btn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .hint{color:var(--mut);font:500 11px/1.5 var(--sans);margin:-8px 0 12px}
@@ -345,7 +348,7 @@ function pageChars(){
   ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
   ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
   ${ptags.length && !ORD ? `<div class="bar" id="pchips">${['all',...ptags].map(k => `<button class="chip ${k===ptag?'on':''}" data-pt="${esc(k)}">${esc(k)}</button>`).join('')}</div>` : ''}
-  ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
+  ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
     ${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
   const pc = $('#pchips'); if(pc) pc.onclick = e => { const b = e.target.closest('[data-pt]'); if(b){ ptag = b.dataset.pt; pageChars(); } };
