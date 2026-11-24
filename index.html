@@ -194,6 +194,30 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 @media(max-width:640px){.gal div{flex:calc(var(--r,.75)*100) 1 calc(var(--r,.75)*150px);max-width:100%}.gal img{width:100%;height:100%}.gal::after{content:'';flex:999 1 0}}
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
 .tg{font:600 11px/1.5 var(--sans);border:1px solid var(--fg);padding:0 8px}
+/* 메인 */
+.ttl{text-align:right;border-bottom:2px solid var(--fg);padding-bottom:12px;margin-bottom:24px}
+.ttl .big{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1.05;margin:0}
+.ttl .lead{font:500 11px var(--mono);color:var(--mut);margin:6px 0 0;letter-spacing:.04em}
+.hm-two{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
+.hm-two.one{grid-template-columns:minmax(0,1fr);max-width:540px}
+.hsec{margin-top:32px}
+.hm-two .hsec{margin-top:0}
+.hsh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:2px solid var(--fg);padding-bottom:5px;margin-bottom:10px}
+.hsh h2{margin:0;padding:0;border:0;font-size:13px;font-weight:800;letter-spacing:.02em;display:block}
+.hsh h2 small{font:500 10px var(--mono);color:var(--mut);margin-left:6px}
+.hsh a{font:600 11px var(--sans);color:var(--mut);text-decoration:none}
+.hsh a:hover{color:var(--fg)}
+.hpp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hpp .card b{font-size:15px}
+.oc1{display:grid;grid-template-columns:30px auto auto minmax(0,1fr);align-items:baseline;gap:8px;padding:8px 6px;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
+.oc1:hover{background:var(--soft)}
+.oc1 .n{font:500 11px var(--mono);color:var(--mut)}
+.oc1 strong{font-weight:600;font-size:12.5px;white-space:nowrap}
+.oc1 .tgs{display:flex;gap:3px}
+.oc1 .tg{font-size:10px;padding:0 5px;white-space:nowrap}
+.oc1 .tg.x18{background:var(--fg);color:var(--bg)}
+.oc1 small{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media(max-width:720px){.hm-two{grid-template-columns:1fr}.oc1{grid-template-columns:30px auto minmax(0,1fr)}.oc1 small{display:none}.ttl .big{font-size:28px}}
 .card{position:relative}
 .pin{position:absolute;top:6px;right:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--bg);color:var(--mut);border:1px solid var(--line);cursor:pointer}
 .pin:hover{color:var(--fg);border-color:var(--fg)}
@@ -248,8 +272,9 @@ a.btn{display:inline-block;text-decoration:none}
 </head>
 <body>
 <header><div class="wrap">
-  <a class="logo" href="#/characters">r♡sie <span class="lg2">prompt</span></a>
+  <a class="logo" href="#/home">r♡sie <span class="lg2">prompt</span></a>
   <nav>
+    <a href="#/home" id="n0">home</a>
     <a href="#/characters" id="n1">persona</a>
     <a href="#/prompts" id="n2">prompt</a>
     <a href="#/ooc" id="n3">ooc</a>
@@ -364,6 +389,23 @@ function promptBox(p){
   <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' ' + ico(vis(p)) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
   ${p.title ? `<div class="pt">${esc(p.title)}</div>` : ''}<pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
+}
+
+/* 메인: 큰 제목(오른쪽) · PIN 된 persona 앞 2명 + OOC 8개 · 최신 PROMPT 4개 (2단) */
+function pageHome(){
+  const pins = sortCh().filter(c => c.pinned), ps = (pins.length ? pins : sortCh()).slice(0, 2);
+  const so = show('oo'), sp = show('pp');
+  const hsh = (t, c, href) => `<div class="hsh"><h2>${t}<small>${c}</small></h2><a href="${href}">ALL →</a></div>`;
+  const lead = [`${ps.length} PERSONA ${pins.length ? 'PINNED' : ''}`.trim(), so ? `${OC.length} OOC` : '', sp ? `${PR.length} PROMPT` : ''].filter(Boolean).join(' · ');
+  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
+  const orows = OC.slice(0, 8).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags));
+    return `<a class="oc1" href="#/ooc/${o.id}"><span class="n">#${i+1}</span><strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong><span class="tgs">${tg.map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</span><small>${lk ? '' : esc(ocText(o).slice(0, 120))}</small></a>`; }).join('');
+  app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
+  <div class="hm-two${so ? '' : ' one'}">
+    <div class="hsec">${hsh('PERSONA', pins.length ? 'PINNED' : '', '#/characters')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
+    ${so ? `<div class="hsec">${hsh('OOC', `${Math.min(8, OC.length)} / ${OC.length}`, '#/ooc')}${orows || '<p class="empty">아직 OOC가 없어요.</p>'}</div>` : ''}
+  </div>
+  ${sp && PR.length ? `<div class="hsec">${hsh('PROMPT', 'LATEST ' + Math.min(4, PR.length), '#/prompts')}<div class="pgrid">${PR.slice().reverse().slice(0, 4).map(promptBox).join('')}</div></div>` : ''}`;
 }
 
 function pageChars(){
@@ -519,9 +561,9 @@ function pageOoc(){
 function ocRow(o, n, open){
   const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
   const vt = admin && vis(o) !== 'public' ? ` ${ico(vis(o))}` : '';
-  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)} ${ico('locked')}</strong><small>비밀번호가 필요해요</small></div></div>
+  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">#${n}</span><div class="oc-t"><strong>${esc(o.title)} ${ico('locked')}</strong><small>비밀번호가 필요해요</small></div></div>
     <div class="oc-body">${lockHtml('o'+o.id)}<div class="oc-bar">${lnk}</div></div></div>`;
-  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o).slice(0, 160))}</small></div></div>
+  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">#${n}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o).slice(0, 160))}</small></div></div>
     <div class="oc-body">${open ? ocBody(o) : ''}</div></div>`;
 }
 /* 펼친 줄의 본문 (긴 글이라 펼칠 때만 그림) */
@@ -545,7 +587,7 @@ function drawOoc(){
 function pageOocOne(id){
   const i = OC.findIndex(x => String(x.id) === String(id)), o = OC[i];
   if(!o){ app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/ooc">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
-  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">${String(i+1).padStart(2,'0')} / ${String(OC.length).padStart(2,'0')}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
+  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">#${i+1} / ${OC.length}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
   <div class="oc one">${ocRow(o, i+1, true)}</div>`;
 }
 function formOoc(o){
@@ -567,14 +609,14 @@ function formOoc(o){
 }
 
 function route(){
-  const [a,b] = (location.hash.slice(2) || (show('oo') ? 'ooc' : 'characters')).split('/'); /* 첫 화면 = OOC (OOC 페이지가 꺼져 있으면 persona) */
+  const [a,b] = (location.hash.slice(2) || 'home').split('/'); /* 첫 화면 = 메인 */
   $('#n2').style.display = show('pp') ? '' : 'none'; $('#n3').style.display = show('oo') ? '' : 'none';
   if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
-  if(a==='prompts' || a==='c' || a==='ooc') ORD = false;
+  if(a==='prompts' || a==='c' || a==='ooc' || a==='home') ORD = false;
   if(a!=='ooc') OTO = false;
-  $('#n1').classList.toggle('on', a!=='prompts' && a!=='ooc'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
-  a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
+  $('#n0').classList.toggle('on', a==='home'); $('#n1').classList.toggle('on', a==='characters' || a==='c'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
+  a==='home' ? pageHome() : a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
 
@@ -1007,7 +1049,7 @@ addEventListener('hashchange', route);
   const shown = fromCache();
   if(shown) route(); else app.innerHTML = '<p class="empty">LOADING…</p>';
   const sess = sb.auth.getSession().then(({ data }) => { admin = !!data.session; syncAdm(); });
-  const onOoc = () => (location.hash.slice(2) || (show('oo') ? 'ooc' : 'characters')).split('/')[0] === 'ooc';
+  const onOoc = () => (location.hash.slice(2) || 'home').split('/')[0] === 'ooc';
   let early = false;
   const r = await load(sess, (o, st) => {
     if(shown) return;
