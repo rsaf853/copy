@@ -323,8 +323,10 @@ let SET = {};
 const LKD = 'M12 2a5 5 0 0 0-5 5v3H6a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 6 22h12a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 18 10h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3H9z';
 const EYD = 'M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4 20 20 4';
 const LOCK = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${LKD}"/></svg>`;
-const ico = k => `<svg class="ico" viewBox="0 0 24 24" role="img" aria-label="${k==='private' ? '나만 보기' : '비밀번호 잠금'}">${k==='private' ? `<path d="${EYD}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>` : `<path d="${LKD}" fill="currentColor"/>`}</svg>`;
-const icoOn = k => `<svg viewBox="0 0 24 24" role="img" aria-label="${k==='private' ? '나만 보기' : '비밀번호 잠금'}">${k==='private' ? `<path d="${EYD}" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="${EYD}" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"/>` : `<path d="${LKD}" fill="#000" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke"/>`}</svg>`;
+const LND = 'M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1';
+const ICL = { private: '나만 보기', unlisted: '링크로만 공개', locked: '비밀번호 잠금' };
+const ico = k => `<svg class="ico" viewBox="0 0 24 24" role="img" aria-label="${ICL[k] || ICL.locked}">${k==='private' || k==='unlisted' ? `<path d="${k==='private' ? EYD : LND}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>` : `<path d="${LKD}" fill="currentColor"/>`}</svg>`;
+const icoOn = k => `<svg viewBox="0 0 24 24" role="img" aria-label="${ICL[k] || ICL.locked}">${k==='private' || k==='unlisted' ? `<path d="${k==='private' ? EYD : LND}" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="${k==='private' ? EYD : LND}" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"/>` : `<path d="${LKD}" fill="#000" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke"/>`}</svg>`;
 const vis = r => r.visibility || 'public';
 const canSee = r => vis(r) !== 'private' || admin;
 let UNL = new Set(); try{ UNL = new Set(JSON.parse(sessionStorage.getItem('unl') || '[]')); }catch(_){}
@@ -334,7 +336,7 @@ const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', 
 const mkLock = async pw => { const salt = crypto.randomUUID().slice(0, 8); return salt + '$' + await sha(salt + pw); };
 const chkLock = async (r, pw) => { const [salt, h] = String(r.lock_hash || '').split('$'); return !!h && await sha(salt + pw) === h; };
 const lockHtml = k => `<div class="lk">${LOCK}<form data-lk="${k}"><input type="password" placeholder="password" autocomplete="off" required><button class="btn" type="submit">OPEN</button></form><div class="st" data-lkerr></div></div>`;
-const visField = r => { const v = vis(r || {}); return `<label>공개 설정</label><select name="vis" id="vsel">${[['public','공개'],['private','나만 보기'],['locked','비밀번호 잠금']].map(([k,t]) => `<option value="${k}"${v===k ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="password" name="lockpw" id="lpw" autocomplete="new-password" placeholder="${v==='locked' ? '새 비밀번호 (비우면 기존 유지)' : '비밀번호'}" style="margin-top:5px"${v==='locked' ? '' : ' hidden'}>`; };
+const visField = r => { const v = vis(r || {}); return `<label>공개 설정</label><select name="vis" id="vsel">${[['public','공개'],['unlisted','링크로만 공개'],['private','나만 보기'],['locked','비밀번호 잠금']].map(([k,t]) => `<option value="${k}"${v===k ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="password" name="lockpw" id="lpw" autocomplete="new-password" placeholder="${v==='locked' ? '새 비밀번호 (비우면 기존 유지)' : '비밀번호'}" style="margin-top:5px"${v==='locked' ? '' : ' hidden'}>`; };
 const bindVis = () => { const s = $('#vsel'); if(s) s.onchange = () => { $('#lpw').hidden = s.value !== 'locked'; }; };
 async function visRow(fd, r){
   const v = fd.get('vis') || 'public', pw = (fd.get('lockpw') || '').trim(), o = {};
@@ -389,47 +391,51 @@ const textOf = k => {
   if(k[0]==='o') return (CH.find(c => c.id===+k.slice(1))||{}).outfit;
   return k[0]==='p' ? (PR.find(p => p.id===+k.slice(1))||{}).text : (CH.find(c => c.id===+k.slice(1))||{}).prompt;
 };
-const num = p => PR.findIndex(x => x.id===p.id) + 1;
+/* 링크로만 공개: 목록/메인/검색/개수에는 관리자에게만, 개별 링크로는 누구나 */
+const listed = r => vis(r) !== 'unlisted' || admin;
+const LC = () => CH.filter(listed), LP = () => PR.filter(listed), LO = () => OC.filter(listed);
+const num = p => LP().findIndex(x => x.id===p.id) + 1;
+const numT = p => num(p) ? '#' + num(p) : 'LINK';
 const chName = id => (CH.find(c => c.id===id)||{}).name;
 
 /* ---------- views ---------- */
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
   const lnk = `<button class="btn" data-act="copy" data-k="u${p.id}" title="이 프롬프트만 열리는 링크를 복사해요">LINK</button>`;
-  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${p.title ? ' · ' + esc(p.title) : ''} ${ico('locked')}</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
+  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>${numT(p)} · ${esc(p.cat)}${p.title ? ' · ' + esc(p.title) : ''} ${ico('locked')}</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
   return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
-  <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' ' + ico(vis(p)) : ''}</span>
+  <div class="bd"><div class="hd"><span>${numT(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' ' + ico(vis(p)) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
   ${p.title ? `<div class="pt">${esc(p.title)}</div>` : ''}<pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
 }
 
 /* 메인: 큰 제목(오른쪽) · PIN 된 persona 앞 2명 + OOC 8개 · 최신 PROMPT 4개 (2단) */
 function pageHome(){
-  const pins = sortCh().filter(c => c.pinned), ps = (pins.length ? pins : sortCh()).slice(0, 2);
+  const sl = sortCh().filter(listed), pins = sl.filter(c => c.pinned), ps = (pins.length ? pins : sl).slice(0, 2);
   const so = show('oo'), sp = show('pp');
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
-  const lead = [['persona', CH.length, 'characters'], so && ['ooc', OC.length, 'ooc'], sp && ['prompt', PR.length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
+  const lead = [['persona', LC().length, 'characters'], so && ['ooc', LO().length, 'ooc'], sp && ['prompt', LP().length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
-  const orows = OC.slice(0, 9).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
+  const orows = LO().slice(0, 9).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
     return `<a class="oc1" href="#/ooc/${o.id}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${i+1}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
   <div class="hm-two${so ? '' : ' one'}">
     <div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
-    ${so ? `<div class="hsec">${hsh('ooc', `${Math.min(9, OC.length)} / ${OC.length}`, '#/ooc')}${orows || '<p class="empty">아직 OOC가 없어요.</p>'}</div>` : ''}
+    ${so ? `<div class="hsec">${hsh('ooc', '', '#/ooc')}${orows || '<p class="empty">아직 OOC가 없어요.</p>'}</div>` : ''}
   </div>
-  ${sp && PR.length ? `<div class="hsec">${hsh('prompt', 'LATEST ' + Math.min(4, PR.length), '#/prompts')}<div class="pgrid">${PR.slice().reverse().slice(0, 4).map(promptBox).join('')}</div></div>` : ''}`;
+  ${sp && LP().length ? `<div class="hsec">${hsh('prompt', '', '#/prompts')}<div class="pgrid">${LP().reverse().slice(0, 4).map(promptBox).join('')}</div></div>` : ''}`;
 }
 
 function pageChars(){
-  const ptags = [...new Set(CH.filter(c => !isLocked(c,'c'+c.id)).flatMap(c => tagsOf(c.tag)))];
+  const ptags = [...new Set(LC().filter(c => !isLocked(c,'c'+c.id)).flatMap(c => tagsOf(c.tag)))];
   if(ORD || (ptag!=='all' && !ptags.includes(ptag))) ptag = 'all';
-  const list = sortCh().filter(c => ptag==='all' || (!isLocked(c,'c'+c.id) && tagsOf(c.tag).includes(ptag)));
-  app.innerHTML = `<div class="top"><div><h1>PERSONA</h1><p class="sub">CHARACTERS · ${CH.length}</p></div>
+  const list = sortCh().filter(listed).filter(c => ptag==='all' || (!isLocked(c,'c'+c.id) && tagsOf(c.tag).includes(ptag)));
+  app.innerHTML = `<div class="top"><div><h1>PERSONA</h1><p class="sub">CHARACTERS · ${LC().length}</p></div>
   ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
   ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
   ${ptags.length && !ORD ? `<div class="bar" id="pchips">${['all',...ptags].map(k => `<button class="chip ${k===ptag?'on':''}" data-pt="${esc(k)}">${esc(k)}</button>`).join('')}</div>` : ''}
-  ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
+  ${LC().length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
     ${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
   const pc = $('#pchips'); if(pc) pc.onclick = e => { const b = e.target.closest('[data-pt]'); if(b){ ptag = b.dataset.pt; pageChars(); } };
@@ -450,7 +456,7 @@ function pageChar(id){
   const c = CH.find(x => x.id===+id);
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
   if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1>${lockHtml('c'+c.id)}`; return; }
-  const rel = PR.filter(p => p.char_id===c.id).reverse(), rcs = relCards(c);
+  const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c);
   app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
   <div class="prof">
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
@@ -503,10 +509,10 @@ function pageChar(id){
 
 let cat = 'all', q = '', shown = 20;
 function pagePrompts(){
-  const cats = [...new Set(PR.map(p => p.cat))];
+  const cats = [...new Set(LP().map(p => p.cat))];
   if(cat!=='all' && !cats.includes(cat)) cat = 'all';
-  const cnt = k => k==='all' ? PR.length : PR.filter(p => p.cat===k).length;
-  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">ARCHIVE · ${PR.length} SAVED</p></div>
+  const cnt = k => k==='all' ? LP().length : LP().filter(p => p.cat===k).length;
+  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">ARCHIVE · ${LP().length} SAVED</p></div>
   ${admin ? '<button class="btn" data-act="new-p">+ NEW</button>' : ''}</div>
   <input type="search" id="q" placeholder="search" aria-label="search" value="${esc(q)}">
   <div class="bar" id="chips">${['all',...cats].map(k => `<button class="chip ${k===cat?'on':''}" data-c="${esc(k)}">${esc(k)} ${cnt(k)}</button>`).join('')}</div>
@@ -518,7 +524,7 @@ function pagePrompts(){
 }
 function list(){
   const s = q.trim().toLowerCase();
-  const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || ((p.title || '').toLowerCase().includes(s) || (!isLocked(p, 'p'+p.id) && p.text.toLowerCase().includes(s))))).reverse();
+  const rows = LP().filter(p => (cat==='all'||p.cat===cat) && (!s || ((p.title || '').toLowerCase().includes(s) || (!isLocked(p, 'p'+p.id) && p.text.toLowerCase().includes(s))))).reverse();
   $('#list').innerHTML = rows.length
     ? `<div class="pgrid">${rows.slice(0,shown).map(promptBox).join('')}</div>` + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
     : '<p class="empty">I\'m feeling lucky!</p>';
@@ -529,7 +535,7 @@ function list(){
 function pagePromptOne(id){
   const p = PR.find(x => String(x.id) === String(id));
   if(!p){ app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/prompts">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
-  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">#${num(p)} / ${PR.length}</p></div><a class="btn" href="#/prompts">← ALL</a></div>
+  app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">${num(p) ? `#${num(p)} / ${LP().length}` : 'LINK ONLY'}</p></div><a class="btn" href="#/prompts">← ALL</a></div>
   <div class="pgrid one">${promptBox(p)}</div>`;
 }
 
@@ -538,7 +544,7 @@ const is18 = t => /^[RG]-?18$/i.test(t);
 /* 태그 순서: site_settings.ooc_tags(JSON). 저장된 순서 먼저, 새 태그는 뒤에 */
 let OTO = false;
 const ocOrder = () => { try{ const a = JSON.parse(SET.ooc_tags || '[]'); return Array.isArray(a) ? a : []; }catch(_){ return []; } };
-const ocAll = () => { const seen = [...new Set(OC.flatMap(o => ocTags(o.tags)))], ord = ocOrder(); return [...ord.filter(t => seen.includes(t)), ...seen.filter(t => !ord.includes(t))]; };
+const ocAll = () => { const seen = [...new Set(LO().flatMap(o => ocTags(o.tags)))], ord = ocOrder(); return [...ord.filter(t => seen.includes(t)), ...seen.filter(t => !ord.includes(t))]; };
 let OCA = null;
 const ocSorted = tags => { const all = OCA || ocAll(); return [...new Set(tags)].sort((a, b) => all.indexOf(a) - all.indexOf(b)); };
 /* {{user}} ↔ {{char}} 교체 (이 탭에서만 유지) */
@@ -556,7 +562,7 @@ function pageOoc(){
   const tags = ocAll();
   if(OTO) otag = 'all';
   if(otag!=='all' && !tags.includes(otag)) otag = 'all';
-  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">ARCHIVE · ${OC.length} SAVED</p></div>
+  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">ARCHIVE · ${LO().length} SAVED</p></div>
   ${admin ? `<div style="display:flex;gap:5px">${tags.length > 1 ? `<button class="btn ${OTO ? 'on' : ''}" data-act="otag-order">${OTO ? 'DONE' : 'TAG ORDER'}</button>` : ''}<button class="btn" data-act="new-o">+ NEW</button></div>` : ''}</div>
   ${admin && OTO ? '<p class="hint">태그를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (OOC 목록의 태그도 같은 순서로 보여요)</p>' : ''}
   <input type="search" id="oq" placeholder="search" aria-label="search" value="${esc(oq)}">
@@ -591,17 +597,17 @@ function openRow(r){
 }
 function drawOoc(){
   const s = oq.trim().toLowerCase();
-  const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (isLocked(o, 'o'+o.id) ? '' : o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
+  const rows = LO().map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (isLocked(o, 'o'+o.id) ? '' : o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
   OCA = ocAll();
   $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => ocRow(o, n, false)).join('') : '<p class="empty">I\'m feeling lucky!</p>';
   OCA = null;
 }
 /* OOC 하나만 보여주는 페이지: #/ooc/번호 (공유용 링크) */
 function pageOocOne(id){
-  const i = OC.findIndex(x => String(x.id) === String(id)), o = OC[i];
+  const o = OC.find(x => String(x.id) === String(id)), i = o ? LO().indexOf(o) : -1;
   if(!o){ app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/ooc">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
-  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">${i+1} / ${OC.length}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
-  <div class="oc one">${ocRow(o, i+1, true)}</div>`;
+  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">${i < 0 ? 'LINK ONLY' : `${i+1} / ${LO().length}`}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
+  <div class="oc one">${ocRow(o, i < 0 ? '–' : i+1, true)}</div>`;
 }
 function formOoc(o){
   openM(`<h3>${o ? 'OOC 수정' : 'OOC 추가'}</h3>
@@ -752,7 +758,7 @@ const subRow = (x={}, ph=false) => `<div class="sr"><input name="sub_t" placehol
 /* ---------- related characters ---------- */
 const nz = v => String(v || '50% 50%').split(' ').slice(0, 2).map(x => (parseFloat(x) || 0).toFixed(1)).join(' ');
 const relOf = c => [...(c.related || []), ...CH.filter(t => t.id !== c.id && (t.related || []).some(o => o.id === c.id) && !(c.related || []).some(o => o.id === t.id)).map(t => ({ id: t.id }))];
-const relCards = c => relOf(c).map(o => {
+const relCards = c => relOf(c).filter(o => o.ext || !CH.find(t => t.id === o.id) || listed(CH.find(t => t.id === o.id))).map(o => {
   if(o.ext){
     const src = o.img || '', pos = o.pos || '', pz = xyOf(pos), nm = o.name || '';
     const thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(nm)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, nm, pos);
