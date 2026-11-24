@@ -287,7 +287,7 @@ const vbadge = r => vis(r) !== 'public' && (admin || vis(r) === 'locked') ? `<sp
 const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join('');
 const mkLock = async pw => { const salt = crypto.randomUUID().slice(0, 8); return salt + '$' + await sha(salt + pw); };
 const chkLock = async (r, pw) => { const [salt, h] = String(r.lock_hash || '').split('$'); return !!h && await sha(salt + pw) === h; };
-const lockHtml = k => `<div class="lk">${LOCK}<form data-lk="${k}"><input type="password" placeholder="비밀번호" autocomplete="off" required><button class="btn" type="submit">OPEN</button></form><div class="st" data-lkerr></div></div>`;
+const lockHtml = k => `<div class="lk">${LOCK}<form data-lk="${k}"><input type="password" placeholder="password" autocomplete="off" required><button class="btn" type="submit">OPEN</button></form><div class="st" data-lkerr></div></div>`;
 const visField = r => { const v = vis(r || {}); return `<label>공개 설정</label><select name="vis" id="vsel">${[['public','공개'],['private','나만 보기'],['locked','비밀번호 잠금']].map(([k,t]) => `<option value="${k}"${v===k ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="password" name="lockpw" id="lpw" autocomplete="new-password" placeholder="${v==='locked' ? '새 비밀번호 (비우면 기존 유지)' : '비밀번호'}" style="margin-top:5px"${v==='locked' ? '' : ' hidden'}>`; };
 const bindVis = () => { const s = $('#vsel'); if(s) s.onchange = () => { $('#lpw').hidden = s.value !== 'locked'; }; };
 async function visRow(fd, r){
@@ -320,8 +320,12 @@ function fromCache(){
   try{ const raw = localStorage.getItem(CK); if(!raw) return false; const d = JSON.parse(raw);
     CH = d.c.filter(canSee); PR = d.p.filter(canSee); OC = d.o.filter(canSee); SET = d.s || {}; cacheSig = raw; return true; }catch(_){ return false; }
 }
-async function load(pre){
-  const [c, p, o, st2] = await Promise.all([sb.from('characters').select('*').order('id'), sb.from('prompts').select('*').order('id'), sb.from('ooc').select('*').order('id'), sb.from('site_settings').select('*'), pre]);
+async function load(pre, early){
+  const q = t => Promise.resolve(sb.from(t).select('*').order(t === 'site_settings' ? 'key' : 'id'));
+  const qo = q('ooc'), qs = q('site_settings');
+  /* OOC 화면은 캐릭터/프롬프트를 안 쓰니까 OOC랑 설정만 오면 먼저 그림 */
+  if(early) Promise.all([qo, qs, pre]).then(([o, st]) => early(o, st), () => {});
+  const [c, p, o, st2] = await Promise.all([q('characters'), q('prompts'), qo, qs, pre]);
   if(c.error || p.error){ if(!CH.length && !PR.length) app.innerHTML = `<p class="empty">불러오기 실패<br>${esc((c.error||p.error).message)}</p>`; return false; }
   const od = o.error ? [] : o.data;
   CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = od.filter(canSee);
@@ -471,7 +475,8 @@ const is18 = t => /^[RG]-?18$/i.test(t);
 let OTO = false;
 const ocOrder = () => { try{ const a = JSON.parse(SET.ooc_tags || '[]'); return Array.isArray(a) ? a : []; }catch(_){ return []; } };
 const ocAll = () => { const seen = [...new Set(OC.flatMap(o => ocTags(o.tags)))], ord = ocOrder(); return [...ord.filter(t => seen.includes(t)), ...seen.filter(t => !ord.includes(t))]; };
-const ocSorted = tags => { const all = ocAll(); return [...new Set(tags)].sort((a, b) => all.indexOf(a) - all.indexOf(b)); };
+let OCA = null;
+const ocSorted = tags => { const all = OCA || ocAll(); return [...new Set(tags)].sort((a, b) => all.indexOf(a) - all.indexOf(b)); };
 /* {{user}} ↔ {{char}} 교체 (이 탭에서만 유지) */
 const OSW = new Set();
 const swapUC = t => String(t ?? '').replace(/\{\{\s*(user|char)\s*\}\}/gi, (m, k) => { const n = k.toLowerCase() === 'user' ? 'char' : 'user'; return '{{' + (k === k.toUpperCase() ? n.toUpperCase() : k[0] === k[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n) + '}}'; });
@@ -499,7 +504,7 @@ function pageOoc(){
   if(admin && OTO && window.Sortable) Sortable.create($('#ochips'), { animation:150, draggable:'.chip[data-t]:not([data-t="all"])', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: saveOcTagOrder });
   /* 접기/펼치기는 헤더(번호·제목·태그 줄)를 눌렀을 때만 */
   $('#olist').onclick = e => { const t = e.target.closest('.oc-top'); if(!t) return; const r = t.closest('.oc-r');
-    const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(x => x.classList.remove('open')); r.classList.toggle('open', !was); };
+    const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(x => x.classList.remove('open')); if(!was) openRow(r); };
   drawOoc();
 }
 function ocRow(o, n, open){
@@ -507,13 +512,25 @@ function ocRow(o, n, open){
   const vt = admin && vis(o) !== 'public' ? ` ${ico(vis(o))}` : '';
   if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)} ${ico('locked')}</strong><small>비밀번호가 필요해요</small></div></div>
     <div class="oc-body">${lockHtml('o'+o.id)}<div class="oc-bar">${lnk}</div></div></div>`;
-  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
-    <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
+  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o).slice(0, 160))}</small></div></div>
+    <div class="oc-body">${open ? ocBody(o) : ''}</div></div>`;
+}
+/* 펼친 줄의 본문 (긴 글이라 펼칠 때만 그림) */
+function ocBody(o){
+  const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
+  return `<pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div>`;
+}
+function openRow(r){
+  const o = OC.find(x => String(x.id) === r.dataset.oid), b = r.querySelector('.oc-body');
+  if(o && !isLocked(o, 'o'+o.id) && !b.querySelector('pre')) b.innerHTML = ocBody(o);
+  r.classList.add('open');
 }
 function drawOoc(){
   const s = oq.trim().toLowerCase();
   const rows = OC.map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (isLocked(o, 'o'+o.id) ? '' : o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
+  OCA = ocAll();
   $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => ocRow(o, n, false)).join('') : '<p class="empty">I\'m feeling lucky!</p>';
+  OCA = null;
 }
 /* OOC 하나만 보여주는 페이지: #/ooc/번호 (공유용 링크) */
 function pageOocOne(id){
@@ -895,7 +912,7 @@ document.addEventListener('submit', async e => {
   if(!ok){ err.textContent = '비밀번호가 맞지 않아요'; inp.select(); return; }
   UNL.add(k); try{ sessionStorage.setItem('unl', JSON.stringify([...UNL])); }catch(_){}
   const [a, b] = location.hash.slice(2).split('/');
-  if(k[0]==='o' && $('#olist')){ drawOoc(); const row = document.querySelector(`#olist .oc-r[data-oid="${r.id}"]`); if(row) row.classList.add('open'); return; }
+  if(k[0]==='o' && $('#olist')){ drawOoc(); const row = document.querySelector(`#olist .oc-r[data-oid="${r.id}"]`); if(row) openRow(row); return; }
   if(a==='c') pageChar(b); else if($('#list')) list(); else route();
 });
 /* gallery: 관리자는 사진을 드래그해서 순서 조정 (놓으면 자동 저장) */
@@ -929,7 +946,7 @@ document.addEventListener('click', async e => {
   if(a==='otag-order'){ OTO = !OTO; return pageOoc(); }
   if(a==='swap-o'){ const k = +b.dataset.id, o = OC.find(x => x.id===k), r = b.closest('.oc-r'); if(!o) return;
     OSW.has(k) ? OSW.delete(k) : OSW.add(k);
-    if(r){ r.querySelector('pre').textContent = ocText(o); r.querySelector('small').textContent = ocText(o); }
+    if(r){ const pre = r.querySelector('pre'); if(pre) pre.textContent = ocText(o); r.querySelector('small').textContent = ocText(o).slice(0, 160); }
     b.classList.toggle('on', OSW.has(k)); return; }
   if(a==='new-o') return formOoc();
   if(a==='edit-o') return formOoc(OC.find(o => o.id===id));
@@ -979,9 +996,17 @@ addEventListener('hashchange', route);
   const shown = fromCache();
   if(shown) route(); else app.innerHTML = '<p class="empty">LOADING…</p>';
   const sess = sb.auth.getSession().then(({ data }) => { admin = !!data.session; syncAdm(); });
-  const r = await load(sess);
-  /* 저장해 둔 것과 같으면 다시 그리지 않음 (보던 화면/입력 유지). 관리자면 나만 보기 항목 때문에 항상 다시 그림 */
-  if(r && (r !== 'same' || !shown || admin)) route();
+  const onOoc = () => (location.hash.slice(2) || (show('oo') ? 'ooc' : 'characters')).split('/')[0] === 'ooc';
+  let early = false;
+  const r = await load(sess, (o, st) => {
+    if(shown) return;
+    if(!st.error) SET = Object.fromEntries(st.data.map(x => [x.key, x.value]));
+    if(!o.error) OC = o.data.filter(canSee);
+    if(onOoc()){ early = true; route(); }
+  });
+  /* 저장해 둔 것과 같으면 다시 그리지 않음 (보던 화면/입력 유지). 관리자면 나만 보기 항목 때문에 항상 다시 그림.
+     OOC를 먼저 그렸고 아직 OOC 화면이면 다시 그리지 않음 (검색/펼친 줄 유지) */
+  if(r && !(early && onOoc()) && (r !== 'same' || !shown || admin)) route();
 })();
 </script>
 </body>
