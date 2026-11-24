@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-jp@1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fff;--fg:#000;--mut:#9a9a9a;--line:#e4e4e4;--soft:#f6f6f6;--sans:"Pretendard Variable",Pretendard,"Pretendard JP Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#fff;--fg:#000;--mut:#9a9a9a;--line:#e4e4e4;--soft:#f6f6f6;--sans:"Pretendard Variable",Pretendard,"Pretendard JP Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono","Pretendard Variable",Pretendard,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}}
 :root[data-theme="light"]{color-scheme:light}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}
@@ -270,17 +270,18 @@ h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 .oc-num{position:absolute;top:11px;right:10px;font:800 11px/1 var(--sans);letter-spacing:-.03em;white-space:nowrap;color:var(--mut);color:color-mix(in srgb,var(--fg) 14%,var(--bg));transition:color .15s}
 .oc-r:hover .oc-num,.oc-r.open .oc-num{color:var(--fg)}
 .oc.one .oc-num{top:20px;right:16px;font-size:12px}
-.oc-r .tags{display:flex;flex-wrap:wrap;gap:3px;padding:4px 12px 0}
+.oc-r .tags{display:flex;flex-wrap:wrap;align-items:center;gap:3px;padding:5px 12px 0;line-height:1}
+.oc-r .tags .tg{line-height:16px}
 .oc-r .tg{white-space:nowrap;font-size:10.5px;padding:0 6px}
 .oc-r .tg.x18{background:var(--fg);color:var(--bg)}
-.oc-pv{margin:0 0 8px;padding:6px 12px 0;color:var(--mut);white-space:pre-wrap;word-break:break-word;font:400 12px/1.4 var(--mono);display:-webkit-box;-webkit-line-clamp:9;-webkit-box-orient:vertical;overflow:hidden}
+.oc-pv{margin:0 0 8px;padding:8px 12px 0;color:var(--mut);white-space:pre-wrap;word-break:break-word;font:400 13px/1.45 var(--sans);letter-spacing:-.03em;display:-webkit-box;-webkit-line-clamp:9;-webkit-box-orient:vertical;overflow:hidden}
 .oc-f{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding:4px 8px 4px 12px;cursor:auto}
 .oc-len{font:500 10px var(--mono);color:var(--mut);white-space:nowrap}
 .oc-bar{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 .oc-bar .btn{padding:0 7px;font-size:10.5px}
 .oc-r.open{border-color:var(--fg);border-top-width:6px;cursor:auto}
 .oc-r.open .oc-top{cursor:pointer}
-.oc-r.open .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:420px;overflow:auto;line-height:1.6;padding:8px 12px 10px;margin:0}
+.oc-r.open .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:420px;overflow:auto;padding:10px 12px 10px;margin:0}
 .oc-r.open .oc-f{border-top:2px solid var(--fg)}
 .oc-r .lk{border:0;padding:12px}
 .oc-r.locked .oc-pv{display:none}
@@ -290,11 +291,16 @@ h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 .oc.one .oc-top{padding:16px 16px 0;cursor:auto}
 .oc.one .oc-top strong{font-size:22px;letter-spacing:-.03em;white-space:normal}
 .oc.one .tags{padding:8px 16px 0}
-.oc.one .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:none;padding:16px;margin:0;font-size:12.5px;line-height:1.6}
+.oc.one .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:none;padding:16px;margin:0;font-size:13.5px}
 .oc.one .oc-f{border-top:2px solid var(--fg);padding:8px 10px 8px 16px}
 .bar.ordering .chip[data-t]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .bar.ordering .chip.drag{opacity:.35}
 a.btn{display:inline-block;text-decoration:none}
+/* 버튼 · 칩 · 비밀번호 칸: 코드 글꼴 (한글은 Pretendard로) */
+.btn,.chip{font-family:var(--mono);font-weight:700;letter-spacing:0;font-size:10px;line-height:1.6}
+.mb .row .btn{font-size:10.5px}
+.lk input{font:400 12px var(--mono);letter-spacing:0}
+.btn .swi{display:inline-block;width:1em;height:1em;vertical-align:-.16em;margin:0 3px}
 </style>
 </head>
 <body>
@@ -570,6 +576,7 @@ const ocAll = () => { const seen = [...new Set(LO().flatMap(o => ocTags(o.tags))
 let OCA = null;
 const ocSorted = tags => { const all = OCA || ocAll(); return [...new Set(tags)].sort((a, b) => all.indexOf(a) - all.indexOf(b)); };
 /* {{user}} ↔ {{char}} 교체 (이 탭에서만 유지) */
+const SWI = '<svg class="swi" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M3 6h14M14 3l3 3-3 3M17 14H3M6 11l-3 3 3 3"/></svg>';
 const OSW = new Set();
 const swapUC = t => String(t ?? '').replace(/\{\{\s*(user|char)\s*\}\}/gi, (m, k) => { const n = k.toLowerCase() === 'user' ? 'char' : 'user'; return '{{' + (k === k.toUpperCase() ? n.toUpperCase() : k[0] === k[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n) + '}}'; });
 const hasPH = t => /\{\{\s*(user|char)\s*\}\}/i.test(t || '');
@@ -612,7 +619,7 @@ function ocRow(o, n, open){
   const t = ocText(o);
   return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}">${ocNumT(n)}<div class="oc-top"><strong>${esc(o.title)}${vt}</strong></div>${tg}
     <pre class="oc-pv">${esc(open ? t : t.slice(0, OCPV))}</pre>
-    <div class="oc-f"><span class="oc-len">${t.length}자</span><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
+    <div class="oc-f"><span class="oc-len">${t.length}자</span><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}}${SWI}{{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
 }
 /* 펼치면 본문 전체, 접으면 앞부분만 (긴 글이 많아도 가볍게) */
 function openRow(r){
