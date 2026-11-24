@@ -339,7 +339,7 @@ function pageChars(){
   ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
   ${ptags.length && !ORD ? `<div class="bar" id="pchips">${['all',...ptags].map(k => `<button class="chip ${k===ptag?'on':''}" data-pt="${esc(k)}">${esc(k)}</button>`).join('')}</div>` : ''}
   ${CH.length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
-    ${vbadge(c)}<div class="ph">${isLocked(c,'c'+c.id) ? LOCK : c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
+    ${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
   const pc = $('#pchips'); if(pc) pc.onclick = e => { const b = e.target.closest('[data-pt]'); if(b){ ptag = b.dataset.pt; pageChars(); } };
   const g = $('#cg');
@@ -648,7 +648,7 @@ const relCards = c => relOf(c).map(o => {
   const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
   const pz = xyOf(pos), thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
-  return `<a class="rcard" href="#/c/${t.id}" data-rk="i:${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${isLocked(t,'c'+t.id) ? LOCK : src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
+  return `<a class="rcard" href="#/c/${t.id}" data-rk="i:${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
 const rrHtml = (o, t, uid) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || ((o && o.img) ? 1 : zOf(t.img_pos));
   return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"${uid ? ` data-ext="1" data-uid="${esc(uid)}"` : ''}><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
   <div class="pe" style="width:240px;aspect-ratio:4/3">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
