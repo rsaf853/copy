@@ -344,8 +344,15 @@ async function visRow(fd, r){
   if(v !== vis(r || {})) o.visibility = v;
   if(v === 'locked'){ if(pw) o.lock_hash = await mkLock(pw); else if(!(r && r.lock_hash)) throw new Error('비밀번호를 입력해 주세요'); }
   else if(r && r.lock_hash) o.lock_hash = '';
+  /* 링크로만 공개: 숫자 대신 알아보기 힘든 랜덤 주소 (한 번 만들면 계속 같은 주소) */
+  if(v === 'unlisted' && !(r && r.share_key)) o.share_key = mkKey();
   return o;
 }
+const mkKey = () => { const a = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789', b = crypto.getRandomValues(new Uint8Array(12)); return [...b].map(x => a[x % a.length]).join(''); };
+/* 주소 → 항목. 숫자 주소는 링크 전용 항목이면 관리자만, 랜덤 주소는 누구나 */
+const byKey = (arr, k) => /^\d+$/.test(String(k)) ? arr.find(x => x.id === +k && (vis(x) !== 'unlisted' || admin)) : arr.find(x => x.share_key && x.share_key === k);
+const keyOf = r => vis(r) === 'unlisted' && r.share_key ? r.share_key : r.id;
+const shareUrl = (path, r) => location.href.split('#')[0] + '#/' + path + '/' + keyOf(r);
 const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin); };
 const pv = k => SET[k]==='admin' ? ' ' + ico('private') : '';
 const tagsOf = s => !show('tags') ? [] : String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
@@ -384,8 +391,9 @@ async function load(pre, early){
   return true;
 }
 const textOf = k => {
-  if(k[0]==='l') return location.href.split('#')[0] + '#/ooc/' + k.slice(1);
-  if(k[0]==='u') return location.href.split('#')[0] + '#/prompts/' + k.slice(1);
+  if(k[0]==='l'){ const o = OC.find(x => x.id===+k.slice(1)); return o ? shareUrl('ooc', o) : ''; }
+  if(k[0]==='u'){ const p = PR.find(x => x.id===+k.slice(1)); return p ? shareUrl('prompts', p) : ''; }
+  if(k[0]==='k'){ const c = CH.find(x => x.id===+k.slice(1)); return c ? shareUrl('c', c) : ''; }
   if(k[0]==='g'){ const o = OC.find(o => o.id===+k.slice(1)); return o ? ocText(o) : ''; }
   if(k[0]==='q'){ const [i,j] = k.slice(1).split('-'); const p = PR.find(p => p.id===+i); return ((p && p.subs || [])[+j] || {}).x; }
   if(k[0]==='s'){ const [i,j] = k.slice(1).split('-'); const c = CH.find(c => c.id===+i); return ((c && c.subs || [])[+j] || {}).x; }
@@ -454,7 +462,7 @@ async function saveOrder(){
 }
 
 function pageChar(id){
-  const c = CH.find(x => x.id===+id);
+  const c = byKey(CH, id);
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
   if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1>${lockHtml('c'+c.id)}`; return; }
   const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c);
@@ -464,7 +472,7 @@ function pageChar(id){
     <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
       <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(lab(k))}</th><td>${esc(lab(k)==='Height' && /^\d+(\.\d+)?$/.test(String(v).trim()) ? String(v).trim() + 'cm' : v)}</td></tr>`).join('')}</table>
       <div style="white-space:pre-wrap;font-size:12.5px">${esc(c.descr||'')}</div>
-      ${admin ? `<div class="acts"><button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
+      ${admin ? `<div class="acts">${vis(c) === 'unlisted' ? `<button class="btn" data-act="copy" data-k="k${c.id}" title="이 캐릭터 링크를 복사해요">LINK</button>` : ''}<button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
   </div>
   ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="btn" data-act="copy" data-k="c${c.id}">COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="btn" data-act="copy" data-k="o${c.id}">COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
   ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
@@ -534,7 +542,7 @@ function list(){
 
 /* 프롬프트 하나만 보여주는 페이지: #/prompts/번호 (공유용 링크) */
 function pagePromptOne(id){
-  const p = PR.find(x => String(x.id) === String(id));
+  const p = byKey(PR, id);
   if(!p){ app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/prompts">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
   app.innerHTML = `<div class="top"><div><h1>PROMPT</h1><p class="sub">${num(p) ? `#${num(p)} / ${LP().length}` : 'LINK ONLY'}</p></div><a class="btn" href="#/prompts">← ALL</a></div>
   <div class="pgrid one">${promptBox(p)}</div>`;
@@ -605,7 +613,7 @@ function drawOoc(){
 }
 /* OOC 하나만 보여주는 페이지: #/ooc/번호 (공유용 링크) */
 function pageOocOne(id){
-  const o = OC.find(x => String(x.id) === String(id)), i = o ? LO().indexOf(o) : -1;
+  const o = byKey(OC, id), i = o ? LO().indexOf(o) : -1;
   if(!o){ app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/ooc">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
   app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">${i < 0 ? 'LINK ONLY' : `${String(i+1).padStart(2,'0')} / ${String(LO().length).padStart(2,'0')}`}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
   <div class="oc one">${ocRow(o, i < 0 ? '–' : i+1, true)}</div>`;
