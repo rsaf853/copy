@@ -261,33 +261,34 @@ body.is-home header .logo{visibility:hidden}
 .ico{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.14em;margin-left:2px;overflow:visible}
 h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 /* OOC: 열마다 쌓는 카드. 누르면 그 카드만 아래로 길어짐 */
-.oc{columns:3 260px;column-gap:10px}
-.oc-r{break-inside:avoid;display:flex;flex-direction:column;margin-bottom:10px;border:1px solid var(--line);border-top:3px solid var(--fg);background:var(--bg);cursor:pointer}
+.oc{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:10px;align-items:start}
+.oc-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.oc-r{display:flex;flex-direction:column;border:1px solid var(--line);border-top:3px solid var(--fg);background:var(--bg);cursor:pointer}
 .oc-r:hover{border-color:var(--fg)}
-.oc-top{display:flex;align-items:baseline;gap:8px;padding:10px 12px 0;min-width:0}
+.oc-top{display:flex;align-items:baseline;gap:8px;padding:8px 12px 0;min-width:0}
 .oc-top strong{font-weight:800;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .oc-n{font:500 11px var(--mono);letter-spacing:0;color:var(--mut);flex:none}
-.oc-r .tags{display:flex;flex-wrap:wrap;gap:3px;padding:6px 12px 0}
+.oc-r .tags{display:flex;flex-wrap:wrap;gap:3px;padding:4px 12px 0}
 .oc-r .tg{white-space:nowrap;font-size:10.5px;padding:0 6px}
 .oc-r .tg.x18{background:var(--fg);color:var(--bg)}
-.oc-pv{margin:0;padding:10px 12px;color:var(--mut);white-space:pre-wrap;word-break:break-word;font:400 12px/1.75 var(--mono);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
-.oc-f{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding:6px 8px 6px 12px;cursor:auto}
+.oc-pv{margin:0 0 8px;padding:6px 12px 0;color:var(--mut);white-space:pre-wrap;word-break:break-word;font:400 12px/1.3 var(--mono);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.oc-f{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding:4px 8px 4px 12px;cursor:auto}
 .oc-len{font:500 10px var(--mono);color:var(--mut);white-space:nowrap}
 .oc-bar{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 .oc-bar .btn{padding:0 7px;font-size:10.5px}
 .oc-r.open{border-color:var(--fg);border-top-width:6px;cursor:auto}
 .oc-r.open .oc-top{cursor:pointer}
-.oc-r.open .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:420px;overflow:auto}
+.oc-r.open .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:420px;overflow:auto;line-height:1.55;padding:8px 12px 10px;margin:0}
 .oc-r.open .oc-f{border-top:2px solid var(--fg)}
 .oc-r .lk{border:0;padding:12px}
 .oc-r.locked .oc-pv{display:none}
 /* 링크 화면: 카드 하나 크게 + 다른 OOC */
-.oc.one{columns:1;margin-top:6px}
+.oc.one{display:block;margin-top:6px}
 .oc.one .oc-r{border-color:var(--fg);border-top-width:6px;cursor:auto;margin:0}
 .oc.one .oc-top{padding:16px 16px 0;cursor:auto}
 .oc.one .oc-top strong{font-size:22px;letter-spacing:-.03em;white-space:normal}
 .oc.one .tags{padding:8px 16px 0}
-.oc.one .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:none;padding:16px;font-size:12.5px;line-height:1.85}
+.oc.one .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:none;padding:16px;margin:0;font-size:12.5px;line-height:1.6}
 .oc.one .oc-f{border-top:2px solid var(--fg);padding:8px 10px 8px 16px}
 .bar.ordering .chip[data-t]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .bar.ordering .chip.drag{opacity:.35}
@@ -623,9 +624,16 @@ function drawOoc(){
   const s = oq.trim().toLowerCase();
   const rows = LO().map((o,i) => ({ o, n: i+1 })).filter(({ o }) => (otag==='all' || ocTags(o.tags).includes(otag)) && (!s || ((o.title||'') + ' ' + (isLocked(o, 'o'+o.id) ? '' : o.content||'') + ' ' + (o.tags||'')).toLowerCase().includes(s)));
   OCA = ocAll();
-  $('#olist').innerHTML = rows.length ? rows.map(({ o, n }) => ocRow(o, n, false)).join('') : '<p class="empty">I\'m feeling lucky!</p>';
+  /* 가로 순서: 01 02 03이 첫 줄. 카드를 1·2·3열에 돌아가며 넣고 각 열은 위로 붙여 쌓기 */
+  const n = OCN = ocCols(), cols = Array.from({ length: n }, () => []);
+  rows.forEach(({ o, n: k }, i) => cols[i % n].push(ocRow(o, k, false)));
+  const el = $('#olist'); el.style.setProperty('--cols', rows.length ? n : 1);
+  el.innerHTML = rows.length ? cols.map(c => `<div class="oc-col">${c.join('')}</div>`).join('') : '<p class="empty">I\'m feeling lucky!</p>';
   OCA = null;
 }
+let OCN = 0;
+const ocCols = () => innerWidth < 600 ? 1 : innerWidth < 860 ? 2 : 3;
+addEventListener('resize', () => { if($('#olist') && ocCols() !== OCN) drawOoc(); });
 /* OOC 하나만 보여주는 페이지: #/ooc/번호 (공유용 링크) */
 function pageOocOne(id){
   const o = byKey(OC, id), i = o ? LO().indexOf(o) : -1;
