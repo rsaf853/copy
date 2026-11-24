@@ -188,7 +188,8 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .pin.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 #set{border:0;background:none;color:inherit;padding:0;margin:0 0 0 auto;font:inherit;letter-spacing:inherit;line-height:inherit;cursor:pointer}
 @media(min-width:641px){.wrap{max-width:none;width:77vw;min-width:min(1014px,100%)}}
-.vb{position:absolute;top:6px;left:6px;z-index:1;font:600 9px/1.5 var(--sans);padding:1px 6px;background:var(--fg);color:var(--bg);border:1px solid var(--fg)}
+.vb{position:absolute;top:7px;left:7px;z-index:1;line-height:0;filter:drop-shadow(0 0 1px rgba(0,0,0,.3))}
+.vb svg{display:block;width:17px;height:17px;overflow:visible}
 .ph svg{width:30px;height:30px}
 .lk{display:flex;flex-direction:column;align-items:center;gap:8px;padding:36px 16px;border:1px solid var(--line);text-align:center}
 .pr .lk{border:0}
@@ -210,7 +211,8 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .oc-bar{margin-top:10px;display:flex;justify-content:flex-end;gap:5px}
 .oc-r.open{background:var(--fg);color:var(--bg);border-bottom-color:var(--fg)}
 .oc-r.open small{display:none}.oc-r.open .oc-n{color:var(--bg);opacity:.6}.oc-r.open .oc-body{display:block}
-.ovb{display:inline-block;vertical-align:1px;margin-left:4px;font:600 9px/1.5 var(--sans);padding:0 5px;border:1px solid currentColor}
+.ico{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.14em;margin-left:2px;overflow:visible}
+h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 .oc-body .lk{border:0;padding:16px 0 4px}
 .oc-r.open .lk input{background:var(--bg);color:var(--fg)}
 .oc-r.open .oc-body .st{color:var(--bg)}
@@ -265,16 +267,21 @@ let ORD = false;
 const initial = n => esc([...n][0] || '?');
 let CH = [], PR = [], OC = [], admin = false, dirty = false, ptag = 'all', oq = '', otag = 'all';
 let SET = {};
-const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+/* 잠금/비공개 아이콘. 글자 줄에서는 글자색 그대로, 사진 위(.vb)에서는 검은 아이콘 + 흰 외곽선 */
+const LKD = 'M12 2a5 5 0 0 0-5 5v3H6a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 6 22h12a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 18 10h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3H9z';
+const EYD = 'M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4 20 20 4';
+const LOCK = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${LKD}"/></svg>`;
+const ico = k => `<svg class="ico" viewBox="0 0 24 24" role="img" aria-label="${k==='private' ? '나만 보기' : '비밀번호 잠금'}">${k==='private' ? `<path d="${EYD}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>` : `<path d="${LKD}" fill="currentColor"/>`}</svg>`;
+const icoOn = k => `<svg viewBox="0 0 24 24" role="img" aria-label="${k==='private' ? '나만 보기' : '비밀번호 잠금'}">${k==='private' ? `<path d="${EYD}" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="${EYD}" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"/>` : `<path d="${LKD}" fill="#000" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke"/>`}</svg>`;
 const vis = r => r.visibility || 'public';
 const canSee = r => vis(r) !== 'private' || admin;
 let UNL = new Set(); try{ UNL = new Set(JSON.parse(sessionStorage.getItem('unl') || '[]')); }catch(_){}
 const isLocked = (r, k) => vis(r) === 'locked' && !admin && !UNL.has(k);
-const vbadge = r => vis(r) !== 'public' && (admin || vis(r) === 'locked') ? `<span class="vb">${vis(r) === 'private' ? 'PRIVATE' : 'LOCKED'}</span>` : '';
+const vbadge = r => vis(r) !== 'public' && (admin || vis(r) === 'locked') ? `<span class="vb">${icoOn(vis(r))}</span>` : '';
 const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join('');
 const mkLock = async pw => { const salt = crypto.randomUUID().slice(0, 8); return salt + '$' + await sha(salt + pw); };
 const chkLock = async (r, pw) => { const [salt, h] = String(r.lock_hash || '').split('$'); return !!h && await sha(salt + pw) === h; };
-const lockHtml = k => `<div class="lk">${LOCK}<div style="font-weight:800">LOCKED</div><form data-lk="${k}"><input type="password" placeholder="비밀번호" autocomplete="off" required><button class="btn" type="submit">OPEN</button></form><div class="st" data-lkerr></div></div>`;
+const lockHtml = k => `<div class="lk">${LOCK}<form data-lk="${k}"><input type="password" placeholder="비밀번호" autocomplete="off" required><button class="btn" type="submit">OPEN</button></form><div class="st" data-lkerr></div></div>`;
 const visField = r => { const v = vis(r || {}); return `<label>공개 설정</label><select name="vis" id="vsel">${[['public','공개'],['private','나만 보기'],['locked','비밀번호 잠금']].map(([k,t]) => `<option value="${k}"${v===k ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="password" name="lockpw" id="lpw" autocomplete="new-password" placeholder="${v==='locked' ? '새 비밀번호 (비우면 기존 유지)' : '비밀번호'}" style="margin-top:5px"${v==='locked' ? '' : ' hidden'}>`; };
 const bindVis = () => { const s = $('#vsel'); if(s) s.onchange = () => { $('#lpw').hidden = s.value !== 'locked'; }; };
 async function visRow(fd, r){
@@ -323,9 +330,9 @@ const chName = id => (CH.find(c => c.id===id)||{}).name;
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
   const lnk = `<button class="btn" data-act="copy" data-k="u${p.id}" title="이 프롬프트만 열리는 링크를 복사해요">LINK</button>`;
-  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)} · LOCKED</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
+  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)} ${ico('locked')}</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
   return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
-  <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' · ' + (vis(p) === 'private' ? 'PRIVATE' : 'LOCKED') : ''}</span>
+  <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' ' + ico(vis(p)) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
   <pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
 }
@@ -358,7 +365,7 @@ async function saveOrder(){
 function pageChar(id){
   const c = CH.find(x => x.id===+id);
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
-  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)}</h1><p class="sub">LOCKED</p>${lockHtml('c'+c.id)}`; return; }
+  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1>${lockHtml('c'+c.id)}`; return; }
   const rel = PR.filter(p => p.char_id===c.id).reverse(), rcs = relCards(c);
   app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
   <div class="prof">
@@ -481,8 +488,8 @@ function pageOoc(){
 }
 function ocRow(o, n, open){
   const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
-  const vt = admin && vis(o) !== 'public' ? ` <span class="ovb">${vis(o) === 'private' ? 'PRIVATE' : 'LOCKED'}</span>` : '';
-  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)} <span class="ovb">LOCKED</span></strong><small>비밀번호가 필요해요</small></div></div>
+  const vt = admin && vis(o) !== 'public' ? ` ${ico(vis(o))}` : '';
+  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)} ${ico('locked')}</strong><small>비밀번호가 필요해요</small></div></div>
     <div class="oc-body">${lockHtml('o'+o.id)}<div class="oc-bar">${lnk}</div></div></div>`;
   return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${String(n).padStart(2,'0')}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o))}</small></div></div>
     <div class="oc-body"><pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
