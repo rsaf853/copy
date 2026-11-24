@@ -118,6 +118,8 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);font:700 11px/1.5 var(--sans);gap:8px}
 .hd .btn{padding:0 7px;font-size:10.5px}
 .hd div{display:flex;gap:4px}
+.pt{padding:9px 12px 0;font-weight:800;font-size:13.5px;word-break:break-word}
+.pt + .tx{padding-top:4px}
 .tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--fg) transparent}
 .tx::-webkit-scrollbar{width:4px}.tx::-webkit-scrollbar-thumb{background:var(--fg)}
 .more{display:block;margin:16px auto 0}
@@ -197,12 +199,14 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .vb{position:absolute;top:7px;left:7px;z-index:1;line-height:0}
 .vb svg{display:block;width:14px;height:14px;overflow:visible}
 .ph svg{width:30px;height:30px}
-.lk{display:flex;flex-direction:column;align-items:center;gap:8px;padding:36px 16px;border:1px solid var(--line);text-align:center}
+.lk{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:16px;border:1px solid var(--line)}
 .pr .lk{border:0}
-.lk svg{width:22px;height:22px}
-.lk form{display:flex;gap:5px;width:100%;max-width:280px}
-.lk input{flex:1;min-width:0}
-.lk .st{margin-top:0;min-height:16px}
+.lk>svg{width:16px;height:16px;flex:none}
+.lk form{display:flex;align-items:center;gap:5px;flex:1;min-width:180px;max-width:420px}
+.lk input{flex:1;min-width:0;border:0;border-bottom:1px solid currentColor;background:transparent;color:inherit;padding:4px 2px}
+.lk .btn{border-color:currentColor;color:inherit;background:transparent;padding:2px 10px;font-size:11px}
+.lk .st{margin-top:0;min-height:0;flex-basis:100%}
+.lk .st:empty{display:none}
 #oq{margin-bottom:18px}
 .oc{border-top:2px solid var(--fg)}
 .oc-r{border-bottom:1px solid var(--line)}
@@ -219,8 +223,9 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .oc-r.open small{display:none}.oc-r.open .oc-n{color:var(--bg);opacity:.6}.oc-r.open .oc-body{display:block}
 .ico{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.14em;margin-left:2px;overflow:visible}
 h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
-.oc-body .lk{border:0;padding:16px 0 4px}
-.oc-r.open .lk input{background:var(--bg);color:var(--fg)}
+.oc-body .lk{border:0;padding:10px 0 4px}
+.oc-r.open .lk input{background:transparent;color:var(--bg)}
+.oc-r.open .lk input::placeholder{color:var(--bg);opacity:.5}
 .oc-r.open .oc-body .st{color:var(--bg)}
 .oc-r.open .tg{background:transparent;color:var(--bg);border-color:var(--bg)}
 .oc-r.open .btn{background:var(--bg);color:var(--fg);border-color:var(--bg)}
@@ -350,11 +355,11 @@ const chName = id => (CH.find(c => c.id===id)||{}).name;
 function promptBox(p){
   const cn = p.char_id ? chName(p.char_id) : '';
   const lnk = `<button class="btn" data-act="copy" data-k="u${p.id}" title="이 프롬프트만 열리는 링크를 복사해요">LINK</button>`;
-  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)} ${ico('locked')}</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
+  if(isLocked(p, 'p'+p.id)) return `<div class="pr"><div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${p.title ? ' · ' + esc(p.title) : ''} ${ico('locked')}</span><div>${lnk}</div></div>${lockHtml('p'+p.id)}</div></div>`;
   return `<div class="pr">${p.img ? `<div class="im" data-act="zoom" data-src="${esc(p.img)}">${img(p.img,'',p.img_pos)}</div>` : ''}
   <div class="bd"><div class="hd"><span>#${num(p)} · ${esc(p.cat)}${cn ? ' · ' + esc(cn) : ''}${admin && vis(p) !== 'public' ? ' ' + ico(vis(p)) : ''}</span>
   <div>${admin ? `<button class="btn" data-act="edit-p" data-id="${p.id}">EDIT</button><button class="btn" data-act="del-p" data-id="${p.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="p${p.id}">COPY</button></div></div>
-  <pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
+  ${p.title ? `<div class="pt">${esc(p.title)}</div>` : ''}<pre class="tx">${esc(p.text)}</pre>${show('subs') ? (p.subs||[]).map((x,i) => subBox(p,x,i,'q')).join('') : ''}</div></div>`;
 }
 
 function pageChars(){
@@ -454,7 +459,7 @@ function pagePrompts(){
 }
 function list(){
   const s = q.trim().toLowerCase();
-  const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || (!isLocked(p, 'p'+p.id) && p.text.toLowerCase().includes(s)))).reverse();
+  const rows = PR.filter(p => (cat==='all'||p.cat===cat) && (!s || ((p.title || '').toLowerCase().includes(s) || (!isLocked(p, 'p'+p.id) && p.text.toLowerCase().includes(s))))).reverse();
   $('#list').innerHTML = rows.length
     ? `<div class="pgrid">${rows.slice(0,shown).map(promptBox).join('')}</div>` + (rows.length>shown ? '<button class="btn more" id="more">MORE</button>' : '')
     : '<p class="empty">I\'m feeling lucky!</p>';
@@ -637,6 +642,7 @@ function formP(p){
     <label>카테고리</label><select name="csel" id="csel">${cats.map(c => `<option value="${esc(c)}" ${c===cur0 ? 'selected' : ''}>${esc(c)}</option>`).join('')}<option value="__n" ${cats.length ? '' : 'selected'}>+ 새 카테고리</option></select>
     <input name="cat" id="ctxt" placeholder="solo, duo, outfit …" autocomplete="off" style="margin-top:5px" ${cats.length ? 'hidden' : 'required'}>
     <label>연결할 캐릭터 (선택)</label><select name="char_id"><option value="">없음</option>${CH.map(c => `<option value="${c.id}" ${p && p.char_id===c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+    <label>제목 (선택)</label><input name="title" value="${esc(p && p.title || '')}" autocomplete="off">
     <label>프롬프트</label><textarea class="m" name="text" rows="9" required>${esc(p ? p.text : '')}</textarea>
     ${imgField(p && p.img)}
     <div id="pe-wrap" hidden><label>썸네일 위치 — 사진을 드래그해서 보이는 부분을 맞추고, 확대도 할 수 있어요</label><div class="pe" id="pbox"><img id="pimg" alt=""></div><input type="hidden" name="img_pos" value="${esc((p && p.img_pos) || '50% 50%')}"></div>
@@ -653,6 +659,7 @@ function formP(p){
       if(fd.get('rmimg')) im = '';
       const f = fd.get('file'); if(f && f.size){ st('이미지 업로드 중…'); im = await upload(f, 'prompts'); }
       const row = { cat: (fd.get('csel') === '__n' ? fd.get('cat') : fd.get('csel')).trim(), text: fd.get('text').trim(), img: im, img_pos: fd.get('img_pos') || '50% 50%', char_id: fd.get('char_id') ? +fd.get('char_id') : null, subs: await readSubs(fd), ...await visRow(fd, p) };
+      const ti = (fd.get('title') || '').trim(); if(ti || (p && p.title)) row.title = ti;
       const r = p ? await sb.from('prompts').update(row).eq('id', p.id) : await sb.from('prompts').insert(row);
       if(r.error) throw r.error;
     }); };
