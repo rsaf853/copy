@@ -394,14 +394,14 @@ function promptBox(p){
 function pageHome(){
   const pins = sortCh().filter(c => c.pinned), ps = (pins.length ? pins : sortCh()).slice(0, 2);
   const so = show('oo'), sp = show('pp');
-  const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2><a href="${href}" aria-label="${t} 전체 보기">→</a></div>`;
+  const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
   const lead = [['persona', CH.length], so && ['ooc', OC.length], sp && ['prompt', PR.length]].filter(Boolean).map(([l, n]) => `<span>${l}<sup>${n}</sup></span>`).join('');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = OC.slice(0, 8).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     return `<a class="oc1" href="#/ooc/${o.id}"><span class="n">#${i+1}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span><small>${lk ? '' : esc(ocText(o).slice(0, 120))}</small></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
   <div class="hm-two${so ? '' : ' one'}">
-    <div class="hsec">${hsh('persona', pins.length ? 'PINNED' : '', '#/characters')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
+    <div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
     ${so ? `<div class="hsec">${hsh('ooc', `${Math.min(8, OC.length)} / ${OC.length}`, '#/ooc')}${orows || '<p class="empty">아직 OOC가 없어요.</p>'}</div>` : ''}
   </div>
   ${sp && PR.length ? `<div class="hsec">${hsh('prompt', 'LATEST ' + Math.min(4, PR.length), '#/prompts')}<div class="pgrid">${PR.slice().reverse().slice(0, 4).map(promptBox).join('')}</div></div>` : ''}`;
