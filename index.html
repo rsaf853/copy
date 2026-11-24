@@ -378,8 +378,17 @@ async function visRow(fd, r){
 }
 const mkKey = () => { const a = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789', b = crypto.getRandomValues(new Uint8Array(12)); return [...b].map(x => a[x % a.length]).join(''); };
 /* 주소 → 항목. 숫자 주소는 링크 전용 항목이면 관리자만, 랜덤 주소는 누구나 */
-const byKey = (arr, k) => /^\d+$/.test(String(k)) ? arr.find(x => x.id === +k && (vis(x) !== 'unlisted' || admin)) : arr.find(x => x.share_key && x.share_key === k);
-const keyOf = r => vis(r) === 'unlisted' && r.share_key ? r.share_key : r.id;
+/* 랜덤 주소가 있는 항목은 숫자 주소로는 관리자만 열 수 있음 (OOC는 전부 랜덤 주소) */
+const byKey = (arr, k) => /^\d+$/.test(String(k)) ? arr.find(x => x.id === +k && (admin || (vis(x) !== 'unlisted' && !x.share_key))) : arr.find(x => x.share_key && x.share_key === k);
+const keyOf = r => r.share_key || r.id;
+/* 관리자로 들어오면 아직 랜덤 주소가 없는 OOC에 한 번씩 만들어 줌 (저장에 성공한 것만 반영) */
+let keyFill = false;
+async function fillOocKeys(){
+  if(!admin || keyFill) return; keyFill = true;
+  const miss = OC.filter(o => !o.share_key); if(!miss.length) return;
+  const res = await Promise.all(miss.map(o => { const k = mkKey(); return sb.from('ooc').update({ share_key: k }).eq('id', o.id).then(r => { if(!r.error) o.share_key = k; return r; }); }));
+  if(res.some(r => r.error)) keyFill = false;
+}
 const shareUrl = (path, r) => location.href.split('#')[0] + '#/' + path + '/' + keyOf(r);
 const show = k => { const m = SET[k] || 'on'; return m==='on' || (m==='admin' && admin); };
 const pv = k => SET[k]==='admin' ? ' ' + ico('private') : '';
@@ -414,6 +423,7 @@ async function load(pre, early){
   const od = o.error ? [] : o.data;
   CH = c.data.filter(canSee); PR = p.data.filter(canSee); OC = od.filter(canSee);
   if(!st2.error) SET = Object.fromEntries(st2.data.map(r => [r.key, r.value]));
+  fillOocKeys();
   const pub = a => a.filter(r => vis(r) !== 'private');
   try{ const raw = JSON.stringify({ c: pub(c.data), p: pub(p.data), o: pub(od), s: SET }); const same = raw === cacheSig; cacheSig = raw; localStorage.setItem(CK, raw); if(same) return 'same'; }catch(_){}
   return true;
@@ -455,7 +465,7 @@ function pageHome(){
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = LO().slice(0, 10).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
-    return `<a class="oc1" href="#/ooc/${o.id}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
+    return `<a class="oc1" href="#/ooc/${keyOf(o)}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
   <div class="hm-two${so ? '' : ' one'}">
     <div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
@@ -676,6 +686,7 @@ function formOoc(o){
   $('#f').onsubmit = e => { e.preventDefault(); const fd = new FormData(e.target);
     finish(async () => {
       const row = { title: fd.get('title').trim(), tags: fd.get('tags').trim(), content: fd.get('content').trim(), ...await visRow(fd, o) };
+      if(!(o && o.share_key) && !row.share_key) row.share_key = mkKey();
       const r = o ? await sb.from('ooc').update(row).eq('id', o.id) : await sb.from('ooc').insert(row);
       if(r.error) throw r.error;
     }); };
