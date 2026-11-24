@@ -263,11 +263,13 @@ h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 /* OOC: 열마다 쌓는 카드. 누르면 그 카드만 아래로 길어짐 */
 .oc{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:10px;align-items:start}
 .oc-col{display:flex;flex-direction:column;gap:10px;min-width:0}
-.oc-r{display:flex;flex-direction:column;border:1px solid var(--line);border-top:3px solid var(--fg);background:var(--bg);cursor:pointer}
+.oc-r{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);border-top:3px solid var(--fg);background:var(--bg);cursor:pointer}
 .oc-r:hover{border-color:var(--fg)}
 .oc-top{display:flex;align-items:baseline;gap:8px;padding:8px 12px 0;min-width:0}
-.oc-top strong{font-weight:800;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.oc-n{font:500 11px var(--mono);letter-spacing:0;color:var(--mut);flex:none}
+.oc-top strong{font-weight:800;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:30px}
+.oc-num{position:absolute;top:11px;right:10px;font:800 11px/1 var(--sans);letter-spacing:-.03em;white-space:nowrap;color:var(--mut);color:color-mix(in srgb,var(--fg) 14%,var(--bg));transition:color .15s}
+.oc-r:hover .oc-num,.oc-r.open .oc-num{color:var(--fg)}
+.oc.one .oc-num{top:20px;right:16px;font-size:12px}
 .oc-r .tags{display:flex;flex-wrap:wrap;gap:3px;padding:4px 12px 0}
 .oc-r .tg{white-space:nowrap;font-size:10.5px;padding:0 6px}
 .oc-r .tg.x18{background:var(--fg);color:var(--bg)}
@@ -599,14 +601,16 @@ function pageOoc(){
 }
 const OCPV = 400;
 const ocNum = n => typeof n === 'number' ? String(n).padStart(2,'0') : n;
+/* 카드 번호: 오른쪽 위에 작게 #01 (링크 전용은 번호 없음) */
+const ocNumT = n => typeof n === 'number' ? `<span class="oc-num">#${ocNum(n)}</span>` : '';
 function ocRow(o, n, open){
   const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
   const vt = admin && vis(o) !== 'public' ? ` ${ico(vis(o))}` : '';
   const tg = ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : '';
-  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r locked${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${ocNum(n)}</span><strong>${esc(o.title)} ${ico('locked')}</strong></div>${tg}
+  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r locked${open ? ' open' : ''}" data-oid="${o.id}">${ocNumT(n)}<div class="oc-top"><strong>${esc(o.title)} ${ico('locked')}</strong></div>${tg}
     ${lockHtml('o'+o.id)}<div class="oc-f"><span class="oc-len"></span><div class="oc-bar">${lnk}</div></div></div>`;
   const t = ocText(o);
-  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${ocNum(n)}</span><strong>${esc(o.title)}${vt}</strong></div>${tg}
+  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}">${ocNumT(n)}<div class="oc-top"><strong>${esc(o.title)}${vt}</strong></div>${tg}
     <pre class="oc-pv">${esc(open ? t : t.slice(0, OCPV))}</pre>
     <div class="oc-f"><span class="oc-len">${t.length}자</span><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
 }
