@@ -394,7 +394,7 @@ function promptBox(p){
 function pageHome(){
   const pins = sortCh().filter(c => c.pinned), ps = (pins.length ? pins : sortCh()).slice(0, 2);
   const so = show('oo'), sp = show('pp');
-  const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2><a href="${href}">all →</a></div>`;
+  const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2><a href="${href}" aria-label="${t} 전체 보기">→</a></div>`;
   const lead = [['persona', CH.length], so && ['ooc', OC.length], sp && ['prompt', PR.length]].filter(Boolean).map(([l, n]) => `<span>${l}<sup>${n}</sup></span>`).join('');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = OC.slice(0, 8).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
