@@ -224,18 +224,18 @@ body.is-home header .logo{visibility:hidden}
 .hsh a:hover{color:var(--fg)}
 .hpp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hpp .card b{font-size:15px}
-.oc1{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);align-items:baseline;gap:8px;padding:8px 6px;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
-.oc1:hover{background:var(--soft)}
-.oc1 .n{font:500 11px var(--mono);color:var(--mut)}
-.oc1 strong{font-weight:600;font-size:12.5px;white-space:nowrap}
+.oc1{position:relative;display:grid;grid-template-columns:24px minmax(0,1fr);align-items:center;gap:14px;padding:5px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
+.oc1 .n{font:900 14px/1 var(--sans);color:var(--mut);color:color-mix(in srgb,var(--fg) 22%,var(--bg));letter-spacing:-.08em;font-variant-numeric:tabular-nums}
+.oc1:hover .n{color:var(--fg)}
+.oc1 strong{font-weight:600;font-size:12px;white-space:nowrap}
 .oc1 .tt{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
-.oc1 .tg{font-size:10px;padding:0 5px;white-space:nowrap}
+.oc1 .tg{font-size:9.5px;padding:0 4px;white-space:nowrap}
 .oc1 .tg.x18{background:var(--fg);color:var(--bg)}
 .oc1 .tt{min-width:0;overflow:hidden}
 .oc1 strong{overflow:hidden;text-overflow:ellipsis}
 /* 마우스 올리면 내용 미리보기 */
 @media (hover:hover){
-  .oc1[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:36px;top:calc(100% - 2px);z-index:6;width:min(380px,calc(100% - 36px));max-height:240px;overflow:hidden;padding:9px 11px;background:var(--fg);color:var(--bg);font:400 11.5px/1.6 var(--mono);white-space:pre-wrap;word-break:break-word;pointer-events:none;animation:tipin .12s ease-out .25s both}
+  .oc1[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:38px;top:calc(100% - 2px);z-index:6;width:min(380px,calc(100% - 38px));max-height:240px;overflow:hidden;padding:9px 11px;background:var(--fg);color:var(--bg);font:400 11.5px/1.6 var(--mono);white-space:pre-wrap;word-break:break-word;pointer-events:none;animation:tipin .12s ease-out .25s both}
 }
 @keyframes tipin{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.oc1[data-tip]:hover::after{animation:none}}
