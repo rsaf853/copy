@@ -195,7 +195,7 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
 .tg{font:600 11px/1.5 var(--sans);border:1px solid var(--fg);padding:0 8px}
 /* 메인 */
-.ttl{text-align:right;border-bottom:2px solid var(--fg);padding-bottom:12px;margin-bottom:24px}
+.ttl{text-align:right;margin-bottom:24px}
 .ttl .big{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1.05;margin:0}
 .ttl .lead{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;font:700 12px var(--sans);letter-spacing:-.01em;margin:6px 0 0}
 .ttl .lead sup{font:500 9px var(--mono);color:var(--mut);margin-left:2px;vertical-align:5px;letter-spacing:0;line-height:0}
@@ -404,13 +404,13 @@ function pageHome(){
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
   const lead = [['persona', CH.length], so && ['ooc', OC.length], sp && ['prompt', PR.length]].filter(Boolean).map(([l, n]) => `<span>${l}<sup>${n}</sup></span>`).join('');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
-  const orows = OC.slice(0, 10).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
+  const orows = OC.slice(0, 9).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
     return `<a class="oc1" href="#/ooc/${o.id}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${i+1}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
   <div class="hm-two${so ? '' : ' one'}">
     <div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
-    ${so ? `<div class="hsec">${hsh('ooc', `${Math.min(10, OC.length)} / ${OC.length}`, '#/ooc')}${orows || '<p class="empty">아직 OOC가 없어요.</p>'}</div>` : ''}
+    ${so ? `<div class="hsec">${hsh('ooc', `${Math.min(9, OC.length)} / ${OC.length}`, '#/ooc')}${orows || '<p class="empty">아직 OOC가 없어요.</p>'}</div>` : ''}
   </div>
   ${sp && PR.length ? `<div class="hsec">${hsh('prompt', 'LATEST ' + Math.min(4, PR.length), '#/prompts')}<div class="pgrid">${PR.slice().reverse().slice(0, 4).map(promptBox).join('')}</div></div>` : ''}`;
 }
