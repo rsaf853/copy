@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-jp@1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.css">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fff;--fg:#000;--mut:#9a9a9a;--line:#e4e4e4;--soft:#f6f6f6;--sans:"Pretendard Variable",Pretendard,"Pretendard JP Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;--mono:"JetBrains Mono","Pretendard Variable",Pretendard,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#777;--line:#2a2a2a;--soft:#111}}
@@ -133,10 +133,11 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto}
 /* 스크롤바: 사이트 전체 한 가지 (얇고 각진, 테마 색) */
 /* 크롬·사파리·엣지는 아래 각진 스타일, 파이어폭스만 기본 얇은 막대 (표준 속성이 있으면 크롬이 각진 스타일을 무시해서 분리) */
-@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:var(--fg) transparent}}
+@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:transparent transparent}.scrolling{scrollbar-color:var(--fg) transparent}}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--fg);border-radius:0}
+::-webkit-scrollbar-thumb{background:transparent;border-radius:0}
+.scrolling::-webkit-scrollbar-thumb{background:var(--fg)}
 ::-webkit-scrollbar-corner{background:transparent}
 .more{display:block;margin:16px auto 0}
 .back{display:inline-block;margin-bottom:14px;font:600 11px/1.5 var(--sans);color:var(--mut);text-decoration:none}
@@ -269,7 +270,7 @@ h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 .oc-top strong{font-weight:800;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:30px}
 .oc-num{position:absolute;top:11px;right:10px;font:800 11px/1 var(--sans);letter-spacing:-.03em;white-space:nowrap;color:var(--mut);color:color-mix(in srgb,var(--fg) 14%,var(--bg));transition:color .15s}
 .oc-r:hover .oc-num,.oc-r.open .oc-num{color:var(--fg)}
-.oc.one .oc-num{top:20px;right:16px;font-size:12px}
+.oc.one .oc-num{top:14px;right:14px;font-size:12px}
 .oc-r .tags{display:flex;flex-wrap:wrap;align-items:center;gap:3px;padding:5px 12px 0;line-height:1}
 .oc-r .tags .tg{line-height:16px}
 .oc-r .tg{white-space:nowrap;font-size:10.5px;padding:0 6px}
@@ -299,11 +300,21 @@ h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 /* 링크 화면: 카드 하나 크게 + 다른 OOC */
 .oc.one{display:block;margin-top:6px}
 .oc.one .oc-r{border-color:var(--fg);border-top-width:6px;cursor:auto;margin:0}
-.oc.one .oc-top{padding:16px 16px 0;cursor:auto}
+.oc.one .oc-top{padding:10px 14px 0;cursor:auto}
 .oc.one .oc-top strong{font-size:22px;letter-spacing:-.03em;white-space:normal}
-.oc.one .tags{padding:8px 16px 0}
-.oc.one .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:none;padding:16px;margin:0;font-size:13.5px}
-.oc.one .oc-f{border-top:2px solid var(--fg);padding:8px 10px 8px 16px}
+.oc.one .tags{padding:5px 14px 0}
+.oc.one .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:none;padding:10px 14px 12px;margin:0;font-size:13.5px}
+.oc.one .oc-f{border-top:2px solid var(--fg);padding:4px 8px 4px 14px}
+/* 링크 화면: 버튼 크게·굵게, LINK 글자 항상 (OOC·프롬프트) */
+.top:has(+ .oc.one) .sub,.top:has(+ .pgrid.one) .sub{margin-bottom:8px}
+.oc.one .oc-len{font-size:10.5px;color:color-mix(in srgb,var(--fg) 30%,var(--bg))}
+.oc.one .oc-tb,.pgrid.one .oc-tb{font-size:11px;font-weight:800;margin-right:10px;color:color-mix(in srgb,var(--fg) 55%,var(--bg))}
+.oc.one .oc-tb:hover,.oc.one .oc-tb.on,.pgrid.one .oc-tb:hover{color:var(--fg)}
+.oc.one .oc-ib,.pgrid.one .oc-ib{height:26px;font-size:11px;font-weight:800;padding:0 6px}
+.oc.one .oc-ib svg,.pgrid.one .oc-ib svg{width:15px;height:15px;stroke-width:2.2}
+.oc.one .oc-ib.ln,.pgrid.one .oc-ib.ln{color:var(--fg)}
+.oc.one .oc-ib.ln .lt,.pgrid.one .oc-ib.ln .lt{max-width:none;margin-left:4px}
+.oc.one .oc-ib.cp,.pgrid.one .oc-ib.cp{gap:4px}
 .bar.ordering .chip[data-t]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .bar.ordering .chip.drag{opacity:.35}
 a.btn{display:inline-block;text-decoration:none}
@@ -1139,6 +1150,9 @@ $('#set').onclick = formSettings;
 $('#adm').onclick = async () => { if(admin){ await sb.auth.signOut(); route(); } else formLogin(); };
 sb.auth.onAuthStateChange((_ev, s) => { const was = admin; admin = !!s; syncAdm(); if(was !== admin && (CH.length || PR.length)){ CH = CH.filter(canSee); PR = PR.filter(canSee); route(); setTimeout(async () => { if(await load()) route(); }, 0); } });
 addEventListener('hashchange', route);
+/* 스크롤하는 동안에만 스크롤바 보이기 */
+document.addEventListener('scroll', e => { const t = e.target === document ? document.documentElement : e.target; if(!t.classList) return;
+  t.classList.add('scrolling'); clearTimeout(t._sbt); t._sbt = setTimeout(() => t.classList.remove('scrolling'), 900); }, { capture: true, passive: true });
 
 (async () => {
   const shown = fromCache();
