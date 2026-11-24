@@ -67,6 +67,10 @@ h1{font-size:22px;font-weight:800;letter-spacing:-0.05em;margin:0 0 2px}
 .card b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card span{color:var(--mut);font-size:11px;font-weight:500}
 .card.pd{border-color:var(--fg)}
+/* 마우스 올리면 사진 살짝 확대 (위치/확대 설정한 사진도 그대로 유지되게 scale 속성 사용) */
+.card .ph img{transition:scale .25s ease}
+@media (hover:hover){.card:hover .ph img{scale:1.06}}
+@media (prefers-reduced-motion:reduce){.card .ph img{transition:none}}
 .card.pd .meta{background:var(--fg);color:var(--bg)}
 .card.pd .meta .al{color:var(--bg);opacity:.6}
 .card .meta .al{display:inline;margin-left:6px;font-size:10.5px;font-weight:500;color:var(--mut);opacity:.85}
