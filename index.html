@@ -194,9 +194,12 @@ footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
 .tg{font:600 11px/1.5 var(--sans);border:1px solid var(--fg);padding:0 8px}
 /* 메인 */
-.ttl{text-align:right;margin-bottom:24px}
+.ttl{text-align:left;margin-bottom:24px}
+body.is-home header{display:none}
 .ttl .big{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1.05;margin:0}
-.ttl .lead{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;font:700 12px var(--sans);letter-spacing:-.01em;margin:6px 0 0}
+.ttl .lead{display:flex;justify-content:flex-start;flex-wrap:wrap;gap:10px;font:700 12px var(--sans);letter-spacing:-.01em;margin:6px 0 0}
+.ttl .lead a{color:inherit;text-decoration:none}
+.ttl .lead a:hover{text-decoration:underline;text-underline-offset:3px}
 .ttl .lead sup{font:500 9px var(--mono);color:var(--mut);margin-left:2px;vertical-align:5px;letter-spacing:0;line-height:0}
 .hm-two{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
 .hm-two.one{grid-template-columns:minmax(0,1fr);max-width:540px}
@@ -401,7 +404,7 @@ function pageHome(){
   const pins = sortCh().filter(c => c.pinned), ps = (pins.length ? pins : sortCh()).slice(0, 2);
   const so = show('oo'), sp = show('pp');
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
-  const lead = [['persona', CH.length], so && ['ooc', OC.length], sp && ['prompt', PR.length]].filter(Boolean).map(([l, n]) => `<span>${l}<sup>${n}</sup></span>`).join('');
+  const lead = [['persona', CH.length, 'characters'], so && ['ooc', OC.length, 'ooc'], sp && ['prompt', PR.length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = OC.slice(0, 9).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
@@ -622,6 +625,7 @@ function route(){
   if(a==='prompts' || a==='c' || a==='ooc' || a==='home') ORD = false;
   if(a!=='ooc') OTO = false;
   $('#n1').classList.toggle('on', a==='characters' || a==='c'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
+  document.body.classList.toggle('is-home', a==='home');
   a==='home' ? pageHome() : a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
   window.scrollTo(0,0);
 }
