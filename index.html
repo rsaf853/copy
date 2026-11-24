@@ -232,10 +232,6 @@ body.is-home header .logo{visibility:hidden}
 .hsh a:hover{color:var(--fg)}
 .hpp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hpp .card b{font-size:15px}
-/* persona가 숨겨진 사람에게는 main pair가 보이기만 하고 눌리지 않음 */
-.card.nolink{cursor:default}
-.card.nolink:hover{border-color:var(--line)}
-.card.pd.nolink:hover{transform:none;box-shadow:none;border-color:var(--mut);border-color:color-mix(in srgb,var(--fg) 40%,var(--bg))}
 .oc1{position:relative;display:grid;grid-template-columns:24px minmax(0,1fr);align-items:center;gap:14px;padding:7px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
 .oc1 .n{font:900 13px/1 var(--sans);color:var(--mut);color:color-mix(in srgb,var(--fg) 22%,var(--bg));letter-spacing:-.08em;font-variant-numeric:tabular-nums}
 .oc1:hover .n{color:var(--fg)}
@@ -504,12 +500,16 @@ function promptBox(p){
 }
 
 /* 메인: 큰 제목(오른쪽) · PIN 된 persona 앞 2명 + OOC 8개 · 최신 PROMPT 4개 (2단) */
+/* 메인에 나오는 두 명 (PIN 된 캐릭터 앞의 2명, 없으면 목록 앞 2명) */
+const mainPair = () => { const sl = sortCh().filter(listed), pins = sl.filter(c => c.pinned); return (pins.length ? pins : sl).slice(0, 2); };
+/* persona가 숨겨진 사람도 main pair 두 명의 페이지는 볼 수 있음 (다른 캐릭터로 가는 길은 없음) */
+const pairOnly = c => !show('pc') && mainPair().some(x => x.id === c.id);
 function pageHome(){
-  const sl = sortCh().filter(listed), pins = sl.filter(c => c.pinned), ps = (pins.length ? pins : sl).slice(0, 2);
+  const ps = mainPair();
   const so = show('oo'), sp = show('pp'), sc = show('pc');
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
   const lead = [sc && ['persona', LC().length, 'characters'], so && ['ooc', LO().length, 'ooc'], sp && ['prompt', LP().length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
-  const pcards = ps.map(c => `<${sc ? 'a' : 'div'} class="card${c.pinned ? ' pd' : ''}${sc ? '' : ' nolink'}"${sc ? ` href="#/c/${c.id}"` : ''}>${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></${sc ? 'a' : 'div'}>`).join('');
+  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = LO().slice(0, 10).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
     return `<a class="oc1" href="#/ooc/${keyOf(o)}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
@@ -549,9 +549,9 @@ async function saveOrder(){
 function pageChar(id){
   const c = byKey(CH, id);
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
-  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="#/characters">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1><div class="lkfull">${lockHtml('c'+c.id)}</div>`; return; }
+  if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="${pairOnly(c) ? '#/home' : '#/characters'}">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1><div class="lkfull">${lockHtml('c'+c.id)}</div>`; return; }
   const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c);
-  app.innerHTML = `<a class="back" href="#/characters">← BACK</a>
+  app.innerHTML = `<a class="back" href="${pairOnly(c) ? '#/home' : '#/characters'}">← BACK</a>
   <div class="prof">
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
@@ -562,7 +562,7 @@ function pageChar(id){
   ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="oc-ib cp" data-act="copy" data-k="c${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="oc-ib cp" data-act="copy" data-k="o${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
   ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
   ${!show('gal') ? '' : ((c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY${pv('gal')} · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : '')}
-  ${!show('rel') ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg" id="rg">${rcs}</div>` : ''}` : '')}
+  ${!show('rel') || pairOnly(c) ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg" id="rg">${rcs}</div>` : ''}` : '')}
   ${!show('relp') ? '' : (rel.length ? `<h2>RELATED PROMPTS${pv('relp')}</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : '')}`;
   document.querySelectorAll('.gal div[data-gi] img').forEach(im => {
     const f = () => { if(im.naturalWidth) im.parentElement.style.setProperty('--r', (im.naturalWidth / im.naturalHeight).toFixed(3)); };
@@ -748,7 +748,7 @@ function route(){
   if(a==='in'){ try{ if(b) sessionStorage.setItem('pk', b); }catch(_){} history.replaceState(null, '', location.pathname + location.search + '#/home'); a = 'home'; b = undefined; }
   $('#n1').style.display = show('pc') ? '' : 'none';
   $('#n2').style.display = show('pp') ? '' : 'none'; $('#n3').style.display = show('oo') ? '' : 'none';
-  if((a==='characters' || (a==='c' && /^\d+$/.test(b || ''))) && !show('pc')){ location.hash = '#/home'; return; }
+  if((a==='characters' || (a==='c' && /^\d+$/.test(b || '') && !mainPair().some(x => x.id === +b))) && !show('pc')){ location.hash = '#/home'; return; }
   if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
   if(a==='prompts' || a==='c' || a==='ooc' || a==='home') ORD = false;
