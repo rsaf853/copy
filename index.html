@@ -406,7 +406,7 @@ function pageHome(){
   const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = OC.slice(0, 8).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
-    return `<a class="oc1" href="#/ooc/${o.id}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">#${i+1}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
+    return `<a class="oc1" href="#/ooc/${o.id}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${i+1}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
   app.innerHTML = `<div class="ttl"><p class="big">r♡sie<br>archive</p><p class="lead">${lead}</p></div>
   <div class="hm-two${so ? '' : ' one'}">
     <div class="hsec">${hsh('main pair', '', '')}${ps.length ? `<div class="hpp">${pcards}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}</div>
@@ -568,9 +568,9 @@ function pageOoc(){
 function ocRow(o, n, open){
   const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
   const vt = admin && vis(o) !== 'public' ? ` ${ico(vis(o))}` : '';
-  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">#${n}</span><div class="oc-t"><strong>${esc(o.title)} ${ico('locked')}</strong><small>비밀번호가 필요해요</small></div></div>
+  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${n}</span><div class="oc-t"><strong>${esc(o.title)} ${ico('locked')}</strong><small>비밀번호가 필요해요</small></div></div>
     <div class="oc-body">${lockHtml('o'+o.id)}<div class="oc-bar">${lnk}</div></div></div>`;
-  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">#${n}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o).slice(0, 160))}</small></div></div>
+  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${n}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o).slice(0, 160))}</small></div></div>
     <div class="oc-body">${open ? ocBody(o) : ''}</div></div>`;
 }
 /* 펼친 줄의 본문 (긴 글이라 펼칠 때만 그림) */
@@ -594,7 +594,7 @@ function drawOoc(){
 function pageOocOne(id){
   const i = OC.findIndex(x => String(x.id) === String(id)), o = OC[i];
   if(!o){ app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">NOT FOUND</p></div><a class="btn" href="#/ooc">← ALL</a></div><p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p>`; return; }
-  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">#${i+1} / ${OC.length}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
+  app.innerHTML = `<div class="top"><div><h1>OOC</h1><p class="sub">${i+1} / ${OC.length}</p></div><a class="btn" href="#/ooc">← ALL</a></div>
   <div class="oc one">${ocRow(o, i+1, true)}</div>`;
 }
 function formOoc(o){
