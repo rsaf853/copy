@@ -130,6 +130,14 @@ textarea.m{font-family:var(--mono);font-size:12px}
 .pt + .tx{padding-top:4px}
 .tx{padding:10px 12px;margin:0;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--fg) transparent}
 .tx::-webkit-scrollbar{width:4px}.tx::-webkit-scrollbar-thumb{background:var(--fg)}
+/* 스크롤바: 사이트 전체 한 가지 (얇고 각진, 테마 색) */
+*{scrollbar-width:thin;scrollbar-color:var(--mut) transparent}
+*:hover{scrollbar-color:var(--fg) transparent}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--mut);border-radius:0}
+::-webkit-scrollbar-thumb:hover{background:var(--fg)}
+::-webkit-scrollbar-corner{background:transparent}
 .more{display:block;margin:16px auto 0}
 .back{display:inline-block;margin-bottom:14px;font:600 11px/1.5 var(--sans);color:var(--mut);text-decoration:none}
 .back:hover{color:var(--fg)}
@@ -250,38 +258,40 @@ body.is-home header .logo{visibility:hidden}
 .lk .st{margin-top:0;min-height:0;flex-basis:100%}
 .lk .st:empty{display:none}
 #oq{margin-bottom:18px}
-.oc{border-top:2px solid var(--fg)}
-.oc-r{border-bottom:1px solid var(--line)}
-.oc-top{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;align-items:start;padding:12px 10px;cursor:pointer}
-.oc-n{font:500 11px var(--mono);letter-spacing:0;color:var(--mut);padding-top:1px}
-.oc-t strong{display:block;font-weight:600}
-.oc-t .tags{display:flex;flex-wrap:wrap;gap:3px;margin:5px 0 6px}
-.oc-t .tg{white-space:nowrap}
-.oc-t small{display:block;color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.oc-body{display:none;padding:0 10px 12px 46px}
-.oc-body pre{margin:0;white-space:pre-wrap;word-break:break-word;font:400 12px/1.75 var(--mono)}
-.oc-bar{margin-top:10px;display:flex;justify-content:flex-end;gap:5px}
-.oc-r.open{background:var(--fg);color:var(--bg);border-bottom-color:var(--fg)}
-.oc-r.open small{display:none}.oc-r.open .oc-n{color:var(--bg);opacity:.6}.oc-r.open .oc-body{display:block}
 .ico{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.14em;margin-left:2px;overflow:visible}
 h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
-.oc-body .lk{border:0;padding:10px 0 4px}
-.oc-r.open .lk input{background:transparent;color:var(--bg)}
-.oc-r.open .lk input::placeholder{color:var(--bg);opacity:.5}
-.oc-r.open .oc-body .st{color:var(--bg)}
-.oc-r.open .tg{background:transparent;color:var(--bg);border-color:var(--bg)}
-.oc-r.open .btn{background:var(--bg);color:var(--fg);border-color:var(--bg)}
-.oc-r.open .btn:hover{background:transparent;color:var(--bg);border-color:var(--bg)}
-@media(max-width:640px){.oc-body{padding-left:10px}}
-.oc-t .tg.x18{background:var(--fg);color:var(--bg)}
-.oc-r.open .tg.x18{background:var(--bg);color:var(--fg);border-color:var(--bg)}
-.oc-body{cursor:auto}
-.oc-r.open .btn.on{background:transparent;color:var(--bg);border-color:var(--bg);box-shadow:inset 0 0 0 1px var(--bg)}
+/* OOC: 열마다 쌓는 카드. 누르면 그 카드만 아래로 길어짐 */
+.oc{columns:3 260px;column-gap:10px}
+.oc-r{break-inside:avoid;display:flex;flex-direction:column;margin-bottom:10px;border:1px solid var(--line);border-top:3px solid var(--fg);background:var(--bg);cursor:pointer}
+.oc-r:hover{border-color:var(--fg)}
+.oc-top{display:flex;align-items:baseline;gap:8px;padding:10px 12px 0;min-width:0}
+.oc-top strong{font-weight:800;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oc-n{font:500 11px var(--mono);letter-spacing:0;color:var(--mut);flex:none}
+.oc-r .tags{display:flex;flex-wrap:wrap;gap:3px;padding:6px 12px 0}
+.oc-r .tg{white-space:nowrap;font-size:10.5px;padding:0 6px}
+.oc-r .tg.x18{background:var(--fg);color:var(--bg)}
+.oc-pv{margin:0;padding:10px 12px;color:var(--mut);white-space:pre-wrap;word-break:break-word;font:400 12px/1.75 var(--mono);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.oc-f{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding:6px 8px 6px 12px;cursor:auto}
+.oc-len{font:500 10px var(--mono);color:var(--mut);white-space:nowrap}
+.oc-bar{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.oc-bar .btn{padding:0 7px;font-size:10.5px}
+.oc-r.open{border-color:var(--fg);border-top-width:6px;cursor:auto}
+.oc-r.open .oc-top{cursor:pointer}
+.oc-r.open .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:420px;overflow:auto}
+.oc-r.open .oc-f{border-top:2px solid var(--fg)}
+.oc-r .lk{border:0;padding:12px}
+.oc-r.locked .oc-pv{display:none}
+/* 링크 화면: 카드 하나 크게 + 다른 OOC */
+.oc.one{columns:1;margin-top:6px}
+.oc.one .oc-r{border-color:var(--fg);border-top-width:6px;cursor:auto;margin:0}
+.oc.one .oc-top{padding:16px 16px 0;cursor:auto}
+.oc.one .oc-top strong{font-size:22px;letter-spacing:-.03em;white-space:normal}
+.oc.one .tags{padding:8px 16px 0}
+.oc.one .oc-pv{display:block;-webkit-line-clamp:unset;color:var(--fg);max-height:none;padding:16px;font-size:12.5px;line-height:1.85}
+.oc.one .oc-f{border-top:2px solid var(--fg);padding:8px 10px 8px 16px}
 .bar.ordering .chip[data-t]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .bar.ordering .chip.drag{opacity:.35}
 a.btn{display:inline-block;text-decoration:none}
-.oc.one{margin-top:6px}
-.oc.one .oc-top{cursor:default}
 </style>
 </head>
 <body>
@@ -581,28 +591,33 @@ function pageOoc(){
   $('#ochips').onclick = e => { const b = e.target.closest('[data-t]'); if(!b || OTO) return; otag = b.dataset.t;
     document.querySelectorAll('#ochips .chip').forEach(x => x.classList.toggle('on', x===b)); drawOoc(); };
   if(admin && OTO && window.Sortable) Sortable.create($('#ochips'), { animation:150, draggable:'.chip[data-t]:not([data-t="all"])', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: saveOcTagOrder });
-  /* 접기/펼치기는 헤더(번호·제목·태그 줄)를 눌렀을 때만 */
-  $('#olist').onclick = e => { const t = e.target.closest('.oc-top'); if(!t) return; const r = t.closest('.oc-r');
-    const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(x => x.classList.remove('open')); if(!was) openRow(r); };
+  /* 카드를 누르면 그 카드만 펼치기/접기 (버튼·입력칸·펼친 본문은 제외) */
+  $('#olist').onclick = e => { const r = e.target.closest('.oc-r'); if(!r || e.target.closest('button,a,input,form,.oc-f') || (r.classList.contains('open') && e.target.closest('.oc-pv'))) return;
+    const was = r.classList.contains('open'); document.querySelectorAll('#olist .oc-r.open').forEach(closeRow); if(!was) openRow(r); };
   drawOoc();
 }
+const OCPV = 400;
+const ocNum = n => typeof n === 'number' ? String(n).padStart(2,'0') : n;
 function ocRow(o, n, open){
   const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
   const vt = admin && vis(o) !== 'public' ? ` ${ico(vis(o))}` : '';
-  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${typeof n === 'number' ? String(n).padStart(2,'0') : n}</span><div class="oc-t"><strong>${esc(o.title)} ${ico('locked')}</strong><small>비밀번호가 필요해요</small></div></div>
-    <div class="oc-body">${lockHtml('o'+o.id)}<div class="oc-bar">${lnk}</div></div></div>`;
-  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${typeof n === 'number' ? String(n).padStart(2,'0') : n}</span><div class="oc-t"><strong>${esc(o.title)}${vt}</strong>${ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : ''}<small>${esc(ocText(o).slice(0, 160))}</small></div></div>
-    <div class="oc-body">${open ? ocBody(o) : ''}</div></div>`;
+  const tg = ocTags(o.tags).length ? `<div class="tags">${ocSorted(ocTags(o.tags)).map(t => `<span class="tg${is18(t) ? ' x18' : ''}">${esc(t)}</span>`).join('')}</div>` : '';
+  if(isLocked(o, 'o'+o.id)) return `<div class="oc-r locked${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${ocNum(n)}</span><strong>${esc(o.title)} ${ico('locked')}</strong></div>${tg}
+    ${lockHtml('o'+o.id)}<div class="oc-f"><span class="oc-len"></span><div class="oc-bar">${lnk}</div></div></div>`;
+  const t = ocText(o);
+  return `<div class="oc-r${open ? ' open' : ''}" data-oid="${o.id}"><div class="oc-top"><span class="oc-n">${ocNum(n)}</span><strong>${esc(o.title)}${vt}</strong></div>${tg}
+    <pre class="oc-pv">${esc(open ? t : t.slice(0, OCPV))}</pre>
+    <div class="oc-f"><span class="oc-len">${t.length}자</span><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div></div></div>`;
 }
-/* 펼친 줄의 본문 (긴 글이라 펼칠 때만 그림) */
-function ocBody(o){
-  const lnk = `<button class="btn" data-act="copy" data-k="l${o.id}" title="이 OOC만 열리는 링크를 복사해요">LINK</button>`;
-  return `<pre>${esc(ocText(o))}</pre><div class="oc-bar">${hasPH(o.content) ? `<button class="btn${OSW.has(o.id) ? ' on' : ''}" data-act="swap-o" data-id="${o.id}" title="내용 안의 {{user}}와 {{char}} 위치를 서로 바꿔요">{{user}} ↔ {{char}}</button>` : ''}${admin ? `<button class="btn" data-act="edit-o" data-id="${o.id}">EDIT</button><button class="btn" data-act="del-o" data-id="${o.id}">DEL</button>` : ''}${lnk}<button class="btn" data-act="copy" data-k="g${o.id}">COPY</button></div>`;
-}
+/* 펼치면 본문 전체, 접으면 앞부분만 (긴 글이 많아도 가볍게) */
 function openRow(r){
-  const o = OC.find(x => String(x.id) === r.dataset.oid), b = r.querySelector('.oc-body');
-  if(o && !isLocked(o, 'o'+o.id) && !b.querySelector('pre')) b.innerHTML = ocBody(o);
+  const o = OC.find(x => String(x.id) === r.dataset.oid), pv = r.querySelector('.oc-pv');
+  if(o && pv) pv.textContent = ocText(o);
   r.classList.add('open');
+}
+function closeRow(r){
+  const o = OC.find(x => String(x.id) === r.dataset.oid), pv = r.querySelector('.oc-pv');
+  r.classList.remove('open'); if(o && pv){ pv.textContent = ocText(o).slice(0, OCPV); pv.scrollTop = 0; }
 }
 function drawOoc(){
   const s = oq.trim().toLowerCase();
@@ -1036,7 +1051,7 @@ document.addEventListener('click', async e => {
   if(a==='otag-order'){ OTO = !OTO; return pageOoc(); }
   if(a==='swap-o'){ const k = +b.dataset.id, o = OC.find(x => x.id===k), r = b.closest('.oc-r'); if(!o) return;
     OSW.has(k) ? OSW.delete(k) : OSW.add(k);
-    if(r){ const pre = r.querySelector('pre'); if(pre) pre.textContent = ocText(o); r.querySelector('small').textContent = ocText(o).slice(0, 160); }
+    if(r){ const pv = r.querySelector('.oc-pv'); if(pv) pv.textContent = r.classList.contains('open') ? ocText(o) : ocText(o).slice(0, OCPV); }
     b.classList.toggle('on', OSW.has(k)); return; }
   if(a==='new-o') return formOoc();
   if(a==='edit-o') return formOoc(OC.find(o => o.id===id));
