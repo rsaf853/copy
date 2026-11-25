@@ -330,6 +330,8 @@ body.is-memo footer{display:none}
 .oc.one .lk,.pgrid.one .lk,.lkfull .lk{justify-content:center;padding:44px 16px}
 .oc.one .lk form,.pgrid.one .lk form,.lkfull .lk form{flex:0 1 320px}
 .oc.one .lk .st,.pgrid.one .lk .st,.lkfull .lk .st{text-align:center}
+/* 화면 하나를 차지하는 잠금 화면에서는 입력칸 앞 자물쇠 없앰 (제목 옆에 이미 있음) */
+.oc.one .lk>svg,.pgrid.one .lk>svg,.lkfull .lk>svg{display:none}
 .lkfull{margin-top:14px}
 .oc.one .oc-r{border-color:var(--fg);border-top-width:6px;cursor:auto;margin:0}
 .oc.one .oc-top{padding:10px 14px 0;cursor:auto}
