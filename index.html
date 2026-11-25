@@ -181,7 +181,7 @@ td{white-space:pre-wrap;word-break:break-word}
 @media(max-width:640px){[data-v=a] .sp .sim:not(.no){width:96px}[data-v=a] .sp .tx{max-height:90px}}
 h2{font:800 12px/1.5 var(--sans);margin:26px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--fg)}
 .empty{color:var(--mut);padding:32px 0;text-align:center}
-.acts{display:flex;gap:5px;margin-top:12px}
+.acts{display:flex;align-items:center;gap:5px;margin-top:12px}
 footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mut);font:500 11px/1.5 var(--sans)}
 #md{position:fixed;inset:0;background:rgba(0,0,0,.55);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 12px 20px;z-index:20}
 #md[hidden]{display:none}
@@ -295,6 +295,9 @@ h1 .ico{width:.7em;height:.7em;vertical-align:.02em}
 .oc-ib{display:inline-flex;align-items:center;height:20px;padding:0 4px;color:var(--mut);background:none;border:0;cursor:pointer;font:800 9.5px/1 var(--mono);white-space:nowrap}
 .oc-ib svg{width:12px;height:12px;flex:none;stroke-width:2}
 .oc-ib.cp{color:var(--fg);gap:3px;padding:0 2px 0 4px}
+/* 캐릭터 페이지 LINK: 글자 항상 보임 */
+.oc-ib.ln.cl{color:var(--fg);height:24px;font-size:10.5px;padding:0 6px 0 0}
+.oc-ib.ln.cl .lt{max-width:none;margin-left:4px}
 .oc-ib.cp:hover{text-decoration:underline;text-underline-offset:3px}
 .oc-ib.ln:hover,.oc-ib.ln:focus-visible,.oc-ib.done{color:var(--fg)}
 .oc-ib.ln .lt{max-width:0;overflow:hidden;transition:max-width .2s ease,margin .2s ease}
@@ -424,8 +427,8 @@ const keyOf = r => r.share_key || r.id;
 let keyFill = false;
 async function fillOocKeys(){
   if(!admin || keyFill) return; keyFill = true;
-  const miss = OC.filter(o => !o.share_key); if(!miss.length) return;
-  const res = await Promise.all(miss.map(o => { const k = mkKey(); return sb.from('ooc').update({ share_key: k }).eq('id', o.id).then(r => { if(!r.error) o.share_key = k; return r; }); }));
+  const miss = [...OC.filter(o => !o.share_key).map(o => ['ooc', o]), ...CH.filter(c => !c.share_key).map(c => ['characters', c])]; if(!miss.length) return;
+  const res = await Promise.all(miss.map(([t, o]) => { const k = mkKey(); return sb.from(t).update({ share_key: k }).eq('id', o.id).then(r => { if(!r.error) o.share_key = k; return r; }); }));
   if(res.some(r => r.error)) keyFill = false;
 }
 const shareUrl = (path, r) => location.href.split('#')[0] + '#/' + path + '/' + keyOf(r);
@@ -503,13 +506,13 @@ function promptBox(p){
 /* 메인에 나오는 두 명 (PIN 된 캐릭터 앞의 2명, 없으면 목록 앞 2명) */
 const mainPair = () => { const sl = sortCh().filter(listed), pins = sl.filter(c => c.pinned); return (pins.length ? pins : sl).slice(0, 2); };
 /* persona가 숨겨진 사람도 main pair 두 명의 페이지는 볼 수 있음 (다른 캐릭터로 가는 길은 없음) */
-const pairOnly = c => !show('pc') && mainPair().some(x => x.id === c.id);
+const pairOnly = c => !show('pc');
 function pageHome(){
   const ps = mainPair();
   const so = show('oo'), sp = show('pp'), sc = show('pc');
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
   const lead = [sc && ['persona', LC().length, 'characters'], so && ['ooc', LO().length, 'ooc'], sp && ['prompt', LP().length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
-  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
+  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = LO().slice(0, 10).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
     return `<a class="oc1" href="#/ooc/${keyOf(o)}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
@@ -529,7 +532,7 @@ function pageChars(){
   ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
   ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
   ${ptags.length && !ORD ? `<div class="bar" id="pchips">${['all',...ptags].map(k => `<button class="chip ${k===ptag?'on':''}" data-pt="${esc(k)}">${esc(k)}</button>`).join('')}</div>` : ''}
-  ${LC().length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${c.id}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
+  ${LC().length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
     ${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
   const pc = $('#pchips'); if(pc) pc.onclick = e => { const b = e.target.closest('[data-pt]'); if(b){ ptag = b.dataset.pt; pageChars(); } };
@@ -557,7 +560,7 @@ function pageChar(id){
     <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
       <table>${(c.info||[]).map(([k,v]) => `<tr><th>${esc(lab(k))}</th><td>${esc(lab(k)==='Height' && /^\d+(\.\d+)?$/.test(String(v).trim()) ? String(v).trim() + 'cm' : v)}</td></tr>`).join('')}</table>
       <div style="white-space:pre-wrap;font-size:12.5px">${esc(c.descr||'')}</div>
-      ${admin ? `<div class="acts">${vis(c) === 'unlisted' ? `<button class="btn" data-act="copy" data-k="k${c.id}" title="이 캐릭터 링크를 복사해요">LINK</button>` : ''}<button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button></div>` : ''}</div>
+      <div class="acts"><button class="oc-ib ln cl" data-act="copy" data-k="k${c.id}" title="이 캐릭터만 열리는 링크를 복사해요" aria-label="링크 복사">${ICL_LN}<span class="lt">LINK</span></button>${admin ? `<button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button>` : ''}</div></div>
   </div>
   ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="oc-ib cp" data-act="copy" data-k="c${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="oc-ib cp" data-act="copy" data-k="o${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
   ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
@@ -748,7 +751,7 @@ function route(){
   if(a==='in'){ try{ if(b) sessionStorage.setItem('pk', b); }catch(_){} history.replaceState(null, '', location.pathname + location.search + '#/home'); a = 'home'; b = undefined; }
   $('#n1').style.display = show('pc') ? '' : 'none';
   $('#n2').style.display = show('pp') ? '' : 'none'; $('#n3').style.display = show('oo') ? '' : 'none';
-  if((a==='characters' || (a==='c' && /^\d+$/.test(b || '') && !mainPair().some(x => x.id === +b))) && !show('pc')){ location.hash = '#/home'; return; }
+  if((a==='characters' || (a==='c' && /^\d+$/.test(b || ''))) && !show('pc')){ location.hash = '#/home'; return; }
   if(a==='ooc' && !show('oo')){ location.hash = '#/characters'; return; }
   if(a==='prompts' && !show('pp')){ location.hash = '#/characters'; return; }
   if(a==='prompts' || a==='c' || a==='ooc' || a==='home') ORD = false;
@@ -887,7 +890,7 @@ const relCards = c => relOf(c).filter(o => o.ext || !CH.find(t => t.id === o.id)
   const t = CH.find(x => x.id===o.id); if(!t) return '';
   const src = o.img || t.img, pos = o.pos || (o.img ? '' : t.img_pos);
   const pz = xyOf(pos), thumb = o.z > 1 ? `<img src="${esc(src)}" alt="${esc(t.name)}" loading="lazy" style="object-position:${pz};transform-origin:${pz};transform:scale(${+o.z})">` : img(src, t.name, pos);
-  return `<a class="rcard" href="#/c/${t.id}" data-rk="i:${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
+  return `<a class="rcard" href="#/c/${keyOf(t)}" data-rk="i:${t.id}">${admin ? `<span class="rce" data-act="edit-rel" data-id="${c.id}" data-rid="${t.id}">EDIT</span>` : ''}<div class="ph">${src ? thumb : initial(t.name)}</div><div class="rm"><b>${esc(t.name)}</b>${o.k ? `<span class="rk">#${esc(String(o.k).replace(/^#+\s*/, ''))}</span>` : ''}</div></a>`; }).join('');
 const rrHtml = (o, t, uid) => { const src = (o && o.img) || t.img || '', pos = (o && o.pos) || (o && o.img ? '50% 50%' : t.img_pos) || '50% 50%', z = (o && o.z) || ((o && o.img) ? 1 : zOf(t.img_pos));
   return `<div class="rr" data-id="${t.id}" data-dp="${esc(t.img_pos || '50% 50%')}"${uid ? ` data-ext="1" data-uid="${esc(uid)}"` : ''}><div class="rb"><div style="font-size:11px;color:var(--mut)">카드에 보이는 모습 그대로예요 · 드래그: 위치 / 슬라이더·마우스 휠: 확대</div>
   <div class="pe" style="width:240px;aspect-ratio:4/3">${src ? `<img src="${esc(src)}" alt="">` : ''}</div>
@@ -1011,6 +1014,7 @@ function formC(c){
       }).filter(([,v]) => v);
       const gallery = (c && c.gallery) || [];
       const row = { name: fd.get('name').trim(), tag: fd.get('tag').trim(), img: im, info: [...fixed, ...parseInfo(fd.get('info'))], descr: fd.get('descr').trim(), prompt: fd.get('prompt').trim(), outfit: fd.get('outfit').trim(), gallery, img_pos: fd.get('img_pos') || '50% 50%', ...await visRow(fd, c) };
+      if(!(c && c.share_key) && !row.share_key) row.share_key = mkKey();
       const r = c ? await sb.from('characters').update(row).eq('id', c.id) : await sb.from('characters').insert(row);
       if(r.error) throw r.error;
     }); };
