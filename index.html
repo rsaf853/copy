@@ -512,7 +512,7 @@ function pageHome(){
   const so = show('oo'), sp = show('pp'), sc = show('pc');
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
   const lead = [sc && ['persona', LC().length, 'characters'], so && ['ooc', LO().length, 'ooc'], sp && ['prompt', LP().length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
-  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
+  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}/h">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
   const orows = LO().slice(0, 10).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
     return `<a class="oc1" href="#/ooc/${keyOf(o)}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
@@ -549,12 +549,14 @@ async function saveOrder(){
   if(er){ alert('순서 저장 실패: ' + er.error.message); await load(); pageChars(); }
 }
 
-function pageChar(id){
+function pageChar(id, fromHome){
   const c = byKey(CH, id);
+  /* 홈(main pair)에서 들어오면 프로필 + 기본 프롬프트만 (관리자는 전부) */
+  const brief = !!fromHome && !admin;
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
   if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="${pairOnly(c) ? '#/home' : '#/characters'}">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1><div class="lkfull">${lockHtml('c'+c.id)}</div>`; return; }
-  const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c);
-  app.innerHTML = `<a class="back" href="${pairOnly(c) ? '#/home' : '#/characters'}">← BACK</a>
+  const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c), outfit = brief ? '' : c.outfit;
+  app.innerHTML = `<a class="back" href="${pairOnly(c) || brief ? '#/home' : '#/characters'}">← BACK</a>
   <div class="prof">
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div><h1>${esc(c.name)}</h1>${tagsOf(c.tag).length ? `<div class="tags">${tagsOf(c.tag).map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''}
@@ -562,11 +564,11 @@ function pageChar(id){
       <div style="white-space:pre-wrap;font-size:12.5px">${esc(c.descr||'')}</div>
       <div class="acts"><button class="oc-ib ln cl" data-act="copy" data-k="k${c.id}" title="이 캐릭터만 열리는 링크를 복사해요" aria-label="링크 복사">${ICL_LN}<span class="lt">LINK</span></button>${admin ? `<button class="btn" data-act="edit-c" data-id="${c.id}">EDIT</button><button class="btn" data-act="del-c" data-id="${c.id}">DELETE</button>` : ''}</div></div>
   </div>
-  ${!show('cp') ? '' : (c.prompt || c.outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && c.outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="oc-ib cp" data-act="copy" data-k="c${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${c.outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="oc-ib cp" data-act="copy" data-k="o${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.outfit)}</pre></div></div>` : ''}</div>` : '')}
-  ${!show('subs') ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
-  ${!show('gal') ? '' : ((c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY${pv('gal')} · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : '')}
-  ${!show('rel') || pairOnly(c) ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg" id="rg">${rcs}</div>` : ''}` : '')}
-  ${!show('relp') ? '' : (rel.length ? `<h2>RELATED PROMPTS${pv('relp')}</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : '')}`;
+  ${!show('cp') ? '' : (c.prompt || outfit ? `<h2>CHARACTER PROMPT${pv('cp')}</h2><div class="bo${c.prompt && outfit ? '' : ' one'}">${c.prompt ? `<div class="pr"><div class="bd"><div class="hd"><span>BASE</span><button class="oc-ib cp" data-act="copy" data-k="c${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(c.prompt)}</pre></div></div>` : ''}${outfit ? `<div class="pr"><div class="bd"><div class="hd"><span>OUTFIT</span><button class="oc-ib cp" data-act="copy" data-k="o${c.id}" aria-label="내용 복사">${ICL_CP}COPY</button></div><pre class="tx">${esc(outfit)}</pre></div></div>` : ''}</div>` : '')}
+  ${!show('subs') || brief ? '' : ((c.subs||[]).length || admin ? `<h2 class="h2s"><span>SUB PROMPTS${pv('subs')}</span><span class="vs">${admin ? `<button class="btn" data-act="edit-sub" data-id="${c.id}" data-i="-1" style="padding:0 8px;margin-right:4px">+ SUB</button>` : ''}${[['a','LIST'],['c','GRID']].map(([v,l]) => `<button class="chip ${v===SV?'on':''}" data-act="subv" data-sv="${v}">${l}</button>`).join('')}</span></h2><div class="sps" id="sps" data-v="${SV}">${(c.subs||[]).map((x,i) => subBox(c,x,i)).join('')}</div>` : '')}
+  ${!show('gal') || brief ? '' : ((c.gallery||[]).length || admin ? `<h2 class="h2s"><span>GALLERY${pv('gal')} · ${(c.gallery||[]).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-gal" data-id="${c.id}" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${(c.gallery||[]).length ? `<div class="gal${admin ? ' adm' : ''}">${c.gallery.map((u,i) => `<div data-act="zoom" data-src="${esc(u)}" data-gi="${i}">${img(u,'')}</div>`).join('')}</div>` : ''}` : '')}
+  ${!show('rel') || pairOnly(c) || brief ? '' : (rcs || admin ? `<h2 class="h2s"><span>RELATED CHARACTERS${pv('rel')} · ${relOf(c).filter(o => o.ext || CH.some(x => x.id===o.id)).length}</span>${admin ? `<span class="vs"><button class="btn" data-act="edit-rel" data-id="${c.id}" data-rid="" style="padding:0 8px">+ ADD</button></span>` : ''}</h2>${rcs ? `<div class="rg" id="rg">${rcs}</div>` : ''}` : '')}
+  ${!show('relp') || brief ? '' : (rel.length ? `<h2>RELATED PROMPTS${pv('relp')}</h2><div class="pgrid">${rel.map(promptBox).join('')}</div>` : '')}`;
   document.querySelectorAll('.gal div[data-gi] img').forEach(im => {
     const f = () => { if(im.naturalWidth) im.parentElement.style.setProperty('--r', (im.naturalWidth / im.naturalHeight).toFixed(3)); };
     im.loading = 'eager'; im.complete ? f() : im.addEventListener('load', f);
@@ -746,7 +748,7 @@ function formOoc(o){
 }
 
 function route(){
-  let [a,b] = (location.hash.slice(2) || 'home').split('/'); /* 첫 화면 = 메인 */
+  let [a,b,c3] = (location.hash.slice(2) || 'home').split('/'); /* 첫 화면 = 메인 */
   /* 비밀 링크로 들어오면 이 탭에 기억해 두고, 주소는 메인으로 바꿔서 메인부터 보여줌 */
   if(a==='in'){ try{ if(b) sessionStorage.setItem('pk', b); }catch(_){} history.replaceState(null, '', location.pathname + location.search + '#/home'); a = 'home'; b = undefined; }
   $('#n1').style.display = show('pc') ? '' : 'none';
@@ -759,7 +761,7 @@ function route(){
   $('#n1').classList.toggle('on', a==='characters' || a==='c'); $('#n2').classList.toggle('on', a==='prompts'); $('#n3').classList.toggle('on', a==='ooc');
   document.body.classList.toggle('is-home', a==='home');
   document.body.classList.toggle('is-memo', (a==='ooc' || a==='prompts') && !!b);
-  a==='home' ? pageHome() : a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b) : pageChars();
+  a==='home' ? pageHome() : a==='ooc' ? (b ? pageOocOne(b) : pageOoc()) : a==='prompts' ? (b ? pagePromptOne(b) : pagePrompts()) : a==='c' ? pageChar(b, c3==='h') : pageChars();
   window.scrollTo(0,0);
 }
 
@@ -1116,7 +1118,7 @@ document.addEventListener('submit', async e => {
   UNL.add(k); try{ sessionStorage.setItem('unl', JSON.stringify([...UNL])); }catch(_){}
   const [a, b] = location.hash.slice(2).split('/');
   if(k[0]==='o' && $('#olist')){ drawOoc(); const row = document.querySelector(`#olist .oc-r[data-oid="${r.id}"]`); if(row) openRow(row); return; }
-  if(a==='c') pageChar(b); else if($('#list')) list(); else route();
+  if(a==='c') route(); else if($('#list')) list(); else route();
 });
 /* gallery: 관리자는 사진을 드래그해서 순서 조정 (놓으면 자동 저장) */
 let gsorted = false;
