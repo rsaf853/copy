@@ -640,7 +640,7 @@ function pagePromptOne(id){
   /* OOC 링크 화면과 같은 메모 모양 */
   const hd = sub => `<div class="memo-hd"><span class="memo-logo">r♡sie <span>archive</span></span><small>${sub}</small></div>`;
   if(!p){ app.innerHTML = `<div class="memo">${hd('NOT FOUND')}<p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p></div>`; return; }
-  app.innerHTML = `<div class="memo">${hd(num(p) ? `PROMPT #${num(p)}/${LP().length}` : 'LINK ONLY')}<div class="pgrid one">${promptBox(p)}</div><p class="memo-nt">personal archive · no redistribution</p></div>`;
+  app.innerHTML = `<div class="memo">${hd('')}<div class="pgrid one">${promptBox(p)}</div><p class="memo-nt">${num(p) ? `PROMPT #${num(p)}/${LP().length}` : 'LINK ONLY'} · no redistribution</p></div>`;
 }
 
 const ocTags = s => String(s ?? '').split(/[,，#]+/).map(x => x.trim()).filter(Boolean);
@@ -729,8 +729,9 @@ function pageOocOne(id){
   /* 메모처럼: 메뉴줄 없이 좁은 카드 하나 + 위에 작은 로고 줄 */
   const hd = sub => `<div class="memo-hd"><span class="memo-logo">r♡sie <span>archive</span></span><small>${sub}</small></div>`;
   if(!o){ app.innerHTML = `<div class="memo">${hd('NOT FOUND')}<p class="empty">없는 항목이에요. 지워졌거나 링크가 잘못됐을 수 있어요.</p></div>`; return; }
-  app.innerHTML = `<div class="memo">${hd(i < 0 ? 'LINK ONLY' : `OOC ${String(i+1).padStart(2,'0')}/${String(LO().length).padStart(2,'0')}`)}
-  <div class="oc one">${ocRow(o, i < 0 ? '–' : i+1, true)}</div><p class="memo-nt">personal archive · no redistribution</p></div>`;
+  const pos = i < 0 ? 'LINK ONLY' : `OOC ${String(i+1).padStart(2,'0')}/${String(LO().length).padStart(2,'0')}`;
+  app.innerHTML = `<div class="memo">${hd('')}
+  <div class="oc one">${ocRow(o, i < 0 ? '–' : i+1, true)}</div><p class="memo-nt">${pos} · no redistribution</p></div>`;
 }
 function formOoc(o){
   openM(`<h3>${o ? 'OOC 수정' : 'OOC 추가'}</h3>
