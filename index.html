@@ -83,7 +83,8 @@ h1{font-size:22px;font-weight:800;letter-spacing:-0.05em;margin:0 0 2px}
 .btn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .hint{color:var(--mut);font:500 11px/1.5 var(--sans);margin:-8px 0 12px}
 .grid.ordering .card{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-.grid.ordering .card img{-webkit-user-drag:none;pointer-events:none}
+.grid.ordering .card img,.grid.sortable .card img{-webkit-user-drag:none;pointer-events:none}
+.grid.sortable .card.drag{opacity:.35}
 .grid.ordering .card.drag{opacity:.35}
 .sps .sp.drag{opacity:.35}
 .dh{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:var(--mut);font:700 14px/1 var(--sans);padding:4px 8px 4px 0;flex:none}
@@ -539,17 +540,24 @@ function pageChars(){
   if(ORD || (ptag!=='all' && !ptags.includes(ptag))) ptag = 'all';
   const list = sortCh().filter(listed).filter(c => ptag==='all' || (!isLocked(c,'c'+c.id) && tagsOf(c.tag).includes(ptag)));
   app.innerHTML = `<div class="top pghd"><h1>persona<sup>${LC().length}</sup></h1>
-  ${admin ? `<div style="display:flex;gap:5px"><button class="btn ${ORD ? 'on' : ''}" data-act="order">${ORD ? 'DONE' : 'ORDER'}</button><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
-  ${admin && ORD ? '<p class="hint">카드를 꾹 눌러서 끌어다 놓으면 순서가 바뀌어요 (PIN 된 카드는 항상 맨 앞)</p>' : ''}
+  ${admin ? `<div style="display:flex;gap:5px"><button class="btn" data-act="new-c">+ NEW</button></div>` : ''}</div>
   ${ptags.length && !ORD ? `<div class="bar" id="pchips">${['all',...ptags].map(k => `<button class="chip ${k===ptag?'on':''}" data-pt="${esc(k)}">${esc(k)}</button>`).join('')}</div>` : ''}
-  ${LC().length ? `<div class="grid${admin && ORD ? ' ordering' : ''}" id="cg">${list.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
+  ${LC().length ? `<div class="grid${admin && ptag === 'all' ? ' sortable' : ''}" id="cg">${list.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}" data-cid="${c.id}">${admin ? `<span class="pin ${c.pinned ? 'on' : ''}" data-act="pin" data-id="${c.id}">PIN</span>` : ''}
     ${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
     <div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('')}</div>` : '<p class="empty">아직 캐릭터가 없어요.</p>'}`;
   const pc = $('#pchips'); if(pc) pc.onclick = e => { const b = e.target.closest('[data-pt]'); if(b){ ptag = b.dataset.pt; pageChars(); } };
   const g = $('#cg');
-  if(g && admin && ORD){
-    g.addEventListener('click', e => { if(!e.target.closest('[data-act]')) e.preventDefault(); });
-    if(window.Sortable) Sortable.create(g, { animation:150, draggable:'.card', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: saveOrder });
+  /* 관리자: 언제든 카드를 끌어서 순서 바꾸기 (태그로 거른 상태에선 끔). 끌고 난 직후의 클릭은 무시 */
+  if(g && admin && ptag === 'all'){
+    const init = () => {
+      if(!window.Sortable || Sortable.get(g) || !g.isConnected) return;
+      let moved = false;
+      g.addEventListener('click', e => { if(moved){ e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+      Sortable.create(g, { animation:150, draggable:'.card', ghostClass:'drag', delay:150, delayOnTouchOnly:true, touchStartThreshold:5,
+        onStart: () => { moved = true; }, onEnd: e => { setTimeout(() => { moved = false; }, 50); if(e.oldIndex !== e.newIndex) saveOrder(); } });
+    };
+    /* 정렬 스크립트는 늦게 불러오니까, 아직이면 다 불러온 뒤에 붙임 */
+    window.Sortable ? init() : addEventListener('load', init, { once: true });
   }
 }
 async function saveOrder(){
@@ -1146,7 +1154,6 @@ document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if(!b) return;
   const a = b.dataset.act, id = +b.dataset.id || null;
   if(a==='pin'){ e.preventDefault(); const c = CH.find(x => x.id===id); const r = await sb.from('characters').update({ pinned: !c.pinned }).eq('id', id); if(r.error) return alert('핀 실패: ' + r.error.message); await load(); return pageChars(); }
-  if(a==='order'){ ORD = !ORD; return pageChars(); }
   if(a==='copy') return copy(b);
   if(a==='close') return closeM();
   if(a==='pc-new'){ if(!confirm('새 링크를 만들면 예전 링크로는 더 이상 persona가 안 보여요. 만들까요?')) return;
