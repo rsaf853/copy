@@ -569,11 +569,11 @@ async function saveOrder(){
 
 function pageChar(id, fromHome){
   const c = byKey(CH, id);
-  /* 홈(main pair)에서 들어오면 프로필 + 기본 프롬프트만 (관리자는 전부) */
+  /* 홈(main pair)에서 들어오면 프로필 + 캐릭터 프롬프트(BASE·OUTFIT)만 (관리자는 전부) */
   const brief = !!fromHome && !admin;
   if(!c){ app.innerHTML = '<p class="empty">캐릭터를 찾을 수 없어요.</p>'; return; }
   if(isLocked(c, 'c'+c.id)){ app.innerHTML = `<a class="back" href="${pairOnly(c) ? '#/home' : '#/characters'}">← BACK</a><h1>${esc(c.name)} ${ico('locked')}</h1><div class="lkfull">${lockHtml('c'+c.id)}</div>`; return; }
-  const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c), outfit = brief ? '' : c.outfit;
+  const rel = PR.filter(p => p.char_id===c.id && listed(p)).reverse(), rcs = relCards(c), outfit = c.outfit;
   app.innerHTML = `<a class="back" href="${pairOnly(c) || brief ? '#/home' : '#/characters'}">← BACK</a>
   <div class="prof">
     <div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div>
