@@ -520,7 +520,7 @@ function pageHome(){
   const so = show('oo'), sp = show('pp'), sc = show('pc');
   const hsh = (t, c, href) => `<div class="hsh"><h2>${t}</h2>${href ? `<a href="${href}" aria-label="${t} 전체 보기">→</a>` : ''}</div>`;
   const lead = [sc && ['persona', LC().length, 'characters'], so && ['ooc', LO().length, 'ooc'], sp && ['prompt', LP().length, 'prompts']].filter(Boolean).map(([l, n, h]) => `<a href="#/${h}">${l}<sup>${n}</sup></a>`).join('');
-  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}/h">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}${fullOf(c) ? `<span class="al">${esc(fullOf(c))}</span>` : ''}</b></div></a>`).join('');
+  const pcards = ps.map(c => `<a class="card${c.pinned ? ' pd' : ''}" href="#/c/${keyOf(c)}/h">${vbadge(c)}<div class="ph">${c.img ? img(c.img,c.name,c.img_pos) : initial(c.name)}</div><div class="meta"><b>${esc(c.name)}</b></div></a>`).join('');
   const orows = LO().slice(0, 10).map((o, i) => { const lk = isLocked(o, 'o'+o.id), tg = ocSorted(ocTags(o.tags)).filter(is18);
     const tip = lk ? '' : ocText(o).slice(0, 400) + (ocText(o).length > 400 ? ' …' : '');
     return `<a class="oc1" href="#/ooc" data-go="${o.id}"${tip ? ` data-tip="${esc(tip)}"` : ''}><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${tg.map(t => `<span class="tg x18">${esc(t)}</span>`).join('')}<strong>${esc(o.title)}${lk || (admin && vis(o) !== 'public') ? ' ' + ico(vis(o)) : ''}</strong></span></a>`; }).join('');
